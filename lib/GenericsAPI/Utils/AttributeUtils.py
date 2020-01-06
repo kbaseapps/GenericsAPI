@@ -440,7 +440,11 @@ class AttributesUtil:
         }
         if closest:
             params['match_filter'] = {"full_text_in_all": term}
-        res = self.kbse.search_objects(params)
+        try:
+            res = self.kbse.search_objects(params)
+        except Exception:
+            return None
+
         if not res['objects']:
             return None
         term = res['objects'][0]
