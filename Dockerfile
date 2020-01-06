@@ -5,7 +5,7 @@ MAINTAINER KBase Developer
 # to run your App.  For instance, you could place an apt-get update or
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
-
+RUN echo 'start building docker'
 RUN apt-get update
 RUN apt-get install -y gcc wget
 
