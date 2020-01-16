@@ -105,7 +105,7 @@ module KBaseExperiments {
      @metadata ws length(instances) as Number of Instances
     */
      typedef structure{
-    	mapping<string, list<UnspecifiedObject>> instances;
+    	mapping<string, UnspecifiedObject> instances;
     	list<Attribute> attributes;
 	    string ontology_mapping_method;
      } AttributeMapping;
