@@ -7,6 +7,7 @@ import unittest
 from configparser import ConfigParser
 from os import environ
 from mock import patch
+import shutil
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -14,6 +15,7 @@ from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.sample_uploaderClient import sample_uploader
 
 
 class GenericsAPITest(unittest.TestCase):
@@ -50,10 +52,12 @@ class GenericsAPITest(unittest.TestCase):
 
         cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
+        cls.sample_uploader = sample_uploader(cls.callback_url, service_ver="dev")
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
-        cls.wsClient.create_workspace({'workspace': cls.wsName})
+        ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
+        cls.wsId = ret[0]
         cls.prepare_data()
 
     @classmethod
@@ -101,6 +105,33 @@ class GenericsAPITest(unittest.TestCase):
         file_path = params.get('staging_file_subdir_path')
 
         return {'copy_file_path': file_path}
+
+    def loadSampleSet(self):
+        if hasattr(self.__class__, 'sample_set_ref'):
+            return self.__class__.sample_set_ref
+
+        sample_set_file_name = 'ANLPW_JulySamples_IGSN_v2-forKB.csv'
+        sample_set_file_path = os.path.join(self.scratch, sample_set_file_name)
+        shutil.copy(os.path.join('data', sample_set_file_name), sample_set_file_path)
+
+        params = {
+            'workspace_name': self.wsName,
+            'workspace_id': self.wsId,
+            'sample_file': sample_set_file_path,
+            'file_format': "SESAR",
+            'set_name': 'test1',
+            'description': "this is a test sample set."
+        }
+        import_samples_rec = self.sample_uploader.import_samples(params)
+
+        report_data = self.dfu.get_objects(
+                    {"object_refs": [import_samples_rec['report_ref']]})['data'][0]['data']
+
+        sample_set_ref = report_data['objects_created'][0]['ref']
+
+        self.__class__.sample_set_ref = sample_set_ref
+        print('Loaded SampleSet: ' + sample_set_ref)
+        return sample_set_ref
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file):
@@ -190,6 +221,38 @@ class GenericsAPITest(unittest.TestCase):
         self.assertEqual(obj['description'], 'OTU data')
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_matrix_from_biom_1_0_tsv_fasta_with_sample_set(self, download_staging_file):
+        self.start_test()
+
+        sample_set_ref = self.loadSampleSet()
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_name': self.wsName,
+                  "tsv_fasta": {
+                        "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
+                        "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
+                        'metadata_keys_tsv_fasta': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
+                        },
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'sample_set_ref': sample_set_ref
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'OTU data')
+        self.assertIn('row_attributemapping_ref', obj)
+        self.assertIn('col_attributemapping_ref', obj)
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file):

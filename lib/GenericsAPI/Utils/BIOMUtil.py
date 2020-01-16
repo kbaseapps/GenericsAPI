@@ -10,6 +10,7 @@ import csv
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
+from GenericsAPI.Utils.SampleServiceUtil import SampleServiceUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from installed_clients.KBaseReportClient import KBaseReport
@@ -427,7 +428,7 @@ class BiomUtil:
             logging.info('start building attribute mapping object')
             amplicon_data.update(self.get_attribute_mapping("row", observation_metadata,
                                                             matrix_data, matrix_name, refs,
-                                                            workspace_id, metadata_df))
+                                                            workspace_id, metadata_df=metadata_df))
             amplicon_data.update(self.get_attribute_mapping("col", sample_metadata,
                                                             matrix_data, matrix_name, refs,
                                                             workspace_id))
@@ -450,7 +451,12 @@ class BiomUtil:
                               metadata_df=None):
         mapping_data = {}
         axis_ids = matrix_data[f'{axis}_ids']
-        if refs.get(f'{axis}_attributemapping_ref'):
+        if refs.get('sample_set_ref') and axis == 'col':
+            name = matrix_name + "_{}_attributes".format(axis)
+            mapping_data[f'{axis}_attributemapping_ref'] = self._sample_set_to_attribute_mapping(
+                axis_ids, refs.get('sample_set_ref'), name, workspace_id)
+            mapping_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
+        elif refs.get(f'{axis}_attributemapping_ref'):
             am_data = self.dfu.get_objects(
                 {'object_refs': [refs[f'{axis}_attributemapping_ref']]}
             )['data'][0]['data']
@@ -463,7 +469,6 @@ class BiomUtil:
                                  f"{name} mapping tab.")
             else:
                 mapping_data[f'{axis}_mapping'] = {x: x for x in axis_ids}
-
         elif metadata:
             name = matrix_name + "_{}_attributes".format(axis)
             mapping_data[f'{axis}_attributemapping_ref'] = self._metadata_to_attribute_mapping(
@@ -492,6 +497,30 @@ class BiomUtil:
             "objects": [{
                 "type": "KBaseExperiments.AttributeMapping",
                 "data": data,
+                "name": obj_name
+            }]
+        })[0]
+
+        return f'{info[6]}/{info[0]}/{info[4]}'
+
+    def _sample_set_to_attribute_mapping(self, axis_ids, sample_set_ref, obj_name, ws_id):
+
+        am_data = self.sampleservice_util.sample_set_to_attribute_mapping(sample_set_ref)
+
+        unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
+        if unmatched_ids:
+            name = "Column"
+            raise ValueError(f"The following {name} IDs from the uploaded matrix do not match "
+                             f"the supplied {name} attribute mapping: {', '.join(unmatched_ids)}"
+                             f"\nPlease verify the input data or upload an excel file with a"
+                             f"{name} mapping tab.")
+
+        logging.info('start saving AttributeMapping object: {}'.format(obj_name))
+        info = self.dfu.save_objects({
+            "id": ws_id,
+            "objects": [{
+                "type": "KBaseExperiments.AttributeMapping",
+                "data": am_data,
                 "name": obj_name
             }]
         })[0]
@@ -610,6 +639,7 @@ class BiomUtil:
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
         self.data_util = DataUtil(config)
+        self.sampleservice_util = SampleServiceUtil(config)
         self.attr_util = AttributesUtil(config)
         self.matrix_util = MatrixUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]

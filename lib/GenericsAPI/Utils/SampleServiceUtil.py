@@ -156,6 +156,8 @@ class SampleServiceUtil:
                         elif meta_controlled:
                             instance.append(meta_controlled.get(attri_name, {}).get('value'))
 
+            instance = [str(i) for i in instance]
+
             instances[sample_data['name']] = instance
 
         return am_data
