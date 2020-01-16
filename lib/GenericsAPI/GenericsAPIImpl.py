@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -30,9 +30,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "a94564de7a034e0c12c73a14c0e35356c3fb0cbc"
+    GIT_COMMIT_HASH = "15ac8376702fda39baba0fbbc99657aaee097c9b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -158,21 +158,22 @@ class GenericsAPI:
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference
            biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
-           for AmpliconMatrix)) -> structure: parameter "obj_type" of String,
-           parameter "input_shock_id" of String, parameter "input_file_path"
-           of String, parameter "input_staging_file_path" of String,
-           parameter "matrix_name" of String, parameter "amplicon_set_name"
-           of String, parameter "scale" of String, parameter "description" of
-           String, parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "genome_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
-           "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "row_attributemapping_ref" of type "obj_ref"
-           (An X/Y/Z style reference), parameter "diff_expr_matrix_ref" of
+           for AmpliconMatrix) sample_set_ref: SampleSet object reference) ->
+           structure: parameter "obj_type" of String, parameter
+           "input_shock_id" of String, parameter "input_file_path" of String,
+           parameter "input_staging_file_path" of String, parameter
+           "matrix_name" of String, parameter "amplicon_set_name" of String,
+           parameter "scale" of String, parameter "description" of String,
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object), parameter "genome_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "col_attributemapping_ref" of
            type "obj_ref" (An X/Y/Z style reference), parameter
-           "biochemistry_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "reads_set_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+           "row_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "diff_expr_matrix_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "biochemistry_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "reads_set_ref" of
+           type "obj_ref" (An X/Y/Z style reference), parameter
+           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -205,21 +206,22 @@ class GenericsAPI:
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference
            biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
-           for AmpliconMatrix)) -> structure: parameter "obj_type" of String,
-           parameter "input_shock_id" of String, parameter "input_file_path"
-           of String, parameter "input_staging_file_path" of String,
-           parameter "matrix_name" of String, parameter "amplicon_set_name"
-           of String, parameter "scale" of String, parameter "description" of
-           String, parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "genome_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
-           "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "row_attributemapping_ref" of type "obj_ref"
-           (An X/Y/Z style reference), parameter "diff_expr_matrix_ref" of
+           for AmpliconMatrix) sample_set_ref: SampleSet object reference) ->
+           structure: parameter "obj_type" of String, parameter
+           "input_shock_id" of String, parameter "input_file_path" of String,
+           parameter "input_staging_file_path" of String, parameter
+           "matrix_name" of String, parameter "amplicon_set_name" of String,
+           parameter "scale" of String, parameter "description" of String,
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object), parameter "genome_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "col_attributemapping_ref" of
            type "obj_ref" (An X/Y/Z style reference), parameter
-           "biochemistry_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "reads_set_ref" of type "obj_ref" (An X/Y/Z style
-           reference)
+           "row_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "diff_expr_matrix_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "biochemistry_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "reads_set_ref" of
+           type "obj_ref" (An X/Y/Z style reference), parameter
+           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference)
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z

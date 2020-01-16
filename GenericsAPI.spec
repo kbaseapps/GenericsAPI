@@ -103,6 +103,7 @@ module GenericsAPI {
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
     biochemistry_ref: (for MetaboliteMatrix)
     reads_set_ref: (raw data for AmpliconMatrix)
+    sample_set_ref: SampleSet object reference
 
   */
   typedef structure {
@@ -122,6 +123,7 @@ module GenericsAPI {
       obj_ref diff_expr_matrix_ref;
       obj_ref biochemistry_ref;
       obj_ref reads_set_ref;
+      obj_ref sample_set_ref;
   } ImportMatrixParams;
 
   typedef structure {
