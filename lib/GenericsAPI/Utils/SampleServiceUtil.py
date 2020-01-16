@@ -3,7 +3,6 @@ import json
 import requests
 import uuid
 
-from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.DataFileUtilClient import DataFileUtil
 
 
@@ -27,9 +26,6 @@ class SampleServiceUtil:
         self.token = config['KB_AUTH_TOKEN']
         self.srv_wiz_url = config['srv-wiz-url']
         self.dfu = DataFileUtil(self.callback_url)
-        # self.data_util = DataUtil(config)
-        # self.matrix_types = [x.split(".")[1].split('-')[0]
-        #                      for x in self.data_util.list_generic_types()]
 
     def get_sample_service_url(self):
 

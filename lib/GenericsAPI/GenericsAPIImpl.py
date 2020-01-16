@@ -11,7 +11,6 @@ from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.Utils.DataTableUtil import DataTableUtil
-from installed_clients.GenericsServiceClient import GenericsService
 #END_HEADER
 
 
@@ -21,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -32,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.3"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "8850dda241743d0fc11676a2c1a7c4feaff3eaeb"
+    GIT_COMMIT_HASH = "e3a714fb40f95fff8067f4ccdecb29fdc5cf43a9"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
