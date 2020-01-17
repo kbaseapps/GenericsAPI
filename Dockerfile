@@ -6,6 +6,7 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
+RUN echo "start building docker image"
 RUN apt-get update
 RUN apt-get install -y gcc wget
 
