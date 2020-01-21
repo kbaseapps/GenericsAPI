@@ -281,7 +281,6 @@ module KBaseMatrices{
       @contains values(row_mapping) row_attributemapping_ref:instances
       @contains values(col_mapping) col_attributemapping_ref:instances
       @contains values(biochemistry_mapping) biochemistry_ref:compounds.[*].id
-      @contains set(mass,formula,inchikey) row_attributemapping_ref:attributes.[*].attribute
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref
