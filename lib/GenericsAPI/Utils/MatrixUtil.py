@@ -14,6 +14,7 @@ from sklearn import preprocessing
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
+from GenericsAPI.Utils.SampleServiceUtil import SampleServiceUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
@@ -238,13 +239,44 @@ class MatrixUtil:
 
         return data
 
+    def _sample_set_to_attribute_mapping(self, axis_ids, sample_set_ref, obj_name, ws_id):
+
+        am_data = self.sampleservice_util.sample_set_to_attribute_mapping(sample_set_ref)
+
+        unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
+        if unmatched_ids:
+            name = "Column"
+            raise ValueError(f"The following {name} IDs from the uploaded matrix do not match "
+                             f"the supplied {name} attribute mapping: {', '.join(unmatched_ids)}"
+                             f"\nPlease verify the input data or upload an excel file with a"
+                             f"{name} mapping tab.")
+
+        logging.info('start saving AttributeMapping object: {}'.format(obj_name))
+        info = self.dfu.save_objects({
+            "id": ws_id,
+            "objects": [{
+                "type": "KBaseExperiments.AttributeMapping",
+                "data": am_data,
+                "name": obj_name
+            }]
+        })[0]
+
+        return f'{info[6]}/{info[0]}/{info[4]}'
+
     def _get_axis_attributes(self, axis, matrix_data, refs, file_path, matrix_name, workspace_id):
         """Get the row/col_attributemapping and mapping of ids, validating as needed"""
         # Parameter specified mappings should take precedence over tabs in excel so only process
         # if attributemapping_ref is missing:
         attr_data = {}
+        axis_ids = matrix_data[f'{axis}_ids']
 
-        if refs.get(f'{axis}_attributemapping_ref'):
+        attributemapping_ref = None
+
+        if refs.get('sample_set_ref') and axis == 'col':
+            name = matrix_name + "_{}_attributes".format(axis)
+            attributemapping_ref = self._sample_set_to_attribute_mapping(
+                axis_ids, refs.get('sample_set_ref'), name, workspace_id)
+        elif refs.get(f'{axis}_attributemapping_ref'):
             attributemapping_ref = refs[f'{axis}_attributemapping_ref']
         else:
             attributemapping_ref = self._process_attribute_mapping_sheet(
@@ -262,7 +294,6 @@ class MatrixUtil:
             am_data = self.dfu.get_objects(
                 {'object_refs': [attributemapping_ref]}
             )['data'][0]['data']
-            axis_ids = matrix_data[f'{axis}_ids']
             unmatched_ids = set(axis_ids) - set(am_data['instances'].keys())
             if unmatched_ids:
                 name = "Column" if axis == 'col' else "Row"
@@ -416,6 +447,7 @@ class MatrixUtil:
         self.dfu = DataFileUtil(self.callback_url)
         self.data_util = DataUtil(config)
         self.attr_util = AttributesUtil(config)
+        self.sampleservice_util = SampleServiceUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
 
