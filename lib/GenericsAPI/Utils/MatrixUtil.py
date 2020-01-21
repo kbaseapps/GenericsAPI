@@ -138,8 +138,7 @@ class MatrixUtil:
                                     'description': 'Imported Column Attribute Mapping'})
 
         report_params = {'message': '',
-                         'objects_created': [{'ref': matrix_obj_ref,
-                                              'description': 'Imported Matrix'}],
+                         'objects_created': objects_created,
                          'workspace_name': workspace_name,
                          'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
 
