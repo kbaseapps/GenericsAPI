@@ -121,10 +121,21 @@ class MatrixUtil:
             writer.book = load_workbook(file_path)
             df.to_excel(writer, sheet_name=sheet_name)
 
-    def _generate_report(self, matrix_obj_ref, workspace_name):
+    def _generate_report(self, matrix_obj_ref, workspace_name, new_row_attr_ref=None,
+                         new_col_attr_ref=None):
         """
         _generate_report: generate summary report
         """
+
+        objects_created = [{'ref': matrix_obj_ref, 'description': 'Imported Matrix'}]
+
+        if new_row_attr_ref:
+            objects_created.append({'ref': new_row_attr_ref,
+                                    'description': 'Imported Row Attribute Mapping'})
+
+        if new_col_attr_ref:
+            objects_created.append({'ref': new_col_attr_ref,
+                                    'description': 'Imported Column Attribute Mapping'})
 
         report_params = {'message': '',
                          'objects_created': [{'ref': matrix_obj_ref,
@@ -641,6 +652,14 @@ class MatrixUtil:
         if params.get('description'):
             data['description'] = params['description']
 
+        new_row_attr_ref = None
+        if not params.get('row_attributemapping_ref'):
+            new_row_attr_ref = data.get('row_attributemapping_ref')
+
+        new_col_attr_ref = None
+        if not params.get('col_attributemapping_ref'):
+            new_col_attr_ref = data.get('col_attributemapping_ref')
+
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
@@ -649,7 +668,9 @@ class MatrixUtil:
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
-        report_output = self._generate_report(matrix_obj_ref, workspace_name)
+        report_output = self._generate_report(matrix_obj_ref, workspace_name,
+                                              new_row_attr_ref=new_row_attr_ref,
+                                              new_col_attr_ref=new_col_attr_ref)
 
         returnVal.update(report_output)
 
