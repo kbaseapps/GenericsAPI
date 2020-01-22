@@ -283,7 +283,7 @@ module KBaseMatrices{
       @contains values(biochemistry_mapping) biochemistry_ref:compounds.[*].id
 
       @optional description row_normalization col_normalization
-      @optional col_mapping row_mapping col_attributemapping_ref
+      @optional col_mapping row_mapping col_attributemapping_ref sample_set_ref
       @optional attributes search_attributes biochemistry_mapping
 
       @metadata ws scale
@@ -291,6 +291,7 @@ module KBaseMatrices{
       @metadata ws col_normalization
       @metadata ws col_attributemapping_ref as col_attribute_mapping
       @metadata ws row_attributemapping_ref as row_attribute_mapping
+      @metadata ws sample_set_ref as sample_set
       @metadata ws length(data.row_ids) as compound_count
       @metadata ws length(data.col_ids) as condition_count
     */
@@ -308,7 +309,8 @@ module KBaseMatrices{
       ws_ref biochemistry_ref;
       mapping<string, list<string>> biochemistry_mapping;
       FloatMatrix2D data;
-    } MetaboliteMatrix;
+      ws_ref sample_set_ref;
+    } ChemicalAbundance;
 
     /*
       A wrapper around a FloatMatrix2D designed for matrices of amplicon data. The

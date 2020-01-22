@@ -218,6 +218,55 @@ class MatrixUtil:
 
         return df
 
+    def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
+        logging.info('Start reading and converting excel file data')
+        data = refs
+
+        df = self._file_to_df(file_path)
+
+        metadata_df = None
+
+        rename_map = {'Predicted metabolite name': 'name',
+                      'Predicted formula': 'formula',
+                      'Predicted structure (smiles)': 'smiles',
+                      'Predicted structure (inchi)': 'inchi',
+                      'Predicted structure (inchi-key)': 'inchikey',
+                      'ModelSEED': 'modelseed',
+                      'KEGG': 'kegg',
+                      'ChEBI': 'chebi',
+                      'Theoretical M/Z': 'theoretical_mz',
+                      'Reference Standard RT (seconds)': 'reference_rt',
+                      'Polarity': 'polarity'
+                      }
+        df.rename(columns=rename_map, inplace=True)
+
+        metadata_keys = rename_map.values()
+
+        shared_metadata_keys = list(set(metadata_keys) & set(df.columns))
+        if shared_metadata_keys:
+            metadata_df = df[shared_metadata_keys]
+            df.drop(columns=shared_metadata_keys, inplace=True)
+
+        try:
+            df = df.astype(float)
+        except ValueError:
+            err_msg = 'Found some non-float values. Matrix contains only numeric values\n'
+            err_msg += 'Please list any non-numeric column names in  Metadata Keys field'
+            raise ValueError(err_msg)
+        df.fillna(0, inplace=True)
+        matrix_data = {'row_ids': df.index.tolist(),
+                       'col_ids': df.columns.tolist(),
+                       'values': df.values.tolist()}
+
+        data.update({'data': matrix_data})
+
+        data.update(self._get_axis_attributes('col', matrix_data, refs, file_path, matrix_name,
+                                              workspace_id))
+        data.update(self._get_axis_attributes('row', matrix_data, refs, file_path, matrix_name,
+                                              workspace_id, metadata_df=metadata_df))
+
+        return data
+
     def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
         data = refs
@@ -273,7 +322,28 @@ class MatrixUtil:
 
         return f'{info[6]}/{info[0]}/{info[4]}'
 
-    def _get_axis_attributes(self, axis, matrix_data, refs, file_path, matrix_name, workspace_id):
+    def _meta_df_to_attribute_mapping(self, axis_ids, metadata_df, obj_name, ws_id):
+        data = {'ontology_mapping_method': "TSV file", 'instances': {}}
+        attribute_keys = metadata_df.columns.tolist()
+        data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
+
+        for axis_id in axis_ids:
+            data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
+
+        logging.info('start saving AttributeMapping object: {}'.format(obj_name))
+        info = self.dfu.save_objects({
+            "id": ws_id,
+            "objects": [{
+                "type": "KBaseExperiments.AttributeMapping",
+                "data": data,
+                "name": obj_name
+            }]
+        })[0]
+
+        return f'{info[6]}/{info[0]}/{info[4]}'
+
+    def _get_axis_attributes(self, axis, matrix_data, refs, file_path, matrix_name, workspace_id,
+                             metadata_df=None):
         """Get the row/col_attributemapping and mapping of ids, validating as needed"""
         # Parameter specified mappings should take precedence over tabs in excel so only process
         # if attributemapping_ref is missing:
@@ -288,6 +358,10 @@ class MatrixUtil:
                 axis_ids, refs.get('sample_set_ref'), name, workspace_id)
         elif refs.get(f'{axis}_attributemapping_ref'):
             attributemapping_ref = refs[f'{axis}_attributemapping_ref']
+        elif metadata_df is not None:
+            name = matrix_name + "_{}_attributes".format(axis)
+            attr_data[f'{axis}_attributemapping_ref'] = self._meta_df_to_attribute_mapping(
+                axis_ids, metadata_df, name, workspace_id)
         else:
             attributemapping_ref = self._process_attribute_mapping_sheet(
                 file_path, f'{axis}_attribute_mapping', matrix_name, workspace_id)
@@ -646,7 +720,10 @@ class MatrixUtil:
         else:
             workspace_id = workspace_name
 
-        data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
+        if obj_type in ['ChemicalAbundance', 'MetaboliteMatrix']:
+            data = self._file_to_chem_abun_data(file_path, refs, matrix_name, workspace_id)
+        else:
+            data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
         data['scale'] = scale
         if params.get('description'):
             data['description'] = params['description']
