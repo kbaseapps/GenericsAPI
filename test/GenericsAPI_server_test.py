@@ -372,6 +372,7 @@ class GenericsAPITest(unittest.TestCase):
         self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('conditionally_required'))
 
+    @unittest.skip("old validation constraint")
     def test_validate_biochem(self):
         self.start_test()
 
