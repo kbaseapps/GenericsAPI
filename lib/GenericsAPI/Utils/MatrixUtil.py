@@ -328,7 +328,7 @@ class MatrixUtil:
         data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
         for axis_id in axis_ids:
-            data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
+            data['instances'][axis_id] = [str(i) for i in metadata_df.loc[axis_id].tolist()]
 
         logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
