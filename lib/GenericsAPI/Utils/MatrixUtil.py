@@ -360,7 +360,7 @@ class MatrixUtil:
             attributemapping_ref = refs[f'{axis}_attributemapping_ref']
         elif metadata_df is not None:
             name = matrix_name + "_{}_attributes".format(axis)
-            attr_data[f'{axis}_attributemapping_ref'] = self._meta_df_to_attribute_mapping(
+            attributemapping_ref = self._meta_df_to_attribute_mapping(
                 axis_ids, metadata_df, name, workspace_id)
         else:
             attributemapping_ref = self._process_attribute_mapping_sheet(
