@@ -64,7 +64,7 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-        "valid_ws_types" : ["KBaseMatrices.MetaboliteMatrix"],
+        "valid_ws_types" : ["KBaseMatrices.ChemicalAbundance"],
         "is_output_name" : true
       }
     },
@@ -102,7 +102,7 @@
           "target_property": "workspace_name"
         },
         {
-          "constant_value": "MetaboliteMatrix",
+          "constant_value": "ChemicalAbundance",
           "target_property": "obj_type"
         },
         {
