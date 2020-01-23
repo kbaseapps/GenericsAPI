@@ -101,7 +101,7 @@ module GenericsAPI {
     row_attributemapping_ref: row AttributeMapping reference
     genome_ref: genome reference
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
-    biochemistry_ref: (for MetaboliteMatrix)
+    biochemistry_ref: (for ChemicalAbundanceMatrix)
     reads_set_ref: (raw data for AmpliconMatrix)
     sample_set_ref: SampleSet object reference
 
