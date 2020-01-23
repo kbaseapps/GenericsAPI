@@ -173,9 +173,9 @@ class GenericsAPITest(unittest.TestCase):
     def test_import_metabolite_matrix_from_excel(self):
         self.start_test()
 
-        obj_type = 'MetaboliteMatrix'
+        obj_type = 'ChemicalAbundanceMatrix'
         params = {'obj_type': obj_type,
-                  'matrix_name': 'test_MetaboliteMatrix',
+                  'matrix_name': 'test_ChemicalAbundanceMatrix',
                   'workspace_name': self.wsName,
                   'input_file_path': os.path.join('data', 'metabolite.xlsx'),
                   'scale': 'log2',
@@ -232,8 +232,8 @@ class GenericsAPITest(unittest.TestCase):
             returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "Row IDs from the uploaded matrix do not match"):
-            params = {'obj_type': 'MetaboliteMatrix',
-                      'matrix_name': 'test_MetaboliteMatrix',
+            params = {'obj_type': 'ChemicalAbundanceMatrix',
+                      'matrix_name': 'test_ChemicalAbundanceMatrix',
                       'workspace_name': self.wsName,
                       'input_file_path': os.path.join('data', 'generic_data.csv'),
                       'scale': 'log2',

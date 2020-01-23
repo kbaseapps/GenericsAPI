@@ -31,7 +31,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.5"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "e62b27c604f649c4c1118397fea0a428e356fcef"
+    GIT_COMMIT_HASH = "9438d719757be2c5514a41021e4cffd85d1e5a91"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -156,9 +156,9 @@ class GenericsAPI:
            AttributeMapping reference row_attributemapping_ref: row
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference
-           biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
-           for AmpliconMatrix) sample_set_ref: SampleSet object reference) ->
-           structure: parameter "obj_type" of String, parameter
+           biochemistry_ref: (for ChemicalAbundanceMatrix) reads_set_ref:
+           (raw data for AmpliconMatrix) sample_set_ref: SampleSet object
+           reference) -> structure: parameter "obj_type" of String, parameter
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
            "matrix_name" of String, parameter "amplicon_set_name" of String,
@@ -204,9 +204,9 @@ class GenericsAPI:
            AttributeMapping reference row_attributemapping_ref: row
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference
-           biochemistry_ref: (for MetaboliteMatrix) reads_set_ref: (raw data
-           for AmpliconMatrix) sample_set_ref: SampleSet object reference) ->
-           structure: parameter "obj_type" of String, parameter
+           biochemistry_ref: (for ChemicalAbundanceMatrix) reads_set_ref:
+           (raw data for AmpliconMatrix) sample_set_ref: SampleSet object
+           reference) -> structure: parameter "obj_type" of String, parameter
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
            "matrix_name" of String, parameter "amplicon_set_name" of String,
