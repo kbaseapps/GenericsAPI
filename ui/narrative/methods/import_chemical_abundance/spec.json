@@ -1,6 +1,6 @@
 {
   "ver" : "",
-  "authors" : ["jjeffryes"],
+  "authors" : ["jjeffryes", "tgu2"],
   "contact" : "http://kbase.us/contact-us/",
   "visible" : true,
   "categories" : ["upload"],
@@ -64,7 +64,7 @@
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-        "valid_ws_types" : ["KBaseMatrices.ChemicalAbundance"],
+        "valid_ws_types" : ["KBaseMatrices.ChemicalAbundanceMatrix"],
         "is_output_name" : true
       }
     },
@@ -102,7 +102,7 @@
           "target_property": "workspace_name"
         },
         {
-          "constant_value": "ChemicalAbundance",
+          "constant_value": "ChemicalAbundanceMatrix",
           "target_property": "obj_type"
         },
         {

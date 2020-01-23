@@ -720,7 +720,7 @@ class MatrixUtil:
         else:
             workspace_id = workspace_name
 
-        if obj_type in ['ChemicalAbundance', 'MetaboliteMatrix']:
+        if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
             data = self._file_to_chem_abun_data(file_path, refs, matrix_name, workspace_id)
         else:
             data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
