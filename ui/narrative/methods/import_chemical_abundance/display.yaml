@@ -1,6 +1,6 @@
-name     : Import Metabolite Matrix from CSV/Excel/TSV File in Staging Area
-subtitle : Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object
-tooltip  : Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object
+name     : Import Chemical Abundance Matrix from CSV/Excel/TSV File in Staging Area
+subtitle : Import a CSV, Excel or TSV file from your staging area into your Narrative as an ChemicalAbundanceMatrix data object
+tooltip  : Import a CSV, Excel or TSV file from your staging area into your Narrative as an ChemicalAbundanceMatrix data object
 
 icon: upload.png
 
@@ -71,5 +71,5 @@ parameters :
 
 
 description : |
-    <p> Import a CSV, Excel or TSV file from your staging area into your Narrative as an MetaboliteMatrix data object.
+    <p> Import a CSV, Excel or TSV file from your staging area into your Narrative as an ChemicalAbundanceMatrix data object.
     Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

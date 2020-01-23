@@ -310,7 +310,7 @@ module KBaseMatrices{
       mapping<string, list<string>> biochemistry_mapping;
       FloatMatrix2D data;
       ws_ref sample_set_ref;
-    } ChemicalAbundance;
+    } ChemicalAbundanceMatrix;
 
     /*
       A wrapper around a FloatMatrix2D designed for matrices of amplicon data. The
