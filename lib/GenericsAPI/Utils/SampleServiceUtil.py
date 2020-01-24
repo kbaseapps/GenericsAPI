@@ -90,6 +90,20 @@ class SampleServiceUtil:
         sample_id = resp_json['result'][0]['id']
         return sample_id
 
+    def upsert_sample(self, upsert_sample, sample_id):
+        """
+        upsert sample data into existing sample
+        """
+        old_sample = self.get_sample(sample_id)
+
+        try:
+            old_sample.get('node_tree')[0].get('meta_user').update(upsert_sample)
+            sample_id = self.save_sample(old_sample)
+        except Exception:
+            raise ValueError('failed to upsert sample')
+
+        return sample_id
+
     def sample_set_to_attribute_mapping(self, sample_set_ref):
 
         sample_set = self.dfu.get_objects(
