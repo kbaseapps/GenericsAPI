@@ -33,7 +33,7 @@
       "advanced" : false,
       "allow_multiple" : false,
       "default_values" : ["taxonomy, score, taxonomy_source, species_name"],
-      "field_type" : "textarea"
+      "field_type" : "text"
     },
     {
       "id" : "description",
@@ -41,7 +41,7 @@
       "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "" ],
-      "field_type" : "textarea"
+      "field_type" : "text"
     },
     {
       "id" : "matrix_name",
