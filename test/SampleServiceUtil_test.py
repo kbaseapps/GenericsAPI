@@ -115,13 +115,39 @@ class SampleServiceTest(unittest.TestCase):
 
         self.assertTrue('SampleService' in ss_url)
 
-    # def test_get_sample(self):
-    #     sampleservice_util = self.getSampleServiceUtil()
+    def test_save_get_and_upsert_sample(self):
+        sampleservice_util = self.getSampleServiceUtil()
 
-    #     sample_rec = sampleservice_util.get_sample(self.sample_id)
+        sample_v1 = {'name': 'mysample',
+                     'node_tree': [{'id': 'root',
+                                    'type': 'BioReplicate',
+                                    'meta_controlled': {},
+                                    'meta_user': {'foo': {'value': 1}}}]}
 
-    #     self.assertEqual(sample_rec['id'], self.sample_id)
-    #     self.assertEqual(sample_rec['name'], 'OC-1')
+        sample_id = sampleservice_util.save_sample(sample_v1)
+
+        sample_v1_rec = sampleservice_util.get_sample(sample_id)
+
+        sample_v1_meta = sample_v1_rec.get('node_tree')[0].get('meta_user')
+        print('sample v1:\n{}'.format(sample_v1_rec))
+        self.assertEqual(sample_v1_rec.get('version'), 1)
+        self.assertEqual(sample_v1_rec.get('id'), sample_id)
+        self.assertTrue('foo' in sample_v1_meta)
+        self.assertTrue('bar' not in sample_v1_meta)
+        self.assertEqual(sample_v1_meta.get('foo').get('value'), 1)
+
+        upsert_sample = {'bar': {'value': 2}}
+
+        sampleservice_util.upsert_sample(upsert_sample, sample_id)
+        sample_v2_rec = sampleservice_util.get_sample(sample_id)
+        print('sample v2:\n{}'.format(sample_v2_rec))
+        self.assertEqual(sample_v2_rec.get('version'), 2)
+        self.assertEqual(sample_v2_rec.get('id'), sample_id)
+        sample_v2_meta = sample_v2_rec.get('node_tree')[0].get('meta_user')
+        self.assertTrue('foo' in sample_v2_meta)
+        self.assertTrue('bar' in sample_v2_meta)
+        self.assertEqual(sample_v2_meta.get('foo').get('value'), 1)
+        self.assertEqual(sample_v2_meta.get('bar').get('value'), 2)
 
     def test_sample_set_to_attribute_mapping(self):
         sampleservice_util = self.getSampleServiceUtil()

@@ -1,6 +1,6 @@
-name     : Import Amplicon Matrix from BIOM/TSV/FASTA File in Staging Area
-subtitle : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
-tooltip  : Import a BIOM file from your staging area into your Narrative as an AmpliconMatrix
+name     : Import Amplicon Matrix from TSV/FASTA File in Staging Area
+subtitle : Import a TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix
+tooltip  : Import a TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix
 
 icon: upload.png
 
@@ -21,77 +21,29 @@ suggestions :
 
 parameters :
 
-    biom_file_biom_tsv :
+    taxonomic_abundance_tsv :
         ui-name : |
-            BIOM File Path
-        short-hint : |
-            BIOM file contains metadata as well as amplicon matrix values. Metadata will be used to build AttributeMapping.
-        long-hint  : |
-            BIOM file contains metadata as well as amplicon matrix values. Metadata will be used to build AttributeMapping.
-
-    biom_file_biom_fasta :
-        ui-name : |
-            BIOM File Path
-        short-hint : |
-            BIOM file contains metadata as well as amplicon matrix values. Metadata will be used to build AttributeMapping.
-        long-hint  : |
-            BIOM file contains metadata as well as amplicon matrix values. Metadata will be used to build AttributeMapping.
-
-    tsv_file_biom_tsv :
-        ui-name : |
-            TSV File Path
-        short-hint : |
-            TSV file contains consensus sequence. 'consensus_sequence' header is requried.
-        long-hint  : |
-            TSV file contains consensus sequence. 'consensus_sequence' header is requried.
-
-    tsv_file_tsv_fasta :
-        ui-name : |
-            TSV File Path
+            Taxonomic Abundance TSV File Path
         short-hint : |
             TSV file contains metadata as well as amplicon matrix values. Headers specified in Metadata Keys field will be used to build AttributeMapping while rest of headers will be used as sample names to build AmpliconMatrix.
         long-hint  : |
             TSV file contains metadata as well as amplicon matrix values. Headers specified in Metadata Keys field will be used to build AttributeMapping while rest of headers will be used as sample names to build AmpliconMatrix.
 
-    metadata_keys_tsv_fasta :
-        ui-name : |
-            Metadata Keys
-        short-hint : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-        long-hint  : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-
-    tsv_file_tsv :
-        ui-name : |
-            TSV File Path
-        short-hint : |
-            TSV file contains consensus sequence, metadata as well as amplicon matrix values. 'consensus_sequence' header is requried. Headers specified in Metadata Keys field will be used to build AttributeMapping while the rest headers will be used as sample names to build AmpliconMatrix.
-        long-hint  : |
-            TSV file contains consensus sequence, metadata as well as amplicon matrix values. 'consensus_sequence' header is requried. Headers specified in Metadata Keys field will be used to build AttributeMapping while the rest headers will be used as sample names to build AmpliconMatrix.
-
-    metadata_keys_tsv :
-        ui-name : |
-            Metadata Keys
-        short-hint : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-        long-hint  : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-
-    fasta_file_biom_fasta :
-        ui-name : |
-            FASTA File Path
-        short-hint : |
-            FASTA file contains consensus sequence. Sequence name/identifier must match row ids in associated BIOM file
-        long-hint  : |
-            FASTA file contains consensus sequence. Sequence name/identifier must match row ids in associated BIOM file
-
-    fasta_file_tsv_fasta :
+    taxonomic_fasta :
         ui-name : |
             FASTA File Path
         short-hint : |
             FASTA file contains consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
         long-hint  : |
             FASTA file contains consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
+
+    metadata_keys :
+        ui-name : |
+            Attribute Keys
+        short-hint : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+        long-hint  : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
 
     description:
       ui-name : |
@@ -141,25 +93,7 @@ parameters :
         long-hint : |
             Raw data in FASTQ format
 
-parameter-groups :
-    biom_tsv:
-        ui-name : BIOM and TSV
-        short-hint :  Provide BIOM file for amplicon matrix and TSV file for consensus sequence
-        long-hint : Provide BIOM file for amplicon matrix and TSV file for consensus sequence
-    biom_fasta:
-        ui-name : BIOM and FASTA
-        short-hint : Provide BIOM file for amplicon matrix and FASTA file for consensus sequence
-        long-hint : Provide BIOM file for amplicon matrix and FASTA file for consensus sequence
-    tsv_fasta:
-        ui-name : TSV and FASTA
-        short-hint : Provide TSV file for amplicon matrix and FASTA file for consensus sequence
-        long-hint : Provide TSV file for amplicon matrix and FASTA file for consensus sequence
-    tsv:
-        ui-name : TSV
-        short-hint : Provide TSV file both amplicon matrix and consensus sequence
-        long-hint : Provide TSV file both amplicon matrix and consensus sequence
-
 
 description : |
-    <p> Import an BIOM/TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.
+    <p> Import an TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.
     Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

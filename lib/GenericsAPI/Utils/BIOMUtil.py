@@ -59,7 +59,24 @@ class BiomUtil:
         fasta_file = None
         metadata_keys = DEFAULT_META_KEYS
 
-        if params.get('biom_tsv'):
+        if params.get('taxonomic_abundance_tsv') and params.get('taxonomic_fasta'):
+            tsv_file = params.get('taxonomic_abundance_tsv')
+            fasta_file = params.get('taxonomic_fasta')
+
+            if not (tsv_file and fasta_file):
+                raise ValueError('missing TSV or FASTA file')
+
+            tsv_file = self.dfu.download_staging_file(
+                                {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
+
+            fasta_file = self.dfu.download_staging_file(
+                                {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
+
+            metadata_keys_str = params.get('metadata_keys')
+            if metadata_keys_str:
+                metadata_keys += [x.strip() for x in metadata_keys_str.split(',')]
+            mode = 'tsv_fasta'
+        elif params.get('biom_tsv'):
             biom_tsv = params.get('biom_tsv')
             biom_file = biom_tsv.get('biom_file_biom_tsv')
             tsv_file = biom_tsv.get('tsv_file_biom_tsv')
