@@ -247,6 +247,41 @@ module KBaseMatrices{
     } FitnessMatrix;
 
     /*
+      A wrapper around a FloatMatrix2D designed for matrices of data assigned to individual reactions.
+      The columns represent experimental conditions while the rows correspond to reactions from a single
+      metabolic reconstruction or from a biochemistry object
+
+      KBaseMatrices Fields:
+      description - short optional description of the dataset
+      scale - raw, ln, log2, log10
+
+      data - contains values for (reaction,condition) pairs, where
+             reactions correspond to rows and conditions are columns
+             (ie data.values[reaction][condition])
+
+      Additional Fields:
+      fbamodel_ref - a reference to a FBAModel object
+      biochemistry_ref - a reference to a Biochemistry object
+
+      Validation:
+      @unique data.row_ids
+      @unique data.col_ids
+
+      @optional description fbamodel_ref biochemistry_ref
+
+      @metadata ws scale
+      @metadata ws length(data.row_ids) as reaction_count
+      @metadata ws length(data.col_ids) as condition_count
+    */
+    typedef structure {
+      string description;
+      string scale;
+      ws_ref fbamodel_ref;
+      ws_ref biochemistry_ref;
+      FloatMatrix2D data;
+    } ReactionMatrix;
+
+    /*
       A wrapper around a FloatMatrix2D designed for matrices of chemical concentration data. The
       columns represent experimental conditions while the rows correspond to individual
       identified metabolites
