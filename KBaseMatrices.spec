@@ -248,8 +248,9 @@ module KBaseMatrices{
 
     /*
       A wrapper around a FloatMatrix2D designed for matrices of data assigned to individual reactions.
+
       The columns represent experimental conditions while the rows correspond to reactions from a single
-      metabolic reconstruction or from a biochemistry object
+      metabolic reconstruction or from a biochemistry object.
 
       KBaseMatrices Fields:
       description - short optional description of the dataset
@@ -412,8 +413,7 @@ module KBaseMatrices{
     } AmpliconMatrix;
     /*
       A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
-      studies. The columns represent genotypes while the rows correspond to traits
-
+      studies. The columns represent genotypes while the rows correspond to traits.
       KBaseMatrices Fields:
       description - short optional description of the dataset
       scale - raw, ln, log2, log10
