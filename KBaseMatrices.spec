@@ -270,7 +270,7 @@ module KBaseMatrices{
       @unique data.row_ids
       @unique data.col_ids
 
-      @optional description fbamodel_ref biochemistry_ref
+      @optional description fbamodel_ref biochemistry_ref expression_ref fba_refs
 
       @metadata ws scale
       @metadata ws length(data.row_ids) as reaction_count
