@@ -263,6 +263,8 @@ module KBaseMatrices{
       Additional Fields:
       fbamodel_ref - a reference to a FBAModel object
       biochemistry_ref - a reference to a Biochemistry object
+      expression_ref - a reference to a ExpressionMatrix object (from which reaction values can be derived)
+      fba_ref - a reference to a FBA object (from which reaction fluxes can be derived)
 
       Validation:
       @unique data.row_ids
@@ -277,7 +279,9 @@ module KBaseMatrices{
     typedef structure {
       string description;
       string scale;
+      list<ws_ref> fba_refs;
       ws_ref fbamodel_ref;
+      ws_ref expression_ref;
       ws_ref biochemistry_ref;
       FloatMatrix2D data;
     } ReactionMatrix;
