@@ -20,7 +20,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
