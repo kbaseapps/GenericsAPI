@@ -384,7 +384,7 @@ module KBaseMatrices{
       @contains values(col_mapping) col_attributemapping_ref:instances
 
       @optional description row_normalization col_normalization
-      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref
+      @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref sample_set_ref
       @optional attributes search_attributes sequence_mapping reads_set_ref amplicon_set_ref
 
       @metadata ws scale
