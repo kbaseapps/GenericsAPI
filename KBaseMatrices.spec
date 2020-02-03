@@ -351,7 +351,7 @@ module KBaseMatrices{
     /*
       A wrapper around a FloatMatrix2D designed for matrices of amplicon data. The
       columns represent experimental conditions while the rows correspond to individual
-      amplicons
+      amplicons.
 
       KBaseMatrices Fields:
       description - short optional description of the dataset
