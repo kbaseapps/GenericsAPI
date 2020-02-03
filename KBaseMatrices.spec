@@ -415,7 +415,7 @@ module KBaseMatrices{
       FloatMatrix2D data;
       ws_ref amplicon_set_ref;
       ws_ref sample_set_ref;
-      string data;
+      string data_info;
     } AmpliconMatrix;
     /*
       A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
