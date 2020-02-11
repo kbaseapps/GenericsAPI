@@ -242,6 +242,9 @@ module GenericsAPI {
     funcdef file_to_attribute_mapping(FileToAttributeMappingParams params)
         returns (FileToAttributeMappingOutput result) authentication required;
 
+    funcdef file_to_fbamodel_attribute_mapping(FileToAttributeMappingParams params)
+        returns (FileToAttributeMappingOutput result) authentication required;
+
     typedef structure {
         string staging_file_subdir_path;
         string dimension;

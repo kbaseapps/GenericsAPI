@@ -29,9 +29,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "9438d719757be2c5514a41021e4cffd85d1e5a91"
+    GIT_COMMIT_HASH = "a3b9c3e56130f7bfc7dca87a5ff20107c9f18351"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -377,6 +377,34 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method file_to_attribute_mapping return value ' +
+                             'result is not type dict as required.')
+        # return the results
+        return [result]
+
+    def file_to_fbamodel_attribute_mapping(self, ctx, params):
+        """
+        :param params: instance of type "FileToAttributeMappingParams"
+           (input_shock_id and input_file_path - alternative input params,)
+           -> structure: parameter "input_shock_id" of String, parameter
+           "input_file_path" of String, parameter "output_ws_id" of String,
+           parameter "output_obj_name" of String
+        :returns: instance of type "FileToAttributeMappingOutput" ->
+           structure: parameter "attribute_mapping_ref" of type "obj_ref" (An
+           X/Y/Z style reference)
+        """
+        # ctx is the context object
+        # return variables are: result
+        #BEGIN file_to_fbamodel_attribute_mapping
+        logging.info("Starting 'file_to_fbamodel_attribute_mapping' with params:{}".format(params))
+        self.attr_util.validate_params(params, ("output_ws_id", "output_obj_name"),
+                                       ('input_shock_id', 'input_file_path'))
+        params['import_fbamodel_attri_mapping'] = True
+        result = self.attr_util.file_to_attribute_mapping(params)
+        #END file_to_fbamodel_attribute_mapping
+
+        # At some point might do deeper type checking...
+        if not isinstance(result, dict):
+            raise ValueError('Method file_to_fbamodel_attribute_mapping return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]
