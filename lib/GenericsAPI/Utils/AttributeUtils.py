@@ -60,10 +60,16 @@ class AttributesUtil:
         else:
             raise ValueError("Must supply either a input_shock_id or input_file_path")
         attr_mapping = self._file_to_am_obj(scratch_file_path)
+
+        if params.get('import_fbamodel_attri_mapping'):
+            data_type = 'KBaseExperiments.FBAModelAttributeMapping'
+        else:
+            data_type = 'KBaseExperiments.AttributeMapping'
+
         info = self.dfu.save_objects({
             "id": params['output_ws_id'],
             "objects": [{
-                "type": "KBaseExperiments.AttributeMapping",
+                "type": data_type,
                 "data": attr_mapping,
                 "name": params['output_obj_name']
             }]

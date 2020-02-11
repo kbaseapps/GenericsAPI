@@ -378,6 +378,10 @@ class Application(object):
                              name='GenericsAPI.file_to_attribute_mapping',
                              types=[dict])
         self.method_authentication['GenericsAPI.file_to_attribute_mapping'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.file_to_fbamodel_attribute_mapping,
+                             name='GenericsAPI.file_to_fbamodel_attribute_mapping',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.file_to_fbamodel_attribute_mapping'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.update_matrix_attribute_mapping,
                              name='GenericsAPI.update_matrix_attribute_mapping',
                              types=[dict])
