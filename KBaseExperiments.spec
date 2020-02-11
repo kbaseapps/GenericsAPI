@@ -111,6 +111,24 @@ module KBaseExperiments {
      } AttributeMapping;
 
 
+    /*
+     factors - list of supplied factors
+     conditions - mapping of instance_labels to a list of attribute values in the same order as
+     the attributes array
+
+     ontology_mapping_method - One of “User curation”, “Closest matching string”
+
+     @metadata ws ontology_mapping_method as Mapping Method
+     @metadata ws length(attributes) as Number of Attributes
+     @metadata ws length(instances) as Number of Instances
+    */
+     typedef structure{
+      mapping<string, list<string>> instances;
+      list<Attribute> attributes;
+      string ontology_mapping_method;
+     } FBAModelAttributeMapping;
+
+
      /*
         id_to_data_position - simple representation of a cluster, which maps features/conditions of the cluster to the
         row/col index in the data (0-based index).  The index is useful for fast lookup of data
