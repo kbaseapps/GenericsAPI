@@ -53,13 +53,13 @@ parameters :
         long-hint : |
             Provide a name for the Matrix that will be created by this importer
 
-    sample_set_ref :
+    col_attributemapping_ref :
         ui-name : |
-            SamplesSet Reference
+            Samples (Column) AttributeMapping Reference
         short-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            Provide a AttributeMapping associated with columns in amplicon matrix
         long-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            Provide a AttributeMapping associated with columns in amplicon matrix
 
     row_attributemapping_ref :
         ui-name : |
