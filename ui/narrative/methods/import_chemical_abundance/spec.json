@@ -82,7 +82,7 @@
     {
       "id" : "row_attributemapping_ref",
       "optional" : false,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text",
