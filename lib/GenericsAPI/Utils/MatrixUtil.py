@@ -247,6 +247,8 @@ class MatrixUtil:
         shared_metadata_keys = list(set(metadata_keys) & set(df.columns))
         if shared_metadata_keys:
             metadata_df = df[shared_metadata_keys]
+            if set(metadata_df.all(skipna=False).tolist()) == {None}:
+                raise ValueError('All of metadata fields are None')
             df.drop(columns=shared_metadata_keys, inplace=True)
         else:
             err_msg = 'Please provide at least one of metadata in the input file:\n{}'.format(
