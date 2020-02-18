@@ -226,17 +226,19 @@ class MatrixUtil:
 
         metadata_df = None
 
-        rename_map = {'Predicted metabolite name': 'name',
-                      'Predicted formula': 'formula',
-                      'Predicted structure (smiles)': 'smiles',
-                      'Predicted structure (inchi)': 'inchi',
-                      'Predicted structure (inchi-key)': 'inchikey',
+        rename_map = {'Predicted Metabolite Name': 'name',
+                      'Theoretical Mass': 'mass',
+                      'Predicted Formula': 'formula',
+                      'Predicted Structure (smiles)': 'smiles',
+                      'Predicted Structure (inchi)': 'inchi',
+                      'Predicted Structure (inchi-key)': 'inchikey',
                       'ModelSEED': 'modelseed',
+                      'Retention Time': 'retention_time',
                       'KEGG': 'kegg',
-                      'ChEBI': 'chebi',
-                      'Theoretical M/Z': 'theoretical_mz',
-                      'Reference Standard RT (seconds)': 'reference_rt',
-                      'Polarity': 'polarity'
+                      # 'ChEBI': 'chebi',
+                      # 'Theoretical M/Z': 'theoretical_mz',
+                      # 'Reference Standard RT (seconds)': 'reference_rt',
+                      # 'Polarity': 'polarity'
                       }
         df.rename(columns=rename_map, inplace=True)
 
@@ -246,6 +248,10 @@ class MatrixUtil:
         if shared_metadata_keys:
             metadata_df = df[shared_metadata_keys]
             df.drop(columns=shared_metadata_keys, inplace=True)
+        else:
+            err_msg = 'Please provide at least one of metadata in the input file:\n{}'.format(
+                                                                                rename_map.keys())
+            raise ValueError(err_msg)
 
         try:
             df = df.astype(float)
