@@ -251,8 +251,8 @@ class MatrixUtil:
                 raise ValueError('All of metadata fields are None')
             df.drop(columns=shared_metadata_keys, inplace=True)
         else:
-            err_msg = 'Please provide at least one of metadata in the input file:\n{}'.format(
-                                                                                rename_map.keys())
+            err_msg = 'Please provide at least one of below metadata fields:\n{}'.format(
+                                                                        list(rename_map.keys()))
             raise ValueError(err_msg)
 
         try:
