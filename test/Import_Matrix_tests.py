@@ -177,11 +177,10 @@ class GenericsAPITest(unittest.TestCase):
         params = {'obj_type': obj_type,
                   'matrix_name': 'test_ChemicalAbundanceMatrix',
                   'workspace_name': self.wsName,
-                  'input_file_path': os.path.join('data', 'metabolite.xlsx'),
+                  'input_file_path': os.path.join('data', 'metabolite_data.xlsx'),
                   'scale': 'log2',
                   'biochemistry_ref': 'kbase/default',
                   'description': "a biochem matrix",
-                  "row_attributemapping_ref": "",
                   }
         returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
