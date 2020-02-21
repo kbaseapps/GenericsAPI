@@ -6,6 +6,8 @@ import re
 import shutil
 import uuid
 import time
+import traceback
+import sys
 
 import pandas as pd
 from openpyxl import load_workbook
@@ -17,6 +19,7 @@ from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.SampleServiceUtil import SampleServiceUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
+from installed_clients.fba_toolsClient import fba_tools
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -537,6 +540,7 @@ class MatrixUtil:
         self.scratch = config['scratch']
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
+        self.fba_tools = fba_tools(self.callback_url)
         self.data_util = DataUtil(config)
         self.attr_util = AttributesUtil(config)
         self.sampleservice_util = SampleServiceUtil(config)
@@ -749,6 +753,31 @@ class MatrixUtil:
                                                 'obj_name': matrix_name,
                                                 'data': data,
                                                 'workspace_name': workspace_id})['obj_ref']
+
+        try:
+            logging.info('Start trying to look up ModelSeed ID')
+            if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
+                ret = self.fba_tools.lookup_modelseed_ids(
+                                                {'workspace': workspace_name,
+                                                 'chemical_abundance_matrix_id': matrix_name,
+                                                 'chemical_abundance_matrix_out_id': matrix_name})
+
+                matrix_obj_ref = ret.get('new_chemical_abundance_matrix_ref')
+
+                matrix_data = self.dfu.get_objects(
+                                    {"object_refs": [matrix_obj_ref]})['data'][0]['data']
+
+                if not params.get('row_attributemapping_ref'):
+                    new_row_attr_ref = matrix_data.get('row_attributemapping_ref')
+
+                if not params.get('col_attributemapping_ref'):
+                    new_col_attr_ref = matrix_data.get('col_attributemapping_ref')
+
+        except Exception:
+            logging.info('Failed looking up ModelSeed ID')
+            logging.warning('failed to run run_model_characterization')
+            logging.warning(traceback.format_exc())
+            logging.warning(sys.exc_info()[2])
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
