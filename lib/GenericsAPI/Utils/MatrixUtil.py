@@ -6,6 +6,8 @@ import re
 import shutil
 import uuid
 import time
+import traceback
+import sys
 
 import pandas as pd
 from openpyxl import load_workbook
@@ -773,6 +775,9 @@ class MatrixUtil:
 
         except Exception:
             logging.info('Failed looking up ModelSeed ID')
+            logging.warning('failed to run run_model_characterization')
+            logging.warning(traceback.format_exc())
+            logging.warning(sys.exc_info()[2])
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
