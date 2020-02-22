@@ -772,7 +772,6 @@ class MatrixUtil:
 
                 if not params.get('col_attributemapping_ref'):
                     new_col_attr_ref = matrix_data.get('col_attributemapping_ref')
-
         except Exception:
             logging.info('Failed looking up ModelSeed ID')
             logging.warning('failed to run run_model_characterization')
