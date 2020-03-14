@@ -69,14 +69,14 @@
       }
     },
     {
-      "id" : "col_attributemapping_ref",
+      "id" : "sample_set_ref",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
-        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
+        "valid_ws_types" : ["KBaseSets.SampleSet"]
       }
     },
     {
@@ -122,8 +122,8 @@
           "target_property": "matrix_name"
         },
         {
-          "input_parameter" : "col_attributemapping_ref",
-          "target_property" : "col_attributemapping_ref",
+          "input_parameter" : "sample_set_ref",
+          "target_property" : "sample_set_ref",
           "target_type_transform": "resolved-ref"
         },
         {
