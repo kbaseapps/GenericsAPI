@@ -198,37 +198,68 @@ class BiomUtil:
 
         return taxon_level_mapping.get(taxon_char[0].lower(), 'Unknown')
 
-    def _fetch_taxonomy(self, datarow):
-        lineage = self._retrieve_value([], datarow, 'taxonomy')
-        if isinstance(lineage, str):
-            delimiter = csv.Sniffer().sniff(lineage).delimiter
-            lineage = [x.strip() for x in lineage.split(delimiter)]
+    def _fetch_taxonomy(self, datarow, observation_id=None, row_attributemapping_ref=None):
 
-        taxonomy = {'lineage': lineage}
+        taxonomy = dict()
+        lineage = None
+        if row_attributemapping_ref:
+            am_data = self.dfu.get_objects({'object_refs': [row_attributemapping_ref]}
+                                           )['data'][0]['data']
+            attributes = am_data['attributes']
+            instances = am_data['instances']
 
-        for key in ['score', 'taxonomy_source', 'species_name']:
-            val = self._retrieve_value([], datarow, key)
-            if val:
-                taxonomy[key] = val
+            instance = instances.get(observation_id)
+            if not instance:
+                raise ValueError('Cannot find {} instance from attributes'.format(observation_id))
 
-        for item in lineage[::-1]:
-            scientific_name = item.split('_')[-1]
-            taxon_level_char = item.split('_')[0]
-            if scientific_name:
-                taxon_id = self._search_taxon(scientific_name)
-                if taxon_id:
-                    taxon_ref = f"{self.taxon_wsname}/{taxon_id}"
-                    taxon_level = self._fetch_taxon_level(taxon_level_char)
-
-                    taxonomy.update({'taxon_ref': taxon_ref,
-                                     'taxon_id': taxon_id,
-                                     'scientific_name': scientific_name,
-                                     'taxon_level': taxon_level})
+            for index, attribute in attributes:
+                if attribute['attribute'] == 'taxonomy':
+                    lineage = instance[index]
                     break
+
+            if isinstance(lineage, str):
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = [x.strip() for x in lineage.split(delimiter)]
+
+            taxonomy['lineage'] = lineage
+
+            for key in ['score', 'taxonomy_source', 'species_name']:
+                for index, attribute in attributes:
+                    if attribute['attribute'] == key:
+                        taxonomy[key] = instance[index]
+        else:
+            lineage = self._retrieve_value([], datarow, 'taxonomy')
+
+            if isinstance(lineage, str):
+                delimiter = csv.Sniffer().sniff(lineage).delimiter
+                lineage = [x.strip() for x in lineage.split(delimiter)]
+
+            taxonomy['lineage'] = lineage
+
+            for key in ['score', 'taxonomy_source', 'species_name']:
+                val = self._retrieve_value([], datarow, key)
+                if val:
+                    taxonomy[key] = val
+
+        if lineage:
+            for item in lineage[::-1]:
+                scientific_name = item.split('_')[-1]
+                taxon_level_char = item.split('_')[0]
+                if scientific_name:
+                    taxon_id = self._search_taxon(scientific_name)
+                    if taxon_id:
+                        taxon_ref = f"{self.taxon_wsname}/{taxon_id}"
+                        taxon_level = self._fetch_taxon_level(taxon_level_char)
+
+                        taxonomy.update({'taxon_ref': taxon_ref,
+                                         'taxon_id': taxon_id,
+                                         'scientific_name': scientific_name,
+                                         'taxon_level': taxon_level})
+                        break
 
         return taxonomy
 
-    def _retrieve_tsv_amplicon_set_data(self, tsv_file):
+    def _retrieve_tsv_amplicon_set_data(self, tsv_file, refs):
         amplicons = dict()
 
         try:
@@ -244,7 +275,9 @@ class BiomUtil:
 
         logging.info('start processing each row in TSV')
         for observation_id in df.index:
-            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id],
+                                            observation_id,
+                                            refs.get('row_attributemapping_ref'))
 
             amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
                         'taxonomy': taxonomy}
@@ -255,7 +288,7 @@ class BiomUtil:
 
         return amplicons
 
-    def _retrieve_tsv_fasta_amplicon_set_data(self, tsv_file, fasta_file):
+    def _retrieve_tsv_fasta_amplicon_set_data(self, tsv_file, fasta_file, refs):
         amplicons = dict()
         try:
             logging.info('start parsing FASTA file')
@@ -276,7 +309,9 @@ class BiomUtil:
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
 
-            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id],
+                                            observation_id,
+                                            refs.get('row_attributemapping_ref'))
 
             amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
                         'taxonomy': taxonomy}
@@ -285,7 +320,7 @@ class BiomUtil:
         logging.info('finished processing files')
         return amplicons
 
-    def _retrieve_biom_fasta_amplicon_set_data(self, biom_file, fasta_file):
+    def _retrieve_biom_fasta_amplicon_set_data(self, biom_file, fasta_file, refs):
         amplicons = dict()
         try:
             logging.info('start parsing FASTA file')
@@ -304,7 +339,9 @@ class BiomUtil:
             if observation_id not in fastq_dict:
                 raise ValueError('FASTA file does not have [{}] OTU id'.format(observation_id))
 
-            taxonomy = self._fetch_taxonomy(observation_metadata[index])
+            taxonomy = self._fetch_taxonomy(observation_metadata[index],
+                                            observation_id,
+                                            refs.get('row_attributemapping_ref'))
 
             amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
                         'taxonomy': taxonomy}
@@ -314,7 +351,7 @@ class BiomUtil:
         logging.info('finished processing files')
         return amplicons
 
-    def _retrieve_biom_tsv_amplicon_set_data(self, biom_file, tsv_file):
+    def _retrieve_biom_tsv_amplicon_set_data(self, biom_file, tsv_file, refs):
         amplicons = dict()
         try:
             logging.info('start parsing TSV file')
@@ -338,7 +375,9 @@ class BiomUtil:
             if observation_id not in df.index:
                 raise ValueError('TSV file does not have [{}] OTU id'.format(observation_id))
 
-            taxonomy = self._fetch_taxonomy(df.loc[observation_id])
+            taxonomy = self._fetch_taxonomy(df.loc[observation_id],
+                                            observation_id,
+                                            refs.get('row_attributemapping_ref'))
 
             amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
                         'taxonomy': taxonomy}
@@ -356,13 +395,13 @@ class BiomUtil:
         amplicon_set_data = dict()
 
         if mode == 'biom_tsv':
-            amplicons = self._retrieve_biom_tsv_amplicon_set_data(biom_file, tsv_file)
+            amplicons = self._retrieve_biom_tsv_amplicon_set_data(biom_file, tsv_file, refs)
         elif mode == 'biom_fasta':
-            amplicons = self._retrieve_biom_fasta_amplicon_set_data(biom_file, fasta_file)
+            amplicons = self._retrieve_biom_fasta_amplicon_set_data(biom_file, fasta_file, refs)
         elif mode == 'tsv_fasta':
-            amplicons = self._retrieve_tsv_fasta_amplicon_set_data(tsv_file, fasta_file)
+            amplicons = self._retrieve_tsv_fasta_amplicon_set_data(tsv_file, fasta_file, refs)
         elif mode == 'tsv':
-            amplicons = self._retrieve_tsv_amplicon_set_data(tsv_file)
+            amplicons = self._retrieve_tsv_amplicon_set_data(tsv_file, refs)
         else:
             raise ValueError('error parsing _file_to_amplicon_set_data, mode: {}'.format(mode))
 
