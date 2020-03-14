@@ -198,13 +198,11 @@ class BiomUtil:
 
         return taxon_level_mapping.get(taxon_char[0].lower(), 'Unknown')
 
-    def _fetch_taxonomy(self, datarow, observation_id=None, row_attributemapping_ref=None):
+    def _fetch_taxonomy(self, datarow, observation_id=None, am_data=None):
 
         taxonomy = dict()
         lineage = None
-        if row_attributemapping_ref:
-            am_data = self.dfu.get_objects({'object_refs': [row_attributemapping_ref]}
-                                           )['data'][0]['data']
+        if am_data:
             attributes = am_data['attributes']
             instances = am_data['instances']
 
@@ -259,7 +257,7 @@ class BiomUtil:
 
         return taxonomy
 
-    def _retrieve_tsv_amplicon_set_data(self, tsv_file, refs):
+    def _retrieve_tsv_amplicon_set_data(self, tsv_file, am_data):
         amplicons = dict()
 
         try:
@@ -277,7 +275,7 @@ class BiomUtil:
         for observation_id in df.index:
             taxonomy = self._fetch_taxonomy(df.loc[observation_id],
                                             observation_id,
-                                            refs.get('row_attributemapping_ref'))
+                                            am_data)
 
             amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
                         'taxonomy': taxonomy}
@@ -288,7 +286,7 @@ class BiomUtil:
 
         return amplicons
 
-    def _retrieve_tsv_fasta_amplicon_set_data(self, tsv_file, fasta_file, refs):
+    def _retrieve_tsv_fasta_amplicon_set_data(self, tsv_file, fasta_file, am_data):
         amplicons = dict()
         try:
             logging.info('start parsing FASTA file')
@@ -311,7 +309,7 @@ class BiomUtil:
 
             taxonomy = self._fetch_taxonomy(df.loc[observation_id],
                                             observation_id,
-                                            refs.get('row_attributemapping_ref'))
+                                            am_data)
 
             amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
                         'taxonomy': taxonomy}
@@ -320,7 +318,7 @@ class BiomUtil:
         logging.info('finished processing files')
         return amplicons
 
-    def _retrieve_biom_fasta_amplicon_set_data(self, biom_file, fasta_file, refs):
+    def _retrieve_biom_fasta_amplicon_set_data(self, biom_file, fasta_file, am_data):
         amplicons = dict()
         try:
             logging.info('start parsing FASTA file')
@@ -341,7 +339,7 @@ class BiomUtil:
 
             taxonomy = self._fetch_taxonomy(observation_metadata[index],
                                             observation_id,
-                                            refs.get('row_attributemapping_ref'))
+                                            am_data)
 
             amplicon = {'consensus_sequence': str(fastq_dict.get(observation_id).seq),
                         'taxonomy': taxonomy}
@@ -351,7 +349,7 @@ class BiomUtil:
         logging.info('finished processing files')
         return amplicons
 
-    def _retrieve_biom_tsv_amplicon_set_data(self, biom_file, tsv_file, refs):
+    def _retrieve_biom_tsv_amplicon_set_data(self, biom_file, tsv_file, am_data):
         amplicons = dict()
         try:
             logging.info('start parsing TSV file')
@@ -377,7 +375,7 @@ class BiomUtil:
 
             taxonomy = self._fetch_taxonomy(df.loc[observation_id],
                                             observation_id,
-                                            refs.get('row_attributemapping_ref'))
+                                            am_data)
 
             amplicon = {'consensus_sequence': df.loc[observation_id, 'consensus_sequence'],
                         'taxonomy': taxonomy}
@@ -394,14 +392,20 @@ class BiomUtil:
 
         amplicon_set_data = dict()
 
+        row_attributemapping_ref = refs.get('row_attributemapping_ref')
+        am_data = None
+        if row_attributemapping_ref:
+            am_data = self.dfu.get_objects({'object_refs': [row_attributemapping_ref]}
+                                           )['data'][0]['data']
+
         if mode == 'biom_tsv':
-            amplicons = self._retrieve_biom_tsv_amplicon_set_data(biom_file, tsv_file, refs)
+            amplicons = self._retrieve_biom_tsv_amplicon_set_data(biom_file, tsv_file, am_data)
         elif mode == 'biom_fasta':
-            amplicons = self._retrieve_biom_fasta_amplicon_set_data(biom_file, fasta_file, refs)
+            amplicons = self._retrieve_biom_fasta_amplicon_set_data(biom_file, fasta_file, am_data)
         elif mode == 'tsv_fasta':
-            amplicons = self._retrieve_tsv_fasta_amplicon_set_data(tsv_file, fasta_file, refs)
+            amplicons = self._retrieve_tsv_fasta_amplicon_set_data(tsv_file, fasta_file, am_data)
         elif mode == 'tsv':
-            amplicons = self._retrieve_tsv_amplicon_set_data(tsv_file, refs)
+            amplicons = self._retrieve_tsv_amplicon_set_data(tsv_file, am_data)
         else:
             raise ValueError('error parsing _file_to_amplicon_set_data, mode: {}'.format(mode))
 
