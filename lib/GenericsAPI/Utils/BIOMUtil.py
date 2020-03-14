@@ -212,7 +212,7 @@ class BiomUtil:
             if not instance:
                 raise ValueError('Cannot find {} instance from attributes'.format(observation_id))
 
-            for index, attribute in attributes:
+            for index, attribute in enumerate(attributes):
                 if attribute['attribute'] == 'taxonomy':
                     lineage = instance[index]
                     break
@@ -224,7 +224,7 @@ class BiomUtil:
             taxonomy['lineage'] = lineage
 
             for key in ['score', 'taxonomy_source', 'species_name']:
-                for index, attribute in attributes:
+                for index, attribute in enumerate(attributes):
                     if attribute['attribute'] == key:
                         taxonomy[key] = instance[index]
         else:
