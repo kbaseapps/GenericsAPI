@@ -69,13 +69,13 @@ parameters :
         long-hint : |
             Provide a name for the AmpliconSet that will be created by this importer
 
-    col_attributemapping_ref :
+    sample_set_ref :
         ui-name : |
-            Samples (Column) AttributeMapping Reference
+            SamplesSet Reference
         short-hint : |
-            Provide a AttributeMapping associated with columns in amplicon matrix
+            Provide a SampleSet object associated with columns in amplicon matrix
         long-hint : |
-            Provide a AttributeMapping associated with columns in amplicon matrix
+            Provide a SampleSet object associated with columns in amplicon matrix
 
     row_attributemapping_ref :
         ui-name : |
