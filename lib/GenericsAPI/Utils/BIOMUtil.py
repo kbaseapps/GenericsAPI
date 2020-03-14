@@ -214,7 +214,6 @@ class BiomUtil:
 
             for index, attribute in enumerate(attributes):
                 if attribute['attribute'] == 'taxonomy':
-                    print(index)
                     lineage = instance[index]
                     break
 
