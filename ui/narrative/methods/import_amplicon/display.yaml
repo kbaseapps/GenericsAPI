@@ -37,9 +37,25 @@ parameters :
         long-hint  : |
             FASTA file contains consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
 
+    sample_set_ref :
+        ui-name : |
+            SamplesSet Reference
+        short-hint : |
+            Provide a SampleSet object associated with columns in amplicon matrix
+        long-hint : |
+            Provide a SampleSet object associated with columns in amplicon matrix
+
+    row_attributemapping_ref :
+        ui-name : |
+            Amplicon (Row) AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping associated with rows in amplicon matrix
+        long-hint : |
+            Provide a AttributeMapping associated with rows in amplicon matrix
+
     metadata_keys :
         ui-name : |
-            Attribute Keys
+            Amplicon Attribute Keys From Taxonomic Abundance TSV File
         short-hint : |
             Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
         long-hint  : |
@@ -69,21 +85,7 @@ parameters :
         long-hint : |
             Provide a name for the AmpliconSet that will be created by this importer
 
-    sample_set_ref :
-        ui-name : |
-            SamplesSet Reference
-        short-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
-        long-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
 
-    row_attributemapping_ref :
-        ui-name : |
-            Amplicons (Row) AttributeMapping Reference
-        short-hint : |
-            Provide a AttributeMapping associated with rows in amplicon matrix
-        long-hint : |
-            Provide a AttributeMapping associated with rows in amplicon matrix
 
     reads_set_ref:
         ui-name : |

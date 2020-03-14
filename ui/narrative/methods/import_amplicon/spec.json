@@ -28,11 +28,33 @@
       "text_options" : {}
     },
     {
-      "id" : "metadata_keys",
+      "id" : "sample_set_ref",
       "optional" : true,
       "advanced" : false,
       "allow_multiple" : false,
-      "default_values" : ["taxonomy, score, taxonomy_source, species_name"],
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseSets.SampleSet"]
+      }
+    },
+    {
+      "id" : "row_attributemapping_ref",
+      "optional" : true,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
+      }
+    },
+    {
+      "id" : "metadata_keys",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [""],
       "field_type" : "text"
     },
     {
@@ -65,28 +87,6 @@
       "text_options" : {
         "valid_ws_types" : ["KBaseExperiments.AmpliconSet"],
         "is_output_name" : true
-      }
-    },
-    {
-      "id" : "sample_set_ref",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseSets.SampleSet"]
-      }
-    },
-    {
-      "id" : "row_attributemapping_ref",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
       }
     },
     {
