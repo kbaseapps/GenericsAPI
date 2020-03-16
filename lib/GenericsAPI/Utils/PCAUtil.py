@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 import uuid
+import traceback
 
 import pandas as pd
 import plotly.graph_objs as go
@@ -412,7 +413,15 @@ class PCAUtil:
         if 'attribute_value_color' in plot_pca_matrix.columns and 'attribute_value_size' in plot_pca_matrix.columns:
 
             maximum_marker_size = 10
-            sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+            try:
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+            except Exception:
+                print('failed to run _build_2_comp_trace')
+                print(traceback.format_exc())
+                print(sys.exc_info()[2])
+                error_msg = "Failed to calculate data point value size."
+                error_msg += "Some data value in your matrix is not numerical."
+                raise ValueError(error_msg)
 
             for name in set(plot_pca_matrix.attribute_value_color):
                 attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['attribute_value_color'].eq(name)].attribute_value_size
@@ -447,7 +456,15 @@ class PCAUtil:
         elif 'attribute_value_size' in plot_pca_matrix.columns:
 
             maximum_marker_size = 10
-            sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+            try:
+                sizeref = 2.*float(max(plot_pca_matrix['attribute_value_size']))/(maximum_marker_size**2)
+            except Exception:
+                print('failed to run _build_2_comp_trace')
+                print(traceback.format_exc())
+                print(sys.exc_info()[2])
+                error_msg = "Failed to calculate data point value size."
+                error_msg += "Some data value in your matrix is not numerical."
+                raise ValueError(error_msg)
 
             for name in set(plot_pca_matrix.instance):
                 attribute_value_size = plot_pca_matrix.loc[plot_pca_matrix['instance'].eq(name)].attribute_value_size
