@@ -160,33 +160,38 @@ class BiomUtil:
         """
         taxon_id = None
 
-        search_params = {
-            "object_types": ["taxon"],
-            "match_filter": {
-                "lookup_in_keys": {
-                    "scientific_name": {"value": scientific_name}},
-                "exclude_subobjects": 1
-            },
-            "access_filter": {
-                "with_private": 0,
-                "with_public": 1
-            },
-            "sorting_rules": [{
-                "is_object_property": 0,
-                "property": "timestamp",
-                "ascending": 0
-            }]
-        }
-
-        objects = self.kbse.search_objects(search_params)['objects']
-
-        if not objects:
-            search_params['match_filter']['lookup_in_keys'] = {
-                "aliases": {"value": scientific_name}
+        if scientific_name in self.taxon_cache:
+            taxon_id = self.taxon_cache.get(scientific_name)
+        else:
+            search_params = {
+                "object_types": ["taxon"],
+                "match_filter": {
+                    "lookup_in_keys": {
+                        "scientific_name": {"value": scientific_name}},
+                    "exclude_subobjects": 1
+                },
+                "access_filter": {
+                    "with_private": 0,
+                    "with_public": 1
+                },
+                "sorting_rules": [{
+                    "is_object_property": 0,
+                    "property": "timestamp",
+                    "ascending": 0
+                }]
             }
+
             objects = self.kbse.search_objects(search_params)['objects']
-        if objects:
-            taxon_id = objects[0].get('object_name')
+
+            if not objects:
+                search_params['match_filter']['lookup_in_keys'] = {
+                    "aliases": {"value": scientific_name}
+                }
+                objects = self.kbse.search_objects(search_params)['objects']
+            if objects:
+                taxon_id = objects[0].get('object_name')
+
+            self.taxon_cache[scientific_name] = taxon_id
 
         return taxon_id
 
@@ -706,6 +711,7 @@ class BiomUtil:
                              for x in self.data_util.list_generic_types()]
         self.taxon_wsname = config['taxon-workspace-name']
         self.kbse = KBaseSearchEngine(config['search-url'])
+        self.taxon_cache = dict()
 
     def import_matrix_from_biom(self, params):
         """
