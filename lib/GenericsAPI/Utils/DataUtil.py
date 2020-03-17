@@ -1,12 +1,15 @@
 import logging
 import re
 from collections import defaultdict
-
+import os
+import json
 from dotmap import DotMap
+import uuid
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.GenericsServiceClient import GenericsService
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.WsLargeDataIOClient import WsLargeDataIO
 
 GENERICS_TYPE = ['FloatMatrix2D']  # add case in _convert_data for each additional type
 GENERICS_MODULES = ['KBaseMatrices']
@@ -188,6 +191,7 @@ class DataUtil:
         self.wsClient = workspaceService(self.ws_url, token=self.token)
         self.dfu = DataFileUtil(self.callback_url)
         self.generics_service = GenericsService(self.serviceWizardURL)
+        self.ws_large_data = WsLargeDataIO(self.callback_url)
 
     def list_generic_types(self, params=None):
         """
@@ -293,13 +297,27 @@ class DataUtil:
         else:
             ws_name_id = workspace_name
 
-        info = self.dfu.save_objects({
-            "id": ws_name_id,
-            "objects": [{
-                "type": obj_type,
-                "data": data,
-                "name": params.get('obj_name')
-            }]
-        })[0]
+        try:
+            info = self.dfu.save_objects({
+                "id": ws_name_id,
+                "objects": [{
+                    "type": obj_type,
+                    "data": data,
+                    "name": params.get('obj_name')
+                }]
+            })[0]
+        except Exception:
+            data_path = os.path.join(self.scratch,
+                                     params.get('obj_name') + "_" + str(uuid.uuid4()) + ".json")
+            json.dump(data, open(data_path, 'w'))
+
+            info = self.ws_large_data.save_objects({
+                "id": ws_name_id,
+                "objects": [{
+                    "type": obj_type,
+                    "data_json_file": data_path,
+                    "name": params.get('obj_name')
+                }]
+            })[0]
 
         return {"obj_ref": "%s/%s/%s" % (info[6], info[0], info[4])}
