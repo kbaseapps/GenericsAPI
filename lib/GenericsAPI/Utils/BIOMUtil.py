@@ -201,7 +201,7 @@ class BiomUtil:
                                'c': 'Class', 'o': 'Order', 'f': 'Family', 'g': 'Genus',
                                's': 'Species'}
 
-        return taxon_level_mapping.get(taxon_char[0].lower(), 'Unknown')
+        return taxon_level_mapping.get(taxon_char.lower(), taxon_char)
 
     def _fetch_taxonomy(self, datarow, observation_id=None, am_data=None):
 
@@ -245,9 +245,15 @@ class BiomUtil:
                     taxonomy[key] = val
 
         if lineage:
-            for item in lineage[::-1]:
-                scientific_name = item.split('_')[-1]
-                taxon_level_char = item.split('_')[0]
+            for taxon_str in lineage[::-1]:
+                taxon_items = taxon_str.split('__')
+                if len(taxon_items) == 1:
+                    scientific_name = taxon_items[-1]
+                    taxon_level_char = 'None'
+                else:
+                    scientific_name = taxon_items[-1]
+                    taxon_level_char = taxon_items[0]
+
                 if scientific_name:
                     taxon_id = self._search_taxon(scientific_name)
                     if taxon_id:
