@@ -199,9 +199,11 @@ class BiomUtil:
 
         taxon_level_mapping = {'l': 'Life', 'd': 'Domain', 'k': 'Kingdom', 'p': 'Phylum',
                                'c': 'Class', 'o': 'Order', 'f': 'Family', 'g': 'Genus',
-                               's': 'Species'}
+                               's': 'Species',
+                               'd_0': 'Kingdom', 'd_1': 'Phylum', 'd_2': 'Class',
+                               'd_3': 'Order', 'd_4': 'Family', 'd_5': 'Genus', 'd_6': 'Species'}
 
-        return taxon_level_mapping.get(taxon_char[0].lower(), 'Unknown')
+        return taxon_level_mapping.get(taxon_char.lower(), 'Unknown')
 
     def _fetch_taxonomy(self, datarow, observation_id=None, am_data=None):
 
@@ -246,8 +248,8 @@ class BiomUtil:
 
         if lineage:
             for item in lineage[::-1]:
-                scientific_name = item.split('_')[-1]
-                taxon_level_char = item.split('_')[0]
+                scientific_name = item.split('__')[-1]
+                taxon_level_char = item.split('__')[0]
                 if scientific_name:
                     taxon_id = self._search_taxon(scientific_name)
                     if taxon_id:
