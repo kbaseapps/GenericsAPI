@@ -203,7 +203,7 @@ class BiomUtil:
                                'd_0': 'Kingdom', 'd_1': 'Phylum', 'd_2': 'Class',
                                'd_3': 'Order', 'd_4': 'Family', 'd_5': 'Genus', 'd_6': 'Species'}
 
-        return taxon_level_mapping.get(taxon_char.lower(), 'Unknown')
+        return taxon_level_mapping.get(taxon_char.lower(), taxon_char)
 
     def _fetch_taxonomy(self, datarow, observation_id=None, am_data=None):
 
