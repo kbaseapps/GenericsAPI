@@ -105,7 +105,7 @@ class TemplateUtil:
         workspace_id = params.get('workspace_id')
         sample_set_ref = params.get('sample_set_ref')
         chemical_data_included = params.get('chemical_data_included')
-        chemical_ids_included = params.get('chemical_data_included')
+        chemical_ids_included = params.get('chemical_ids_included')
 
         chemical_datas = self._fetch_chemical_datas(chemical_data_included, chemical_ids_included)
 
