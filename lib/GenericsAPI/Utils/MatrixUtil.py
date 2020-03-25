@@ -229,19 +229,20 @@ class MatrixUtil:
 
         metadata_df = None
 
-        rename_map = {'Predicted Metabolite Name': 'name',
-                      'Theoretical Mass': 'mass',
+        rename_map = {'Aggregate M/Z': 'aggregate_mz',
+                      'Compound Name': 'name',
                       'Predicted Formula': 'formula',
                       'Predicted Structure (smiles)': 'smiles',
                       'Predicted Structure (inchi)': 'inchi',
                       'Predicted Structure (inchi-key)': 'inchikey',
-                      'ModelSEED': 'modelseed',
+                      'Theoretical Mass': 'mass',
                       'Retention Time': 'retention_time',
+                      'Polarity': 'polarity',
                       'KEGG': 'kegg',
-                      # 'ChEBI': 'chebi',
+                      'ChemBi': 'chembi',
+                      'ModelSEED': 'modelseed',
                       # 'Theoretical M/Z': 'theoretical_mz',
                       # 'Reference Standard RT (seconds)': 'reference_rt',
-                      # 'Polarity': 'polarity'
                       }
         df.rename(columns=rename_map, inplace=True)
 
