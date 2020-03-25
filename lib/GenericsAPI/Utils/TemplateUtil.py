@@ -67,7 +67,7 @@ class TemplateUtil:
             chemical_datas.extend(items)
 
         if chemical_ids_included:
-            items = [rename_map[key] for key in chemical_data_included if chemical_data_included[key]]
+            items = [rename_map[key] for key in chemical_ids_included if chemical_ids_included[key]]
             chemical_datas.extend(items)
 
         if not chemical_datas:
