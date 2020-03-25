@@ -1,0 +1,138 @@
+name     : Create Chemical Abundance Matrix Template
+subtitle : Create a template file for Import Chemical Abundance Matrix app
+tooltip  : Create a template file for Import Chemical Abundance Matrix app
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    sample_set_ref :
+        ui-name : |
+            SamplesSet Reference
+        short-hint : |
+            Provide a SampleSet object associated with columns in Chemical Abundance matrix
+        long-hint : |
+            Provide a SampleSet object associated with columns in Chemical Abundance matrix
+
+    aggregate_mz:
+        ui-name: |
+            Aggregate M/Z
+        short-hint : |
+            Aggregate M/Z
+        long-hint  : |
+            Aggregate M/Z
+
+    name:
+        ui-name: |
+            Compound Name
+        short-hint : |
+            Compound Name
+        long-hint  : |
+            Compound Name
+
+    formula:
+        ui-name: |
+            Predicted Formula
+        short-hint : |
+            Predicted Formula
+        long-hint  : |
+            Predicted Formula
+
+    smiles:
+        ui-name: |
+            Predicted Structure (smiles)
+        short-hint : |
+            Predicted Structure (smiles)
+        long-hint  : |
+            Predicted Structure (smiles)
+
+    inchi:
+        ui-name: |
+            Predicted Structure (inchi)
+        short-hint : |
+            Predicted Structure (inchi)
+        long-hint  : |
+            Predicted Structure (inchi)
+
+    inchikey:
+        ui-name: |
+            Predicted Structure (inchi-key)
+        short-hint : |
+            Predicted Structure (inchi-key)
+        long-hint  : |
+            Predicted Structure (inchi-key)
+
+    mass:
+        ui-name: |
+            Theoretical Mass
+        short-hint : |
+            Theoretical Mass
+        long-hint  : |
+            Theoretical Mass
+
+    retention_time:
+        ui-name: |
+            Retention Time
+        short-hint : |
+            Retention Time
+        long-hint  : |
+            Retention Time
+
+    polarity:
+        ui-name: |
+            Polarity
+        short-hint : |
+            Polarity
+        long-hint  : |
+            Polarity
+
+    kegg:
+        ui-name: |
+            KEGG
+        short-hint : |
+            KEGG
+        long-hint  : |
+            KEGG
+
+    chembi:
+        ui-name: |
+            ChemBi
+        short-hint : |
+            ChemBi
+        long-hint  : |
+            ChemBi
+
+    modelseed:
+        ui-name: |
+            ModelSEED
+        short-hint : |
+            ModelSEED
+        long-hint  : |
+            ModelSEED
+
+parameter-groups :
+    chemical_data_included :
+        ui-name : Chemical Data To Include In Template
+        short-hint : Chemical Data To Include In Template
+
+    chemical_ids_included :
+        ui-name : Chemical IDs To Include In Template
+        short-hint : Chemical IDs To Include In Template
+
+
+description : |
+    <p>Create a template file for Import Chemical Abundance Matrix app.</p>

@@ -1,0 +1,239 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "sample_set_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseSets.SampleSet"]
+      }
+    },
+    {
+      "id": "aggregate_mz",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "name",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "formula",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "smiles",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "inchi",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "inchikey",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "mass",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "retention_time",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "polarity",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "kegg",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "chembi",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "modelseed",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    }
+  ],
+  "parameter-groups": [
+    {
+      "id": "chemical_data_included",
+      "parameters": [
+        "aggregate_mz",
+        "name",
+        "formula",
+        "smiles",
+        "inchi",
+        "inchikey",
+        "mass",
+        "retention_time",
+        "polarity"
+      ],
+      "optional": true,
+      "allow_multiple": false,
+      "with_border": false
+    },
+    {
+      "id": "chemical_ids_included",
+      "parameters": [
+        "kegg",
+        "chembi",
+        "modelseed"
+      ],
+      "optional": true,
+      "allow_multiple": false,
+      "with_border": false
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "build_chemical_abundance_template",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
+        },
+        {
+          "input_parameter" : "sample_set_ref",
+          "target_property" : "sample_set_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "chemical_data_included",
+          "target_property" : "chemical_data_included"
+        },
+        {
+          "input_parameter" : "chemical_ids_included",
+          "target_property" : "chemical_ids_included"
+        }
+      ],
+      "output_mapping" : [
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

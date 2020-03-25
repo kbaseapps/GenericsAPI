@@ -11,6 +11,7 @@ from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.Utils.DataTableUtil import DataTableUtil
+from GenericsAPI.Utils.TemplateUtil import TemplateUtil
 #END_HEADER
 
 
@@ -20,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -31,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "a7786bde1dc9fd783a9edefaf3f0f5b199246000"
+    GIT_COMMIT_HASH = "77f42a187c25e5b224c1f45bded31b2d3d659459"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -52,6 +53,7 @@ class GenericsAPI:
         self.biom_util = BiomUtil(self.config)
         self.pca_util = PCAUtil(self.config)
         self.data_table_util = DataTableUtil(self.config)
+        self.template_util = TemplateUtil(self.config)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
@@ -770,6 +772,30 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method view_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def build_chemical_abundance_template(self, ctx, params):
+        """
+        :param params: instance of type "ChemAbunTempParams" -> structure:
+           parameter "workspace_name" of String, parameter "workspace_id" of
+           Long, parameter "sample_set_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "chemical_data_included" of mapping from
+           String to Long, parameter "chemical_ids_included" of mapping from
+           String to Long
+        :returns: instance of type "ViewMatrixOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN build_chemical_abundance_template
+        returnVal = self.template_util.build_chemical_abundance_template(params)
+        #END build_chemical_abundance_template
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method build_chemical_abundance_template return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

@@ -427,5 +427,15 @@ module GenericsAPI {
   /* view_matrix: generate a report for matrix viewer*/
   funcdef view_matrix (ViewMatrixParams params) returns (ViewMatrixOutput returnVal) authentication required;
 
+  typedef structure {
+    string workspace_name;
+    int workspace_id;
+    obj_ref sample_set_ref;
+    mapping<string, int> chemical_data_included;
+    mapping<string, int> chemical_ids_included;
+  } ChemAbunTempParams;
+
+  funcdef build_chemical_abundance_template(ChemAbunTempParams params) returns (ViewMatrixOutput returnVal) authentication required;
+
 
 };
