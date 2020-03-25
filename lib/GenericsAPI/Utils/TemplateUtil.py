@@ -102,6 +102,7 @@ class TemplateUtil:
                             level=logging.INFO)
 
     def build_chemical_abundance_template(self, params):
+        logging.info('Start building tempalte for Chemical Abundance:\n{}\n'.format(params))
         workspace_id = params.get('workspace_id')
         sample_set_ref = params.get('sample_set_ref')
         chemical_data_included = params.get('chemical_data_included')
