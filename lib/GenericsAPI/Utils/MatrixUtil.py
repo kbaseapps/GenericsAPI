@@ -737,9 +737,11 @@ class MatrixUtil:
             data = self._file_to_chem_abun_data(file_path, refs, matrix_name, workspace_id)
         else:
             data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
+
         data['scale'] = scale
-        if params.get('description'):
-            data['description'] = params['description']
+        for key in ['description', 'unit', 'type']:
+            if params.get(key):
+                data[key] = params[key]
 
         new_row_attr_ref = None
         if not params.get('row_attributemapping_ref'):
