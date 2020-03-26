@@ -37,6 +37,22 @@ parameters :
       long-hint  : |
           Scale factor for the data in the matrix
 
+    type:
+      ui-name : |
+          Data Type
+      short-hint : |
+          Type for the data in the matrix
+      long-hint  : |
+          Type for the data in the matrix
+
+    unit:
+      ui-name : |
+          Data Unit
+      short-hint : |
+          Unit for the data in the matrix
+      long-hint  : |
+          Unit for the data in the matrix
+
     description:
       ui-name : |
           Description

@@ -324,16 +324,18 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref sample_set_ref
-      @optional attributes search_attributes biochemistry_mapping
+      @optional attributes search_attributes biochemistry_mapping unit type
 
       @metadata ws scale
+      @metadata ws unit
+      @metadata ws type
       @metadata ws row_normalization
       @metadata ws col_normalization
       @metadata ws col_attributemapping_ref as col_attribute_mapping
       @metadata ws row_attributemapping_ref as row_attribute_mapping
       @metadata ws sample_set_ref as sample_set
       @metadata ws length(data.row_ids) as compound_count
-      @metadata ws length(data.col_ids) as condition_count
+      @metadata ws length(data.col_ids) as sample_count
     */
     typedef structure {
       string description;
@@ -350,6 +352,8 @@ module KBaseMatrices{
       mapping<string, list<string>> biochemistry_mapping;
       FloatMatrix2D data;
       ws_ref sample_set_ref;
+      string unit;
+      string type;
     } ChemicalAbundanceMatrix;
 
     /*
