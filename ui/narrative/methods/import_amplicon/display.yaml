@@ -69,6 +69,86 @@ parameters :
       long-hint  : |
           Describe the matrix
 
+    extraction_kit:
+      ui-name : |
+          Extraction Kit
+      short-hint : |
+          Extraction Kit
+      long-hint  : |
+          Extraction Kit
+
+    target_gene_region:
+      ui-name : |
+          Target Gene/Region
+      short-hint : |
+          Target Gene/Region
+      long-hint  : |
+          Target Gene/Region
+
+    forward_primer_sequence:
+      ui-name : |
+          Forward Primer Sequence
+      short-hint : |
+          Forward Primer Sequence
+      long-hint  : |
+          Forward Primer Sequence
+
+    reverse_primer_sequence:
+      ui-name : |
+          Reverse Primer Sequence
+      short-hint : |
+          Reverse Primer Sequence
+      long-hint  : |
+          Reverse Primer Sequence
+
+    sequencing_platform:
+      ui-name : |
+          Sequencing Platform
+      short-hint : |
+          Sequencing Platform
+      long-hint  : |
+          Sequencing Platform
+
+    sequencing_run:
+      ui-name : |
+          Sequencing Run
+      short-hint : |
+          Sequencing Run
+      long-hint  : |
+          Sequencing Run
+
+    sequencing_kit:
+      ui-name : |
+          Sequencing Kit
+      short-hint : |
+          Sequencing Kit
+      long-hint  : |
+          Sequencing Kit
+
+    sequencing_quality_filter_cutoff:
+      ui-name : |
+          Sequencing Quality Filtering Cutoff
+      short-hint : |
+          Sequencing Quality Filtering Cutoff
+      long-hint  : |
+          Sequencing Quality Filtering Cutoff
+
+    clustering_cutoff:
+      ui-name : |
+          Clustering Cutoff
+      short-hint : |
+          Clustering Cutoff
+      long-hint  : |
+          Clustering Cutoff
+
+    clustering_method:
+      ui-name : |
+          Clustering Method
+      short-hint : |
+          Clustering Method
+      long-hint  : |
+          Clustering Method
+
     matrix_name :
         ui-name : |
             Amplicon Matrix Object Name
@@ -84,8 +164,6 @@ parameters :
             Provide a name for the AmpliconSet that will be created by this importer
         long-hint : |
             Provide a name for the AmpliconSet that will be created by this importer
-
-
 
     reads_set_ref:
         ui-name : |

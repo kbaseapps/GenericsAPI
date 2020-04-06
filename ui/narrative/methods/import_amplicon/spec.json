@@ -66,6 +66,175 @@
       "field_type" : "text"
     },
     {
+      "id" : "extraction_kit",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "target_gene_region",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["full_length"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Full Length",
+              "value": "full_length"
+          },
+          {
+              "display": "V1",
+              "value": "V1"
+          },
+          {
+              "display": "V2",
+              "value": "V2"
+          },
+          {
+              "display": "V3",
+              "value": "V3"
+          },
+          {
+              "display": "V4",
+              "value": "V4"
+          },
+          {
+              "display": "V5",
+              "value": "V5"
+          },
+          {
+              "display": "V6",
+              "value": "V6"
+          },
+          {
+              "display": "V7",
+              "value": "V7"
+          },
+          {
+              "display": "V8",
+              "value": "V8"
+          },
+          {
+              "display": "V9",
+              "value": "V9"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "forward_primer_sequence",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "reverse_primer_sequence",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_platform",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["Illumina"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Illumina",
+              "value": "Illumina"
+          },
+          {
+              "display": "PacBio",
+              "value": "PacBio"
+          },
+          {
+              "display": "IonTorrent",
+              "value": "IonTorrent"
+          },
+          {
+              "display": "NanoPore",
+              "value": "NanoPore"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "sequencing_run",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_kit",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_quality_filter_cutoff",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "clustering_cutoff",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id" : "clustering_method",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["reference"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Reference",
+              "value": "reference"
+          },
+          {
+              "display": "De Novo",
+              "value": "de_novo"
+          },
+          {
+              "display": "Combined",
+              "value": "combined"
+          }
+        ]
+      }
+    },
+    {
       "id" : "matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -134,6 +303,50 @@
         {
           "input_parameter": "description",
           "target_property": "description"
+        },
+        {
+          "input_parameter": "extraction_kit",
+          "target_property": "extraction_kit"
+        },
+        {
+          "constant_value": "16S",
+          "target_property": "amplicon_type"
+        },
+        {
+          "input_parameter": "target_gene_region",
+          "target_property": "target_gene_region"
+        },
+        {
+          "input_parameter": "forward_primer_sequence",
+          "target_property": "forward_primer_sequence"
+        },
+        {
+          "input_parameter": "reverse_primer_sequence",
+          "target_property": "reverse_primer_sequence"
+        },
+        {
+          "input_parameter": "sequencing_platform",
+          "target_property": "sequencing_platform"
+        },
+        {
+          "input_parameter": "sequencing_run",
+          "target_property": "sequencing_run"
+        },
+        {
+          "input_parameter": "sequencing_kit",
+          "target_property": "sequencing_kit"
+        },
+        {
+          "input_parameter": "sequencing_quality_filter_cutoff",
+          "target_property": "sequencing_quality_filter_cutoff"
+        },
+        {
+          "input_parameter": "clustering_cutoff",
+          "target_property": "clustering_cutoff"
+        },
+        {
+          "input_parameter": "clustering_method",
+          "target_property": "clustering_method"
         },
         {
           "input_parameter": "matrix_name",
