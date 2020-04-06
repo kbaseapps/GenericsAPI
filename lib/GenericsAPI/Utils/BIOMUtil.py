@@ -756,6 +756,13 @@ class BiomUtil:
         amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
+        for key in ['extraction_kit', 'amplicon_type', 'target_gene_region',
+                    'forward_primer_sequence', 'reverse_primer_sequence', 'sequencing_platform',
+                    'sequencing_run', 'sequencing_kit', 'sequencing_quality_filter_cutoff',
+                    'clustering_cutoff', 'clustering_method']:
+            if params.get(key):
+                amplicon_data[key] = params[key]
+
         new_row_attr_ref = None
         if not params.get('row_attributemapping_ref'):
             new_row_attr_ref = amplicon_data.get('row_attributemapping_ref')
