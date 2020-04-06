@@ -781,6 +781,12 @@ class BiomUtil:
         amplicon_set_data = self._file_to_amplicon_set_data(biom_file, tsv_file, fasta_file, mode,
                                                             refs, description, matrix_obj_ref)
 
+        if fasta_file:
+            handle_id = self.dfu.file_to_shock({'file_path': fasta_file,
+                                                'make_handle': True,
+                                                'pack': 'zip'})['handle']['hid']
+            amplicon_set_data['sequencing_file_handle'] = handle_id
+
         logging.info('start saving AmpliconSet object: {}'.format(amplicon_set_name))
         amplicon_set_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseExperiments.AmpliconSet',
