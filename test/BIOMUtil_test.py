@@ -152,7 +152,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -190,7 +190,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -229,7 +229,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -269,7 +269,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -305,7 +305,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -372,7 +372,7 @@ class GenericsAPITest(unittest.TestCase):
                   'forward_primer_sequence': 'forward_primer_sequence',
                   'reverse_primer_sequence': 'reverse_primer_sequence',
                   'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 0.7,
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
                   'clustering_method': 'clustering_method'
                   }
@@ -409,7 +409,7 @@ class GenericsAPITest(unittest.TestCase):
                       'forward_primer_sequence': 'forward_primer_sequence',
                       'reverse_primer_sequence': 'reverse_primer_sequence',
                       'sequencing_platform': 'Illumina',
-                      'sequencing_quality_filter_cutoff': 0.7,
+                      'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
@@ -430,7 +430,7 @@ class GenericsAPITest(unittest.TestCase):
                       'forward_primer_sequence': 'forward_primer_sequence',
                       'reverse_primer_sequence': 'reverse_primer_sequence',
                       'sequencing_platform': 'Illumina',
-                      'sequencing_quality_filter_cutoff': 0.7,
+                      'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
@@ -451,7 +451,7 @@ class GenericsAPITest(unittest.TestCase):
                       'forward_primer_sequence': 'forward_primer_sequence',
                       'reverse_primer_sequence': 'reverse_primer_sequence',
                       'sequencing_platform': 'Illumina',
-                      'sequencing_quality_filter_cutoff': 0.7,
+                      'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
@@ -474,7 +474,7 @@ class GenericsAPITest(unittest.TestCase):
                       'forward_primer_sequence': 'forward_primer_sequence',
                       'reverse_primer_sequence': 'reverse_primer_sequence',
                       'sequencing_platform': 'Illumina',
-                      'sequencing_quality_filter_cutoff': 0.7,
+                      'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
