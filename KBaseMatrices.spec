@@ -9,6 +9,12 @@ module KBaseMatrices{
     typedef string ws_genome_id;
 
     /*
+     * Reference to a handle ID
+     * @id handle
+     */
+    typedef string handle_ref;
+
+    /*
       The workspace ID for a Genome data object.
       @id ws
     */
@@ -396,7 +402,7 @@ module KBaseMatrices{
       @optional attributes search_attributes sequence_mapping reads_set_ref amplicon_set_ref
       @optional extraction_kit amplicon_type target_gene_region forward_primer_sequence
       @optional reverse_primer_sequence sequencing_platform sequencing_run sequencing_kit
-      @optional sequencing_quality_filter_cutoff clustering_cutoff clustering_method
+      @optional sequencing_quality_filter_cutoff clustering_cutoff clustering_method sequencing_file_handle
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -446,6 +452,7 @@ module KBaseMatrices{
       string sequencing_quality_filter_cutoff;
       float clustering_cutoff;
       string clustering_method;
+      handle_ref sequencing_file_handle;
     } AmpliconMatrix;
     /*
       A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
