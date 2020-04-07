@@ -71,7 +71,7 @@ class BiomUtil:
             if not (tsv_file and fasta_file):
                 raise ValueError('missing TSV or FASTA file')
 
-            if input_local_file:
+            if not input_local_file:
                 tsv_file = self.dfu.download_staging_file(
                                     {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
@@ -90,7 +90,7 @@ class BiomUtil:
             if not (biom_file and tsv_file):
                 raise ValueError('missing BIOM or TSV file')
 
-            if input_local_file:
+            if not input_local_file:
                 biom_file = self.dfu.download_staging_file(
                                     {'staging_file_subdir_path': biom_file}).get('copy_file_path')
 
@@ -105,7 +105,7 @@ class BiomUtil:
             if not (biom_file and fasta_file):
                 raise ValueError('missing BIOM or FASTA file')
 
-            if input_local_file:
+            if not input_local_file:
                 biom_file = self.dfu.download_staging_file(
                                     {'staging_file_subdir_path': biom_file}).get('copy_file_path')
 
@@ -120,7 +120,7 @@ class BiomUtil:
             if not (tsv_file and fasta_file):
                 raise ValueError('missing TSV or FASTA file')
 
-            if input_local_file:
+            if not input_local_file:
                 tsv_file = self.dfu.download_staging_file(
                                     {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
@@ -138,7 +138,7 @@ class BiomUtil:
             if not tsv_file:
                 raise ValueError('missing TSV file')
 
-            if input_local_file:
+            if not input_local_file:
                 tsv_file = self.dfu.download_staging_file(
                                     {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
