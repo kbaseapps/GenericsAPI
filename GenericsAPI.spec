@@ -135,8 +135,41 @@ module GenericsAPI {
   /* import_matrix_from_excel: import matrix object from excel*/
   funcdef import_matrix_from_excel (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
 
+  typedef structure {
+      string obj_type;
+      string taxonomic_abundance_tsv;
+      string taxonomic_fasta;
+      string input_local_file;
+      string matrix_name;
+      string amplicon_set_name;
+      string scale;
+      string description;
+      workspace_name workspace_name;
+
+      obj_ref genome_ref;
+      obj_ref col_attributemapping_ref;
+      obj_ref row_attributemapping_ref;
+      obj_ref diff_expr_matrix_ref;
+      obj_ref biochemistry_ref;
+      obj_ref reads_set_ref;
+      obj_ref sample_set_ref;
+
+      list<string> metadata_keys;
+      string extraction_kit;
+      string amplicon_type;
+      string target_gene_region;
+      string forward_primer_sequence;
+      string reverse_primer_sequence;
+      string sequencing_platform;
+      string sequencing_run;
+      string sequencing_kit;
+      string sequencing_quality_filter_cutoff;
+      float clustering_cutoff;
+      string clustering_method;
+  } ImportOTUParams;
+
   /* import_matrix_from_biom: import matrix object from BIOM file format*/
-  funcdef import_matrix_from_biom (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
+  funcdef import_matrix_from_biom (ImportOTUParams params) returns (ImportMatrixOutput returnVal) authentication required;
 
   /* Input of the import_matrix_from_excel function
     obj_type: saving object data type

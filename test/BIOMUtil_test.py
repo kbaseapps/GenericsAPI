@@ -146,7 +146,15 @@ class GenericsAPITest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet'
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
@@ -176,7 +184,15 @@ class GenericsAPITest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet'
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
@@ -207,7 +223,15 @@ class GenericsAPITest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet'
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
@@ -239,7 +263,15 @@ class GenericsAPITest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_set_name': 'test_AmpliconSet',
-                  'sample_set_ref': sample_set_ref
+                  'sample_set_ref': sample_set_ref,
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
@@ -267,7 +299,15 @@ class GenericsAPITest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet'
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
@@ -326,7 +366,15 @@ class GenericsAPITest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_set_name': 'test_AmpliconSet',
-                  'col_attributemapping_ref': self.attribute_mapping_ref
+                  'col_attributemapping_ref': self.attribute_mapping_ref,
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
 
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
@@ -355,7 +403,15 @@ class GenericsAPITest(unittest.TestCase):
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                            }
+                            },
+                      'amplicon_type': '16S',
+                      'target_gene_region': 'V1',
+                      'forward_primer_sequence': 'forward_primer_sequence',
+                      'reverse_primer_sequence': 'reverse_primer_sequence',
+                      'sequencing_platform': 'Illumina',
+                      'sequencing_quality_filter_cutoff': 0.7,
+                      'clustering_cutoff': 0.3,
+                      'clustering_method': 'clustering_method'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
@@ -368,7 +424,15 @@ class GenericsAPITest(unittest.TestCase):
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                             },
-                      'scale': 'log2'
+                      'scale': 'log2',
+                      'amplicon_type': '16S',
+                      'target_gene_region': 'V1',
+                      'forward_primer_sequence': 'forward_primer_sequence',
+                      'reverse_primer_sequence': 'reverse_primer_sequence',
+                      'sequencing_platform': 'Illumina',
+                      'sequencing_quality_filter_cutoff': 0.7,
+                      'clustering_cutoff': 0.3,
+                      'clustering_method': 'clustering_method'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
@@ -381,7 +445,15 @@ class GenericsAPITest(unittest.TestCase):
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                             },
-                      'scale': 'foo'
+                      'scale': 'foo',
+                      'amplicon_type': '16S',
+                      'target_gene_region': 'V1',
+                      'forward_primer_sequence': 'forward_primer_sequence',
+                      'reverse_primer_sequence': 'reverse_primer_sequence',
+                      'sequencing_platform': 'Illumina',
+                      'sequencing_quality_filter_cutoff': 0.7,
+                      'clustering_cutoff': 0.3,
+                      'clustering_method': 'clustering_method'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
@@ -396,6 +468,14 @@ class GenericsAPITest(unittest.TestCase):
                       'scale': 'raw',
                       'description': "OTU data",
                       'amplicon_set_name': 'test_AmpliconSet',
-                      'row_attributemapping_ref': self.attribute_mapping_ref
+                      'row_attributemapping_ref': self.attribute_mapping_ref,
+                      'amplicon_type': '16S',
+                      'target_gene_region': 'V1',
+                      'forward_primer_sequence': 'forward_primer_sequence',
+                      'reverse_primer_sequence': 'reverse_primer_sequence',
+                      'sequencing_platform': 'Illumina',
+                      'sequencing_quality_filter_cutoff': 0.7,
+                      'clustering_cutoff': 0.3,
+                      'clustering_method': 'clustering_method'
                       }
             returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]

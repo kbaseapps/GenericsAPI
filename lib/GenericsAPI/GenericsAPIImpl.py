@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "77f42a187c25e5b224c1f45bded31b2d3d659459"
+    GIT_COMMIT_HASH = "41bcaa862990122ab6f80cfd4f2e60fbdf4b6825"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -196,21 +196,10 @@ class GenericsAPI:
     def import_matrix_from_biom(self, ctx, params):
         """
         import_matrix_from_biom: import matrix object from BIOM file format
-        :param params: instance of type "ImportMatrixParams" (Input of the
-           import_matrix_from_excel function obj_type: a type in
-           KBaseMatrices input_shock_id: file shock id input_file_path:
-           absolute file path input_staging_file_path: staging area file path
-           matrix_name: matrix object name description: optional, a
-           description of the matrix workspace_name: workspace name matrix
-           object to be saved to optional: col_attributemapping_ref: column
-           AttributeMapping reference row_attributemapping_ref: row
-           AttributeMapping reference genome_ref: genome reference
-           diff_expr_matrix_ref: DifferentialExpressionMatrix reference
-           biochemistry_ref: (for ChemicalAbundanceMatrix) reads_set_ref:
-           (raw data for AmpliconMatrix) sample_set_ref: SampleSet object
-           reference) -> structure: parameter "obj_type" of String, parameter
-           "input_shock_id" of String, parameter "input_file_path" of String,
-           parameter "input_staging_file_path" of String, parameter
+        :param params: instance of type "ImportOTUParams" -> structure:
+           parameter "obj_type" of String, parameter
+           "taxonomic_abundance_tsv" of String, parameter "taxonomic_fasta"
+           of String, parameter "input_local_file" of String, parameter
            "matrix_name" of String, parameter "amplicon_set_name" of String,
            parameter "scale" of String, parameter "description" of String,
            parameter "workspace_name" of type "workspace_name" (workspace
@@ -222,7 +211,17 @@ class GenericsAPI:
            X/Y/Z style reference), parameter "biochemistry_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "reads_set_ref" of
            type "obj_ref" (An X/Y/Z style reference), parameter
-           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference)
+           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "metadata_keys" of list of String, parameter
+           "extraction_kit" of String, parameter "amplicon_type" of String,
+           parameter "target_gene_region" of String, parameter
+           "forward_primer_sequence" of String, parameter
+           "reverse_primer_sequence" of String, parameter
+           "sequencing_platform" of String, parameter "sequencing_run" of
+           String, parameter "sequencing_kit" of String, parameter
+           "sequencing_quality_filter_cutoff" of String, parameter
+           "clustering_cutoff" of Double, parameter "clustering_method" of
+           String
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
