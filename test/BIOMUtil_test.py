@@ -246,6 +246,41 @@ class GenericsAPITest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
 
+    def test_import_matrix_from_tsv_fasta(self):
+        self.start_test()
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_name': self.wsName,
+                  'taxonomic_abundance_tsv': os.path.join('data', 'amplicon_test.tsv'),
+                  'taxonomic_fasta': os.path.join('data', 'phyloseq_test.fa'),
+                  'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method',
+                  'input_local_file': True
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        self.assertIn('matrix_obj_ref', returnVal)
+        self.assertIn('amplicon_set_obj_ref', returnVal)
+        self.assertIn('report_name', returnVal)
+        self.assertIn('report_ref', returnVal)
+        obj = self.dfu.get_objects(
+            {'object_refs': [returnVal['matrix_obj_ref']]}
+        )['data'][0]['data']
+        self.assertIn('description', obj)
+        self.assertEqual(obj['description'], 'OTU data')
+        self.assertIn('row_attributemapping_ref', obj)
+        self.assertNotIn('col_attributemapping_ref', obj)
+
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_tsv_fasta_with_sample_set(self, download_staging_file):
         self.start_test()
