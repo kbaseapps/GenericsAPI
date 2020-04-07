@@ -306,8 +306,7 @@ class GenericsAPITest(unittest.TestCase):
                   'sequencing_platform': 'Illumina',
                   'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method',
-                  'input_local_file': True
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
