@@ -42,7 +42,10 @@ class BiomUtil:
         logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale', 'amplicon_set_name']:
+        for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale', 'amplicon_set_name',
+                  'amplicon_type', 'target_gene_region', 'forward_primer_sequence',
+                  'reverse_primer_sequence', 'sequencing_platform',
+                  'sequencing_quality_filter_cutoff', 'clustering_cutoff', 'clustering_method']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
@@ -59,6 +62,8 @@ class BiomUtil:
         fasta_file = None
         metadata_keys = DEFAULT_META_KEYS
 
+        input_local_file = params.get('input_local_file', False)
+
         if params.get('taxonomic_abundance_tsv') and params.get('taxonomic_fasta'):
             tsv_file = params.get('taxonomic_abundance_tsv')
             fasta_file = params.get('taxonomic_fasta')
@@ -66,11 +71,12 @@ class BiomUtil:
             if not (tsv_file and fasta_file):
                 raise ValueError('missing TSV or FASTA file')
 
-            tsv_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
+            if input_local_file:
+                tsv_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
-            fasta_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
+                fasta_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
 
             metadata_keys_str = params.get('metadata_keys')
             if metadata_keys_str:
@@ -84,11 +90,12 @@ class BiomUtil:
             if not (biom_file and tsv_file):
                 raise ValueError('missing BIOM or TSV file')
 
-            biom_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': biom_file}).get('copy_file_path')
+            if input_local_file:
+                biom_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': biom_file}).get('copy_file_path')
 
-            tsv_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
+                tsv_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
             mode = 'biom_tsv'
         elif params.get('biom_fasta'):
             biom_fasta = params.get('biom_fasta')
@@ -98,11 +105,12 @@ class BiomUtil:
             if not (biom_file and fasta_file):
                 raise ValueError('missing BIOM or FASTA file')
 
-            biom_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': biom_file}).get('copy_file_path')
+            if input_local_file:
+                biom_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': biom_file}).get('copy_file_path')
 
-            fasta_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
+                fasta_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
             mode = 'biom_fasta'
         elif params.get('tsv_fasta'):
             tsv_fasta = params.get('tsv_fasta')
@@ -112,11 +120,12 @@ class BiomUtil:
             if not (tsv_file and fasta_file):
                 raise ValueError('missing TSV or FASTA file')
 
-            tsv_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
+            if input_local_file:
+                tsv_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
-            fasta_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
+                fasta_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
 
             metadata_keys_str = tsv_fasta.get('metadata_keys_tsv_fasta')
             if metadata_keys_str:
@@ -129,8 +138,9 @@ class BiomUtil:
             if not tsv_file:
                 raise ValueError('missing TSV file')
 
-            tsv_file = self.dfu.download_staging_file(
-                                {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
+            if input_local_file:
+                tsv_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': tsv_file}).get('copy_file_path')
 
             metadata_keys_str = tsv.get('metadata_keys_tsv')
             if metadata_keys_str:

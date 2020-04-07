@@ -97,7 +97,15 @@ class CorrUtilTest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet'
+                  'amplicon_set_name': 'test_AmpliconSet',
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 0.7,
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
