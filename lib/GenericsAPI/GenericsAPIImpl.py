@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "41bcaa862990122ab6f80cfd4f2e60fbdf4b6825"
+    GIT_COMMIT_HASH = "5519fe8a6cbe3ee15d5335ccdea55976c08e00b8"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -174,7 +174,8 @@ class GenericsAPI:
            X/Y/Z style reference), parameter "biochemistry_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "reads_set_ref" of
            type "obj_ref" (An X/Y/Z style reference), parameter
-           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference)
+           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "unit" of String, parameter "type" of String
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z

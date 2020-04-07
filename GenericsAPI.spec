@@ -124,6 +124,9 @@ module GenericsAPI {
       obj_ref biochemistry_ref;
       obj_ref reads_set_ref;
       obj_ref sample_set_ref;
+
+      string unit;
+      string type;
   } ImportMatrixParams;
 
   typedef structure {
