@@ -293,15 +293,15 @@ class PCAUtil:
         for pca_plot in pca_plots:
             shutil.copy2(pca_plot,
                          os.path.join(output_directory, os.path.basename(pca_plot)))
-            visualization_content += '\n<iframe height="900px" width="100%" '
+            visualization_content += '<iframe height="900px" width="100%" '
             visualization_content += 'src="{}" '.format(os.path.basename(pca_plot))
             visualization_content += 'style="border:none;"></iframe>\n<p></p>\n'
 
         if bi_plots:
             for bi_plot in bi_plots:
                 shutil.copy2(bi_plot,
-                             os.path.join(output_directory, os.path.basename(pca_plot)))
-                biplot_content += '''\n<img src="{}" '''.format(os.path.basename(pca_plot))
+                             os.path.join(output_directory, os.path.basename(bi_plot)))
+                biplot_content += '''\n<img src="{}" '''.format(os.path.basename(bi_plot))
                 biplot_content += '''alt="biplot" width="480" height="480">\n<p></p>\n'''
         else:
             biplot_content += '''\n<p style="color:red;" >'''
