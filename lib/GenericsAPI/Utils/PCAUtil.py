@@ -288,13 +288,25 @@ class PCAUtil:
         result_file_path = os.path.join(output_directory, 'pca_report.html')
 
         visualization_content = ''
+        biplot_content = ''
 
         for pca_plot in pca_plots:
             shutil.copy2(pca_plot,
                          os.path.join(output_directory, os.path.basename(pca_plot)))
-            visualization_content += '<iframe height="900px" width="100%" '
+            visualization_content += '\n<iframe height="900px" width="100%" '
             visualization_content += 'src="{}" '.format(os.path.basename(pca_plot))
             visualization_content += 'style="border:none;"></iframe>\n<p></p>\n'
+
+        if bi_plots:
+            for bi_plot in bi_plots:
+                shutil.copy2(bi_plot,
+                             os.path.join(output_directory, os.path.basename(pca_plot)))
+                biplot_content += '''\n<img src="{}" '''.format(os.path.basename(pca_plot))
+                biplot_content += '''alt="biplot" width="480" height="480">\n<p></p>\n'''
+        else:
+            biplot_content += '''\n<p style="color:red;" >'''
+            biplot_content += '''Failed to generate Biplots or '''
+            biplot_content += '''they are too large to be displayed.</p>\n'''
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'pca_template.html'),
@@ -304,6 +316,8 @@ class PCAUtil:
                                                           visualization_content)
                 report_template = report_template.replace('n_components',
                                                           '{} Components'.format(n_components))
+                report_template = report_template.replace('<p>BiPlot</p>',
+                                                          biplot_content)
                 result_file.write(report_template)
 
         report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
