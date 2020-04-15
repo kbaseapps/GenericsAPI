@@ -9,6 +9,7 @@ import uuid
 import traceback
 
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from plotly.offline import plot
@@ -172,6 +173,27 @@ class PCAUtil:
 
         return "%s/%s/%s" % (info[6], info[0], info[4])
 
+    def _creat_biplot(self, xs, ys, coeff, first_component, second_component, bi_plot_path,
+                      labels=None):
+        plt.clf()
+        n = coeff.shape[0]
+        scalex = 1.0/(xs.max() - xs.min())
+        scaley = 1.0/(ys.max() - ys.min())
+        plt.scatter(xs * scalex, ys * scaley, s=5)
+        for i in range(n):
+            plt.arrow(0, 0, coeff[i, 0], coeff[i, 1], color='r', alpha=0.5)
+            if labels is None:
+                plt.text(coeff[i, 0] * 1.15, coeff[i, 1] * 1.15, "Var"+str(i+1),
+                         color='green', ha='center', va='center')
+            else:
+                plt.text(coeff[i, 0] * 1.15, coeff[i, 1] * 1.15, labels[i],
+                         color='green', ha='center', va='center')
+
+        plt.xlabel("PC{}".format(first_component))
+        plt.ylabel("PC{}".format(second_component))
+        plt.grid()
+        plt.savefig(bi_plot_path)
+
     def _pca_for_matrix(self, input_obj_ref, n_components, dimension):
         """
         _pca_for_matrix: perform PCA analysis for matrix object
@@ -221,10 +243,42 @@ class PCAUtil:
 
         rotation_matrix_df.fillna(0, inplace=True)
 
-        return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
-                singular_values)
+        all_pairs = list(itertools.combinations(range(1, n_components+1), 2))
+        biplot_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(biplot_directory)
+        bi_plots = list()
+        for pair in all_pairs:
+            first_component = pair[0]
+            second_component = pair[1]
 
-    def _generate_pca_html_report(self, pca_plots, n_components):
+            coeff = list()
+            coeff.append(pca.components_[first_component-1, :])
+            coeff.append(pca.components_[second_component-1, :])
+            coeff = np.transpose(coeff)
+
+            bi_plot_name = '{}_{}_bi_plot.png'.format(first_component, second_component)
+            bi_plot_path = os.path.join(biplot_directory, bi_plot_name)
+            try:
+                self._creat_biplot(principalComponents[:, first_component-1],
+                                   principalComponents[:, second_component-1],
+                                   coeff,
+                                   first_component,
+                                   second_component,
+                                   bi_plot_path,
+                                   list(data_df.columns))
+            except Exception:
+                logging.warning('failed to run biplot for component {} and {}'.format(
+                                                                            first_component,
+                                                                            second_component))
+                logging.warning(traceback.format_exc())
+                logging.warning(sys.exc_info()[2])
+            else:
+                bi_plots.append(bi_plot_path)
+
+        return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
+                singular_values, bi_plots)
+
+    def _generate_pca_html_report(self, pca_plots, bi_plots, n_components):
 
         logging.info('start generating html report')
         html_report = list()
@@ -262,10 +316,10 @@ class PCAUtil:
                             })
         return html_report
 
-    def _generate_pca_report(self, pca_ref, pca_plots, workspace_name, n_components):
+    def _generate_pca_report(self, pca_ref, pca_plots, bi_plots, workspace_name, n_components):
         logging.info('creating report')
 
-        output_html_files = self._generate_pca_html_report(pca_plots, n_components)
+        output_html_files = self._generate_pca_html_report(pca_plots, bi_plots, n_components)
 
         objects_created = list()
         objects_created.append({'ref': pca_ref,
@@ -587,9 +641,10 @@ class PCAUtil:
         if "KBaseMatrices" in obj_type:
 
             (rotation_matrix_df, components_df, explained_variance,
-             explained_variance_ratio, singular_values) = self._pca_for_matrix(input_obj_ref,
-                                                                               n_components,
-                                                                               dimension)
+             explained_variance_ratio, singular_values, bi_plots) = self._pca_for_matrix(
+                                                                                input_obj_ref,
+                                                                                n_components,
+                                                                                dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'
@@ -618,6 +673,7 @@ class PCAUtil:
         report_output = self._generate_pca_report(pca_ref,
                                                   self._plot_pca_matrix(plot_pca_matrix,
                                                                         n_components),
+                                                  bi_plots,
                                                   workspace_name,
                                                   n_components)
 
