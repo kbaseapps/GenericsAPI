@@ -161,10 +161,11 @@ class MatrixUtil:
 
     def _generate_heatmap_html_report(self, heatmap_dir):
 
-        logging.info('Start generating html report')
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
         html_report = list()
 
-        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
         result_file_path = os.path.join(output_directory, 'matrix_viewer_report.html')
 
