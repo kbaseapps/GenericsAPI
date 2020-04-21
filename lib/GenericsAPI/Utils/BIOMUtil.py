@@ -7,6 +7,7 @@ import biom
 import pandas as pd
 from Bio import SeqIO
 import csv
+import shutil
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -15,6 +16,7 @@ from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
+from installed_clients.kb_GenericsReportClient import kb_GenericsReport
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -627,8 +629,73 @@ class BiomUtil:
         })[0]
         return f'{info[6]}/{info[0]}/{info[4]}'
 
+    def _generate_visualization_content(self, output_directory, heatmap_dir):
+        tab_def_content = ''
+        tab_content = ''
+
+        tab_def_content += '''
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'MatrixViewer')" id="defaultOpen">Matrix Heatmap</button>
+        </div>
+        '''
+
+        heatmap_report_files = os.listdir(heatmap_dir)
+
+        heatmap_index_page = None
+        for heatmap_report_file in heatmap_report_files:
+            if heatmap_report_file.endswith('.html'):
+                heatmap_index_page = heatmap_report_file
+
+            shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
+                         output_directory)
+
+        if heatmap_index_page:
+            tab_content += '''\n<div id="MatrixViewer" class="tabcontent">'''
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(heatmap_index_page)
+            tab_content += 'style="border:none;"></iframe>'
+            tab_content += '\n</div>\n'
+        else:
+            tab_content += '''\n<div id="MatrixViewer" class="tabcontent">'''
+            tab_content += '''\n<p style="color:red;" >'''
+            tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+            tab_content += '\n</div>\n'
+
+        return tab_def_content + tab_content
+
+    def _generate_heatmap_html_report(self, heatmap_dir):
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'matrix_viewer_report.html')
+
+        visualization_content = self._generate_visualization_content(output_directory,
+                                                                     heatmap_dir)
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Compute Correlation App'
+                            })
+        return html_report
+
     def _generate_report(self, matrix_obj_ref, amplicon_set_obj_ref, new_row_attr_ref,
-                         new_col_attr_ref, workspace_name):
+                         new_col_attr_ref, workspace_name, data=None):
         """
         _generate_report: generate summary report
         """
@@ -644,10 +711,31 @@ class BiomUtil:
             objects_created.append({'ref': new_col_attr_ref,
                                     'description': 'Imported Samples(Column) Attribute Mapping'})
 
-        report_params = {'message': '',
-                         'objects_created': objects_created,
-                         'workspace_name': workspace_name,
-                         'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+        if data:
+            data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
+            result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+            self._mkdir_p(result_directory)
+            tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            data_df.to_csv(tsv_file_path)
+            heatmap_dir = self.report_util.build_heatmap_html({
+                                                    'tsv_file_path': tsv_file_path})['html_dir']
+
+            output_html_files = self._generate_heatmap_html_report(heatmap_dir)
+
+            report_params = {'message': '',
+                             'objects_created': objects_created,
+                             'workspace_name': workspace_name,
+                             'html_links': output_html_files,
+                             'direct_html_link_index': 0,
+                             'html_window_height': 660,
+                             'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+
+        else:
+            report_params = {'message': '',
+                             'objects_created': objects_created,
+                             'workspace_name': workspace_name,
+                             'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
@@ -719,6 +807,7 @@ class BiomUtil:
         self.scratch = config['scratch']
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
+        self.report_util = kb_GenericsReport(self.callback_url)
         self.data_util = DataUtil(config)
         self.sampleservice_util = SampleServiceUtil(config)
         self.attr_util = AttributesUtil(config)
@@ -816,7 +905,8 @@ class BiomUtil:
                      'amplicon_set_obj_ref': amplicon_set_obj_ref}
 
         report_output = self._generate_report(matrix_obj_ref, amplicon_set_obj_ref,
-                                              new_row_attr_ref, new_col_attr_ref, workspace_name)
+                                              new_row_attr_ref, new_col_attr_ref, workspace_name,
+                                              data=amplicon_data['data'])
 
         returnVal.update(report_output)
 
