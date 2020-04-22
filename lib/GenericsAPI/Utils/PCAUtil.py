@@ -562,7 +562,7 @@ class PCAUtil:
 
         return traces
 
-    def _plot_pca_matrix(self, plot_pca_matrix, n_components):
+    def _plot_score_pca_matrix(self, plot_pca_matrix, n_components):
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
@@ -573,7 +573,7 @@ class PCAUtil:
         for pair in all_pairs:
             first_component = pair[0]
             second_component = pair[1]
-            result_file_path = os.path.join(output_directory, 'pca_plot_{}_{}.html'.format(
+            result_file_path = os.path.join(output_directory, 'pca_score_plot_{}_{}.html'.format(
                                                                                 first_component,
                                                                                 second_component))
 
@@ -603,7 +603,7 @@ class PCAUtil:
         for pair in all_pairs:
             first_component = pair[0]
             second_component = pair[1]
-            result_file_path = os.path.join(output_directory, 'pca_plot_{}_{}.html'.format(
+            result_file_path = os.path.join(output_directory, 'pca_biplot_plot_{}_{}.html'.format(
                                                                                 first_component,
                                                                                 second_component))
 
@@ -738,8 +738,8 @@ class PCAUtil:
         returnVal = {'pca_ref': pca_ref}
 
         report_output = self._generate_pca_report(pca_ref,
-                                                  self._plot_pca_matrix(plot_pca_matrix,
-                                                                        n_components),
+                                                  self._plot_score_pca_matrix(plot_pca_matrix,
+                                                                              n_components),
                                                   self._plot_biplot_pca_matrix(plot_pca_matrix,
                                                                                components_df,
                                                                                n_components),
