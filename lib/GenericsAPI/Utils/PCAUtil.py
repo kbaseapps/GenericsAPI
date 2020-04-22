@@ -297,16 +297,12 @@ class PCAUtil:
             visualization_content += 'src="{}" '.format(os.path.basename(pca_plot))
             visualization_content += 'style="border:none;"></iframe>\n<p></p>\n'
 
-        if bi_plots:
-            for bi_plot in bi_plots:
-                shutil.copy2(bi_plot,
-                             os.path.join(output_directory, os.path.basename(bi_plot)))
-                biplot_content += '''\n<img src="{}" '''.format(os.path.basename(bi_plot))
-                biplot_content += '''alt="biplot" width="480" height="480">\n<p></p>\n'''
-        else:
-            biplot_content += '''\n<p style="color:red;" >'''
-            biplot_content += '''Failed to generate Biplots or '''
-            biplot_content += '''they are too large to be displayed.</p>\n'''
+        for bi_plot in bi_plots:
+            shutil.copy2(bi_plot,
+                         os.path.join(output_directory, os.path.basename(bi_plot)))
+            biplot_content += '<iframe height="900px" width="100%" '
+            biplot_content += 'src="{}" '.format(os.path.basename(bi_plot))
+            biplot_content += 'style="border:none;"></iframe>\n<p></p>\n'
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'pca_template.html'),
@@ -557,6 +553,7 @@ class PCAUtil:
                 x=list(plot_pca_matrix[components_x]),
                 y=list(plot_pca_matrix[components_y]),
                 mode='markers',
+                name='score plot',
                 text=list(plot_pca_matrix.index),
                 textposition='bottom center',
                 marker=go.Marker(size=10, opacity=0.8,
@@ -588,6 +585,62 @@ class PCAUtil:
             layout = go.Layout(xaxis=go.XAxis(title='PC{}'.format(first_component), showline=False),
                                yaxis=go.YAxis(title='PC{}'.format(second_component), showline=False))
             fig = go.Figure(data=data, layout=layout)
+
+            plot(fig, filename=result_file_path)
+
+            result_file_paths.append(result_file_path)
+
+        return result_file_paths
+
+    def _plot_biplot_pca_matrix(self, plot_pca_matrix, components_df, n_components):
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_paths = []
+
+        all_pairs = list(itertools.combinations(range(1, n_components+1), 2))
+
+        for pair in all_pairs:
+            first_component = pair[0]
+            second_component = pair[1]
+            result_file_path = os.path.join(output_directory, 'pca_plot_{}_{}.html'.format(
+                                                                                first_component,
+                                                                                second_component))
+
+            traces = self._build_2_comp_trace(plot_pca_matrix,
+                                              'principal_component_{}'.format(first_component),
+                                              'principal_component_{}'.format(second_component))
+
+            data = go.Data(traces)
+            layout = go.Layout(xaxis=go.XAxis(title='PC{}'.format(first_component), showline=False),
+                               yaxis=go.YAxis(title='PC{}'.format(second_component), showline=False))
+            fig = go.Figure(data=data, layout=layout)
+
+            coeff = list()
+            coeff.append(components_df['principal_component_{}'.format(first_component)])
+            coeff.append(components_df['principal_component_{}'.format(second_component)])
+            coeff = np.transpose(coeff)
+
+            loading_x = list()
+            loading_y = list()
+            loading_text = list()
+            for idx, position in enumerate(coeff):
+                loading_x.append(0)
+                loading_y.append(0)
+                loading_text.append('0')
+
+                loading_x.append(position[0])
+                loading_y.append(position[1])
+                loading_text.append(components_df.index[idx])
+
+            fig.add_trace(go.Scatter(
+                x=loading_x,
+                y=loading_y,
+                mode="lines+markers",
+                name="loading plot",
+                text=loading_text,
+                textposition="bottom center"
+            ))
 
             plot(fig, filename=result_file_path)
 
@@ -634,7 +687,7 @@ class PCAUtil:
         """
 
         logging.info('--->\nrunning NetworkUtil.build_network\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
+                     'params:\n{}'.format(json.dumps(params, indent=1)))
 
         self._validate_run_pca_params(params)
 
@@ -687,7 +740,9 @@ class PCAUtil:
         report_output = self._generate_pca_report(pca_ref,
                                                   self._plot_pca_matrix(plot_pca_matrix,
                                                                         n_components),
-                                                  bi_plots,
+                                                  self._plot_biplot_pca_matrix(plot_pca_matrix,
+                                                                               components_df,
+                                                                               n_components),
                                                   workspace_name,
                                                   n_components)
 
