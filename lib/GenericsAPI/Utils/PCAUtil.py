@@ -243,42 +243,10 @@ class PCAUtil:
 
         rotation_matrix_df.fillna(0, inplace=True)
 
-        all_pairs = list(itertools.combinations(range(1, n_components+1), 2))
-        biplot_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(biplot_directory)
-        bi_plots = list()
-        for pair in all_pairs:
-            first_component = pair[0]
-            second_component = pair[1]
-
-            coeff = list()
-            coeff.append(pca.components_[first_component-1, :])
-            coeff.append(pca.components_[second_component-1, :])
-            coeff = np.transpose(coeff)
-
-            bi_plot_name = '{}_{}_bi_plot.png'.format(first_component, second_component)
-            bi_plot_path = os.path.join(biplot_directory, bi_plot_name)
-            try:
-                self._creat_biplot(principalComponents[:, first_component-1],
-                                   principalComponents[:, second_component-1],
-                                   coeff,
-                                   first_component,
-                                   second_component,
-                                   bi_plot_path,
-                                   list(data_df.columns))
-            except Exception:
-                logging.warning('failed to run biplot for component {} and {}'.format(
-                                                                            first_component,
-                                                                            second_component))
-                logging.warning(traceback.format_exc())
-                logging.warning(sys.exc_info()[2])
-            else:
-                bi_plots.append(bi_plot_path)
-
         return (rotation_matrix_df, components_df, explained_variance, explained_variance_ratio,
-                singular_values, bi_plots)
+                singular_values)
 
-    def _generate_pca_html_report(self, pca_plots, bi_plots, n_components):
+    def _generate_pca_html_report(self, score_plots, loading_plots, bi_plots, n_components):
 
         logging.info('start generating html report')
         html_report = list()
@@ -289,13 +257,21 @@ class PCAUtil:
 
         visualization_content = ''
         biplot_content = ''
+        loading_content = ''
 
-        for pca_plot in pca_plots:
-            shutil.copy2(pca_plot,
-                         os.path.join(output_directory, os.path.basename(pca_plot)))
+        for score_plot in score_plots:
+            shutil.copy2(score_plot,
+                         os.path.join(output_directory, os.path.basename(score_plot)))
             visualization_content += '<iframe height="900px" width="100%" '
-            visualization_content += 'src="{}" '.format(os.path.basename(pca_plot))
+            visualization_content += 'src="{}" '.format(os.path.basename(score_plot))
             visualization_content += 'style="border:none;"></iframe>\n<p></p>\n'
+
+        for loading_plot in loading_plots:
+            shutil.copy2(loading_plot,
+                         os.path.join(output_directory, os.path.basename(loading_plot)))
+            loading_content += '<iframe height="900px" width="100%" '
+            loading_content += 'src="{}" '.format(os.path.basename(loading_plot))
+            loading_content += 'style="border:none;"></iframe>\n<p></p>\n'
 
         for bi_plot in bi_plots:
             shutil.copy2(bi_plot,
@@ -314,6 +290,8 @@ class PCAUtil:
                                                           '{} Components'.format(n_components))
                 report_template = report_template.replace('<p>BiPlot</p>',
                                                           biplot_content)
+                report_template = report_template.replace('<p>LoadingPlot</p>',
+                                                          loading_content)
                 result_file.write(report_template)
 
         report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
@@ -326,10 +304,12 @@ class PCAUtil:
                             })
         return html_report
 
-    def _generate_pca_report(self, pca_ref, pca_plots, bi_plots, workspace_name, n_components):
+    def _generate_pca_report(self, pca_ref, score_plots, loading_plots, bi_plots,
+                             workspace_name, n_components):
         logging.info('creating report')
 
-        output_html_files = self._generate_pca_html_report(pca_plots, bi_plots, n_components)
+        output_html_files = self._generate_pca_html_report(score_plots, loading_plots,
+                                                           bi_plots, n_components)
 
         objects_created = list()
         objects_created.append({'ref': pca_ref,
@@ -592,6 +572,59 @@ class PCAUtil:
 
         return result_file_paths
 
+    def _plot_loading_pca_matrix(self, components_df, n_components):
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(output_directory)
+        result_file_paths = []
+
+        all_pairs = list(itertools.combinations(range(1, n_components+1), 2))
+
+        for pair in all_pairs:
+            first_component = pair[0]
+            second_component = pair[1]
+            result_file_path = os.path.join(output_directory, 'pca_loading_plot_{}_{}.html'.format(
+                                                                                first_component,
+                                                                                second_component))
+
+            traces = list()
+            data = go.Data(traces)
+            layout = go.Layout(xaxis=go.XAxis(title='PC{}'.format(first_component), showline=False),
+                               yaxis=go.YAxis(title='PC{}'.format(second_component), showline=False))
+            fig = go.Figure(data=data, layout=layout)
+
+            coeff = list()
+            coeff.append(components_df['principal_component_{}'.format(first_component)])
+            coeff.append(components_df['principal_component_{}'.format(second_component)])
+            coeff = np.transpose(coeff)
+
+            loading_x = list()
+            loading_y = list()
+            loading_text = list()
+            for idx, position in enumerate(coeff):
+                loading_x.append(0)
+                loading_y.append(0)
+                loading_text.append('0')
+
+                loading_x.append(position[0])
+                loading_y.append(position[1])
+                loading_text.append(components_df.index[idx])
+
+            fig.add_trace(go.Scatter(
+                x=loading_x,
+                y=loading_y,
+                mode="lines+markers",
+                name="loading plot",
+                text=loading_text,
+                textposition="bottom center"
+            ))
+
+            plot(fig, filename=result_file_path)
+
+            result_file_paths.append(result_file_path)
+
+        return result_file_paths
+
     def _plot_biplot_pca_matrix(self, plot_pca_matrix, components_df, n_components):
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -708,10 +741,9 @@ class PCAUtil:
         if "KBaseMatrices" in obj_type:
 
             (rotation_matrix_df, components_df, explained_variance,
-             explained_variance_ratio, singular_values, bi_plots) = self._pca_for_matrix(
-                                                                                input_obj_ref,
-                                                                                n_components,
-                                                                                dimension)
+             explained_variance_ratio, singular_values) = self._pca_for_matrix(input_obj_ref,
+                                                                               n_components,
+                                                                               dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices object'
@@ -740,6 +772,8 @@ class PCAUtil:
         report_output = self._generate_pca_report(pca_ref,
                                                   self._plot_score_pca_matrix(plot_pca_matrix,
                                                                               n_components),
+                                                  self._plot_loading_pca_matrix(components_df,
+                                                                                n_components),
                                                   self._plot_biplot_pca_matrix(plot_pca_matrix,
                                                                                components_df,
                                                                                n_components),
