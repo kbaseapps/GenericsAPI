@@ -4,6 +4,7 @@ import requests
 import uuid
 
 from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.SampleServiceClient import SampleService
 
 
 class SampleServiceUtil:
@@ -26,6 +27,7 @@ class SampleServiceUtil:
         self.token = config['KB_AUTH_TOKEN']
         self.srv_wiz_url = config['srv-wiz-url']
         self.dfu = DataFileUtil(self.callback_url)
+        self.sample_ser = SampleService(self.callback_url)
 
     def get_sample_service_url(self):
 
@@ -43,12 +45,13 @@ class SampleServiceUtil:
 
         return wiz_resp['result'][0]['url']
 
-    def get_sample(self, sample_id):
+    def get_sample(self, sample_id, version=None):
 
         sample_url = self.get_sample_service_url()
         headers = {"Authorization": self.token}
         params = {
             "id": sample_id,
+            "version": version
         }
         payload = {
             "method": "SampleService.get_sample",
@@ -61,6 +64,8 @@ class SampleServiceUtil:
         if resp_json.get('error'):
             raise RuntimeError(f"Error from SampleService - {resp_json['error']}")
         sample = resp_json['result'][0]
+
+        # sample = self.sample_ser.get_sample(params)[0]
 
         return sample
 
@@ -104,6 +109,36 @@ class SampleServiceUtil:
 
         return sample_id
 
+    def create_data_link(self, sample_id, upa, version, dataid=None, node='root'):
+        """
+        'params': [{'upa': '48710/1/1',
+                    'dataid': 'column2',
+                    'id': id_,
+                    'version': 1,
+                    'node': 'root',}]
+        """
+        sample_url = self.get_sample_service_url()
+        headers = {"Authorization": self.token}
+        params = {
+            "id": sample_id,
+            "upa": upa,
+            "version": version,
+            "dataid": dataid,
+            "node": node,
+        }
+        payload = {
+            "method": "SampleService.create_data_link",
+            "id": str(uuid.uuid4()),
+            "params": [params],
+            "version": "1.1"
+        }
+        resp = requests.post(url=sample_url, headers=headers, data=json.dumps(payload, default=str))
+        if not resp.ok:
+            raise RuntimeError(f'Error from SampleService - {resp.text}')
+        resp_json = resp.json()
+        if resp_json.get('error'):
+            raise RuntimeError(f"Error from SampleService - {resp_json['error']}")
+
     def sample_set_to_attribute_mapping(self, sample_set_ref):
 
         sample_set = self.dfu.get_objects(
@@ -117,9 +152,10 @@ class SampleServiceUtil:
 
         sample_datas = []
         for sample in samples:
-            sample_id = sample['id']
+            sample_id = sample.get('id')
+            version = sample.get('version')
 
-            sample_data = self.get_sample(sample_id)
+            sample_data = self.get_sample(sample_id, version=version)
 
             node_tree = sample_data.get('node_tree', [{}])
 
