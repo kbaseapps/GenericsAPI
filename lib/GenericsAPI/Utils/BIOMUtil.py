@@ -8,6 +8,8 @@ import pandas as pd
 from Bio import SeqIO
 import csv
 import shutil
+import traceback
+import sys
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -193,15 +195,21 @@ class BiomUtil:
                 }]
             }
 
-            objects = self.kbse.search_objects(search_params)['objects']
-
-            if not objects:
-                search_params['match_filter']['lookup_in_keys'] = {
-                    "aliases": {"value": scientific_name}
-                }
+            try:
                 objects = self.kbse.search_objects(search_params)['objects']
-            if objects:
-                taxon_id = objects[0].get('object_name')
+
+                if not objects:
+                    search_params['match_filter']['lookup_in_keys'] = {
+                        "aliases": {"value": scientific_name}
+                    }
+                    objects = self.kbse.search_objects(search_params)['objects']
+                if objects:
+                    taxon_id = objects[0].get('object_name')
+            except Exception:
+                logging.info('Failed looking up taxon in search engine')
+                logging.warning(traceback.format_exc())
+                logging.warning(sys.exc_info()[2])
+                taxon_id = None
 
             self.taxon_cache[scientific_name] = taxon_id
 

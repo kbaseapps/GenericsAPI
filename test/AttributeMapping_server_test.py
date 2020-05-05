@@ -17,6 +17,7 @@ from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
+
 class AttributeUtilsTest(unittest.TestCase):
 
     @classmethod
