@@ -257,7 +257,8 @@ class BiomUtil:
                 delimiter = csv.Sniffer().sniff(lineage).delimiter
                 lineage = [x.strip() for x in lineage.split(delimiter)]
 
-            taxonomy['lineage'] = lineage
+            if lineage:
+                taxonomy['lineage'] = lineage
 
             for key in ['score', 'taxonomy_source', 'species_name']:
                 val = self._retrieve_value([], datarow, key)
