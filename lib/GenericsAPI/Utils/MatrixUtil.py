@@ -657,12 +657,13 @@ class MatrixUtil:
 
         logging.info("Removing all zero rows")
         row_check = (df != 0).any(axis=1)
-        removed_row_ids = row_check[row_check == False].index
+        # removed_row_ids = row_check[row_check == False].index
         df = df.loc[row_check]
 
         logging.info("Removing all zero columns")
         df = df.T
         col_check = (df != 0).any(axis=1)
+        # removed_col_ids = col_check[col_check == False].index
         df = df.loc[col_check]
         df = df.T
 
