@@ -13,7 +13,8 @@ RUN apt-get install -y gcc wget
 RUN pip install --upgrade pip \
     && python --version
 
-RUN pip uninstall numpy -y \
+RUN pip install scikit-bio==0.5.6 \
+    && pip uninstall numpy -y \
     && pip install numpy==1.18.0 \
     && pip install networkx==2.1 \
     && pip install pandas==0.23.4 \
@@ -25,7 +26,6 @@ RUN pip uninstall numpy -y \
     && pip install scipy==1.4.1 \
     && pip install natsort==6.2.0 \
     && pip install scikit-learn==0.22.1 \
-    && pip install scikit-bio==0.1.0 \
     && pip install plotly==4.4.1 \
     && pip install mock==3.0.5 \
     && pip install biom-format==2.1.7

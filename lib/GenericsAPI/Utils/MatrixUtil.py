@@ -653,6 +653,21 @@ class MatrixUtil:
 
         return ratio_transformed_df
 
+    def _remove_all_zero(self, df):
+
+        logging.info("Removing all zero rows")
+        row_check = (df != 0).any(axis=1)
+        removed_row_ids = row_check[row_check == False].index
+        df = df.loc[row_check]
+
+        logging.info("Removing all zero columns")
+        df = df.T
+        col_check = (df != 0).any(axis=1)
+        df = df.loc[col_check]
+        df = df.T
+
+        return df
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -676,6 +691,7 @@ class MatrixUtil:
         new_matrix_name = params.get('new_matrix_name')
         with_mean = params.get('with_mean', 1)
         with_std = params.get('with_std', 1)
+        dimension = params.get('dimension', 'col')
 
         if not isinstance(workspace_name, int):
             workspace_id = self.dfu.ws_name_to_id(workspace_name)
@@ -693,8 +709,8 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-
-        standardize_df = self._standardize_df(df, with_mean, with_std)
+        standardize_df = self._standardize_df(df, dimension=dimension,
+                                              with_mean=with_mean, with_std=with_std)
 
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
