@@ -13,6 +13,7 @@ import pandas as pd
 from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
 from sklearn import preprocessing
+from skbio.stats.composition import ilr, clr
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -607,9 +608,12 @@ class MatrixUtil:
 
         return filtered_value_data
 
-    def _standardize_df(self, df, with_mean=True, with_std=True):
+    def _standardize_df(self, df, dimension='col', with_mean=True, with_std=True):
 
         logging.info("Standardizing matrix data")
+
+        if dimension == 'col':
+            df = df.T
 
         df.fillna(0, inplace=True)
 
@@ -621,7 +625,33 @@ class MatrixUtil:
 
         standardize_df = pd.DataFrame(index=df.index, columns=df.columns, data=standardized_values)
 
+        if dimension == 'col':
+            standardize_df = standardize_df.T
+
         return standardize_df
+
+    def _ratio_trans_df(self, df, method, dimension='col'):
+
+        logging.info("Performaing log ratio transformation matrix data")
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+
+        if method == 'clr':
+            ratio_trans = clr(df)
+        elif method == 'ilr':
+            ratio_trans = ilr(df)
+        else:
+            raise ValueError('Unexpected ratio transformation method')
+
+        ratio_transformed_df = pd.DataFrame(index=df.index, columns=df.columns, data=ratio_trans)
+
+        if dimension == 'col':
+            ratio_transformed_df = ratio_transformed_df.T
+
+        return ratio_transformed_df
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']

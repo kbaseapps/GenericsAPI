@@ -25,6 +25,7 @@ RUN pip uninstall numpy -y \
     && pip install scipy==1.4.1 \
     && pip install natsort==6.2.0 \
     && pip install scikit-learn==0.22.1 \
+    && pip install scikit-bio==0.1.0 \
     && pip install plotly==4.4.1 \
     && pip install mock==3.0.5 \
     && pip install biom-format==2.1.7
