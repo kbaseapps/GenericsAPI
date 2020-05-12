@@ -669,6 +669,28 @@ class MatrixUtil:
 
         return df
 
+    def _relative_abundance(self, df, dimension='col'):
+
+        logging.info("Creating relative abundance matrix")
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+        values = df.values
+
+        rel_values = list()
+        for value in values:
+            total = value.sum()
+            rel_values.append([v/float(total) for v in value])
+
+        relative_abundance_df = pd.DataFrame(index=df.index, columns=df.columns, data=rel_values)
+
+        if dimension == 'col':
+            relative_abundance_df = relative_abundance_df.T
+
+        return relative_abundance_df
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
