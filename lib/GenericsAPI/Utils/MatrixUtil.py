@@ -398,7 +398,7 @@ class MatrixUtil:
                          'workspace_name': workspace_name,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 1000,
+                         'html_window_height': 1500,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -441,7 +441,7 @@ class MatrixUtil:
                              'workspace_name': workspace_name,
                              'html_links': output_html_files,
                              'direct_html_link_index': 0,
-                             'html_window_height': 660,
+                             'html_window_height': 1500,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
 
         else:
