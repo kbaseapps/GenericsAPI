@@ -13,7 +13,8 @@ RUN apt-get install -y gcc wget
 RUN pip install --upgrade pip \
     && python --version
 
-RUN pip uninstall numpy -y \
+RUN pip install scikit-bio==0.5.6 \
+    && pip uninstall numpy -y \
     && pip install numpy==1.18.0 \
     && pip install networkx==2.1 \
     && pip install pandas==0.23.4 \

@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5519fe8a6cbe3ee15d5335ccdea55976c08e00b8"
+    GIT_COMMIT_HASH = "adeeab7d4f64a2e3c19d2d00de98dcc9084a15c6"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -337,7 +337,8 @@ class GenericsAPI:
            "workspace_name" (workspace name of the object), parameter
            "with_mean" of type "boolean" (A boolean - 0 for false, 1 for
            true.), parameter "with_std" of type "boolean" (A boolean - 0 for
-           false, 1 for true.), parameter "new_matrix_name" of String
+           false, 1 for true.), parameter "dimension" of String, parameter
+           "new_matrix_name" of String
         :returns: instance of type "StandardizeMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -352,6 +353,36 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method standardize_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def transform_matrix(self, ctx, params):
+        """
+        :param params: instance of type "TransformMatrixParams" -> structure:
+           parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "workspace_name" of type "workspace_name"
+           (workspace name of the object), parameter "new_matrix_name" of
+           String, parameter "abundance_filtering_params" of mapping from
+           String to String, parameter "standardization_params" of mapping
+           from String to String, parameter "ratio_transformation_params" of
+           mapping from String to String, parameter
+           "perform_relative_abundance" of type "boolean" (A boolean - 0 for
+           false, 1 for true.)
+        :returns: instance of type "TransformMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN transform_matrix
+        returnVal = self.matrix_util.transform_matrix(params)
+        #END transform_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method transform_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

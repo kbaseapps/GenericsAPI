@@ -13,6 +13,7 @@ import pandas as pd
 from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
 from sklearn import preprocessing
+from skbio.stats.composition import ilr, clr
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -607,9 +608,12 @@ class MatrixUtil:
 
         return filtered_value_data
 
-    def _standardize_df(self, df, with_mean=True, with_std=True):
+    def _standardize_df(self, df, dimension='col', with_mean=True, with_std=True):
 
         logging.info("Standardizing matrix data")
+
+        if dimension == 'col':
+            df = df.T
 
         df.fillna(0, inplace=True)
 
@@ -621,7 +625,83 @@ class MatrixUtil:
 
         standardize_df = pd.DataFrame(index=df.index, columns=df.columns, data=standardized_values)
 
+        if dimension == 'col':
+            standardize_df = standardize_df.T
+
         return standardize_df
+
+    def _ratio_trans_df(self, df, method='clr', dimension='col'):
+
+        logging.info("Performaing log ratio transformation matrix data")
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+
+        if method == 'clr':
+            ratio_trans = clr(df)
+        elif method == 'ilr':
+            ratio_trans = ilr(df)
+        else:
+            raise ValueError('Unexpected ratio transformation method')
+
+        ratio_transformed_df = pd.DataFrame(index=df.index, columns=df.columns, data=ratio_trans)
+
+        if dimension == 'col':
+            ratio_transformed_df = ratio_transformed_df.T
+
+        return ratio_transformed_df
+
+    def _remove_all_zero(self, df):
+
+        logging.info("Removing all zero rows")
+        row_check = (df != 0).any(axis=1)
+        removed_row_ids = list(row_check[row_check == False].index)
+        df = df.loc[row_check]
+
+        logging.info("Removing all zero columns")
+        col_check = (df != 0).any(axis=0)
+        removed_col_ids = list(col_check[col_check == False].index)
+        df = df.loc[:, col_check]
+
+        return df, removed_row_ids, removed_col_ids
+
+    def _filtering_matrix(self, df, row_threshold=0, columns_threshold=0):
+
+        logging.info("Removing rows with values all below {}".format(row_threshold))
+        row_check = (df > row_threshold).any(axis=1)
+        removed_row_ids = list(row_check[row_check == False].index)
+        df = df.loc[row_check]
+
+        logging.info("Removing columns with values all below {}".format(row_threshold))
+        col_check = (df > columns_threshold).any(axis=0)
+        removed_col_ids = list(col_check[col_check == False].index)
+        df = df.loc[:, col_check]
+
+        return df, removed_row_ids, removed_col_ids
+
+    def _relative_abundance(self, df, dimension='col'):
+
+        logging.info("Creating relative abundance matrix")
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+        values = df.values
+
+        rel_values = list()
+        for value in values:
+            total = value.sum()
+            rel_values.append([v/float(total) for v in value])
+
+        relative_abundance_df = pd.DataFrame(index=df.index, columns=df.columns, data=rel_values)
+
+        if dimension == 'col':
+            relative_abundance_df = relative_abundance_df.T
+
+        return relative_abundance_df
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -646,6 +726,7 @@ class MatrixUtil:
         new_matrix_name = params.get('new_matrix_name')
         with_mean = params.get('with_mean', 1)
         with_std = params.get('with_std', 1)
+        dimension = params.get('dimension', 'col')
 
         if not isinstance(workspace_name, int):
             workspace_id = self.dfu.ws_name_to_id(workspace_name)
@@ -663,8 +744,8 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-
-        standardize_df = self._standardize_df(df, with_mean, with_std)
+        standardize_df = self._standardize_df(df, dimension=dimension,
+                                              with_mean=with_mean, with_std=with_std)
 
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
@@ -696,6 +777,99 @@ class MatrixUtil:
 
         return {'new_matrix_obj_ref': new_matrix_obj_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
+
+    def transform_matrix(self, params):
+        """
+        transform a matrix
+        """
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_name = params.get('workspace_name')
+        new_matrix_name = params.get('new_matrix_name')
+
+        abundance_filtering_params = params.get('abundance_filtering_params')
+        perform_relative_abundance = params.get('perform_relative_abundance', False)
+        standardization_params = params.get('standardization_params')
+        ratio_transformation_params = params.get('ratio_transformation_params')
+
+        if not isinstance(workspace_name, int):
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+        else:
+            workspace_id = workspace_name
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+
+        filtered_df = None
+        if abundance_filtering_params is not None:
+            df = self._filtering_matrix(
+                                        df,
+                                        row_threshold=abundance_filtering_params.get(
+                                                        'abundance_filtering_row_threshold', 0),
+                                        columns_threshold=abundance_filtering_params.get(
+                                                    'abundance_filtering_columns_threshold', 0))
+            filtered_df = df.coppy(deep=True)
+
+        relative_abundance_df = None
+        if perform_relative_abundance:
+
+            df = self._relative_abundance(df, dimension='col')
+            relative_abundance_df = df.coppy(deep=True)
+
+        standardize_df = None
+        if standardization_params is not None:
+            df = self._standardize_df(df,
+                                      dimension=standardization_params.get(
+                                                            'standardization_dimension', 'col'),
+                                      with_mean=standardization_params.get(
+                                                            'standardization_with_mean', True),
+                                      with_std=standardization_params.get(
+                                                            'standardization_with_std', True))
+            standardize_df = df.coppy(deep=True)
+
+        ratio_transformed_df = None
+        if ratio_transformation_params is not None:
+            df = self._ratio_trans_df(df,
+                                      method=ratio_transformation_params.get(
+                                                        'ratio_transformation_method', 'clr'),
+                                      dimension=ratio_transformation_params.get(
+                                                        'ratio_transformation_dimension', 'col'))
+            ratio_transformed_df = df.coppy(deep=True)
+
+        new_matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        logging.info("Saving new transformed matrix object")
+        info = self.dfu.save_objects({
+            "id": workspace_id,
+            "objects": [{
+                "type": input_matrix_info[2],
+                "data": input_matrix_data,
+                "name": new_matrix_name
+            }]
+        })[0]
+
+        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
+
+        report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
+                                              data=new_matrix_data)
+
+        returnVal.update(report_output)
+
+        return returnVal
 
     def filter_matrix(self, params):
         """

@@ -45,6 +45,28 @@
         }
     },
     {
+      "id" : "dimension",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
       "id" : "new_matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -79,6 +101,10 @@
         {
           "input_parameter" : "with_std",
           "target_property" : "with_std"
+        },
+        {
+          "input_parameter" : "dimension",
+          "target_property" : "dimension"
         },
         {
           "input_parameter" : "new_matrix_name",
