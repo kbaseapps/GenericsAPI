@@ -191,6 +191,37 @@ class MatrixUtil:
                             })
         return html_report
 
+    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name,
+                                   filtered_df, relative_abundance_df,
+                                   standardize_df, ratio_transformed_df):
+        objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
+
+        data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+        tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
+                                                                            str(uuid.uuid4())))
+        data_df.to_csv(tsv_file_path)
+        heatmap_dir = self.report_util.build_heatmap_html({
+                                                'tsv_file_path': tsv_file_path})['html_dir']
+
+        output_html_files = self._generate_heatmap_html_report(heatmap_dir)
+
+        report_params = {'message': '',
+                         'objects_created': objects_created,
+                         'workspace_name': workspace_name,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 660,
+                         'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
     def _generate_report(self, matrix_obj_ref, workspace_name, new_row_attr_ref=None,
                          new_col_attr_ref=None, data=None):
         """
@@ -817,13 +848,13 @@ class MatrixUtil:
                                                         'abundance_filtering_row_threshold', 0),
                                         columns_threshold=abundance_filtering_params.get(
                                                     'abundance_filtering_columns_threshold', 0))
-            filtered_df = df.coppy(deep=True)
+            filtered_df = df.copy(deep=True)
 
         relative_abundance_df = None
         if perform_relative_abundance:
 
             df = self._relative_abundance(df, dimension='col')
-            relative_abundance_df = df.coppy(deep=True)
+            relative_abundance_df = df.copy(deep=True)
 
         standardize_df = None
         if standardization_params is not None:
@@ -834,7 +865,7 @@ class MatrixUtil:
                                                             'standardization_with_mean', True),
                                       with_std=standardization_params.get(
                                                             'standardization_with_std', True))
-            standardize_df = df.coppy(deep=True)
+            standardize_df = df.copy(deep=True)
 
         ratio_transformed_df = None
         if ratio_transformation_params is not None:
@@ -843,7 +874,7 @@ class MatrixUtil:
                                                         'ratio_transformation_method', 'clr'),
                                       dimension=ratio_transformation_params.get(
                                                         'ratio_transformation_dimension', 'col'))
-            ratio_transformed_df = df.coppy(deep=True)
+            ratio_transformed_df = df.copy(deep=True)
 
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
@@ -866,6 +897,10 @@ class MatrixUtil:
 
         report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
                                               data=new_matrix_data)
+
+        # report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
+        #                                                 filtered_df, relative_abundance_df,
+        #                                                 standardize_df, ratio_transformed_df)
 
         returnVal.update(report_output)
 
