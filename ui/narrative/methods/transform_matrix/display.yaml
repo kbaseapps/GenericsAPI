@@ -1,0 +1,115 @@
+name     : Transform Matrix
+subtitle : Performaing Standardization/Ratio Transformation Algorithm from input matrix
+tooltip  : Performaing Standardization/Ratio Transformation Algorithm from input matrix
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Input Matrix
+        short-hint : |
+            Input matrix whose data needs to be transformed
+        long-hint  : |
+            Input matrix whose data needs to be transformed
+
+    new_matrix_name:
+        ui-name: |
+            Transformed Matrix Name
+        short-hint : |
+            Output transformed matrix name
+        long-hint  : |
+            Output transformed matrix name
+
+    abundance_filtering_row_threshold:
+        ui-name: |
+            Remove Rows With All Values Below Or Equal To
+        short-hint : |
+            Remove all rows with values below or equal the threshold
+        long-hint  : |
+            Remove all rows with values below or equal the threshold
+
+    abundance_filtering_columns_threshold:
+        ui-name: |
+            Remove Columns With All Values Below Or Equal To
+        short-hint : |
+            Remove all columns with values below or equal the threshold
+        long-hint  : |
+            Remove all columns with values below or equal the threshold
+
+    perform_relative_abundance:
+        ui-name: |
+            Transform Matrix To Relative Abundance Matrix
+        short-hint : |
+            Transform Matrix To Relative Abundance Matrix
+        long-hint  : |
+            Transform Matrix To Relative Abundance Matrix
+
+    standardization_with_mean:
+        ui-name: |
+            Center The Data Before Scaling
+        short-hint : |
+            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+        long-hint  : |
+            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+
+    standardization_with_std:
+        ui-name: |
+            Scale The Data To Unit Variance
+        short-hint : |
+            calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
+        long-hint  : |
+            calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
+
+    standardization_dimension:
+        ui-name: |
+            Perform Standardization Algorithm On
+        short-hint : |
+            Standardize row or column
+        long-hint  : |
+            Standardize row or column
+
+    ratio_transformation_method:
+        ui-name: |
+            Ratio Transformation Method
+        short-hint : |
+            Please select centre (clr) or isometric (ilr) log ratio transformation
+        long-hint  : |
+            Please select centre (clr) or isometric (ilr) log ratio transformation
+
+    ratio_transformation_dimension:
+        ui-name: |
+            Perform Ratio Transformation Algorithm On
+        short-hint : |
+            Standardize row or column
+        long-hint  : |
+            Standardize row or column
+
+parameter-groups :
+    abundance_filtering_params:
+        ui-name : Perform Abundance Filtering
+        short-hint :  Perform Abundance Filtering
+    standardization_params:
+        ui-name : Perform Standardization
+        short-hint :  Perform Standardization
+    ratio_transformation_params:
+        ui-name : Perform Ratio Transformation
+        short-hint :  Perform Ratio Transformation
+
+description : |
+    <p> Create a new transformed matrix from input matrix </p>

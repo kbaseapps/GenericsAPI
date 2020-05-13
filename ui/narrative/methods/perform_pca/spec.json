@@ -36,19 +36,19 @@
       "optional" : false,
       "advanced" : false,
       "allow_multiple" : false,
-      "default_values" : ["row"],
+      "default_values" : ["col"],
       "field_type" : "dropdown",
-      "dropdown_options": 
+      "dropdown_options":
       {
-        "options": 
+        "options":
         [
           {
-              "display": "row",
-              "value": "row"
+              "display": "Column",
+              "value": "col"
           },
           {
-              "display": "column",
-              "value": "col"
+              "display": "Row",
+              "value": "row"
           }
         ]
       }

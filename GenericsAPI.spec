@@ -246,6 +246,7 @@ module GenericsAPI {
       workspace_name workspace_name;
       boolean with_mean;
       boolean with_std;
+      string dimension;
       string new_matrix_name;
   } StandardizeMatrixParams;
 
@@ -257,6 +258,25 @@ module GenericsAPI {
 
   /* standardize_matrix: standardize a matrix*/
   funcdef standardize_matrix (StandardizeMatrixParams params) returns (StandardizeMatrixOutput returnVal) authentication required;
+
+
+  typedef structure {
+      obj_ref input_matrix_ref;
+      workspace_name workspace_name;
+      string new_matrix_name;
+      mapping<string, string> abundance_filtering_params;
+      mapping<string, string> standardization_params;
+      mapping<string, string> ratio_transformation_params;
+      boolean perform_relative_abundance;
+  } TransformMatrixParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref new_matrix_obj_ref;
+  } TransformMatrixOutput;
+
+  funcdef transform_matrix (TransformMatrixParams params) returns (TransformMatrixOutput returnVal) authentication required;
 
 
   /* ATTRIBUTE MAPPING */

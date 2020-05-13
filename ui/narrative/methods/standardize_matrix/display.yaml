@@ -52,5 +52,13 @@ parameters :
         long-hint  : |
             calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
 
+    dimension:
+        ui-name: |
+            Perform Standardization Algorithm On
+        short-hint : |
+            Standardize row or column
+        long-hint  : |
+            Standardize row or column
+
 description : |
     <p> Create a new standardization matrix from input matrix </p>

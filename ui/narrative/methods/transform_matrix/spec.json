@@ -1,0 +1,261 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id": "abundance_filtering_row_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id": "abundance_filtering_columns_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id": "perform_relative_abundance",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":[0],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
+      "id": "standardization_with_mean",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":[1],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
+      "id": "standardization_with_std",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":[1],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
+      "id" : "standardization_dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "ratio_transformation_method",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["clr"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Centre Log Ratio Transformation",
+              "value": "clr"
+          },
+          {
+              "display": "Isometric Log Ratio Transformation",
+              "value": "ilr"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "ratio_transformation_dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "new_matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseMatrices"],
+          "is_output_name" : true
+        }
+    }
+  ],
+  "parameter-groups": [
+    {
+      "id": "abundance_filtering_params",
+      "parameters": [
+        "abundance_filtering_row_threshold",
+        "abundance_filtering_columns_threshold"
+      ],
+      "optional": true,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : false
+    },
+    {
+      "id": "standardization_params",
+      "parameters": [
+        "standardization_with_mean",
+        "standardization_with_std",
+        "standardization_dimension"
+      ],
+      "optional": true,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : false
+    },
+    {
+      "id": "ratio_transformation_params",
+      "parameters": [
+        "ratio_transformation_method",
+        "ratio_transformation_dimension"
+      ],
+      "optional": true,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : false
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "transform_matrix",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "workspace_name"
+        },
+        {
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
+        },
+        {
+          "input_parameter" : "input_matrix_ref",
+          "target_property" : "input_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "abundance_filtering_params",
+          "target_property" : "abundance_filtering_params"
+        },
+        {
+          "input_parameter" : "standardization_params",
+          "target_property" : "standardization_params"
+        },
+        {
+          "input_parameter" : "ratio_transformation_params",
+          "target_property" : "ratio_transformation_params"
+        },
+        {
+          "input_parameter" : "perform_relative_abundance",
+          "target_property" : "perform_relative_abundance"
+        },
+        {
+          "input_parameter" : "new_matrix_name",
+          "target_property" : "new_matrix_name"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "new_matrix_obj_ref"],
+            "target_property": "new_matrix_obj_ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

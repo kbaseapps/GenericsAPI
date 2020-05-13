@@ -374,6 +374,10 @@ class Application(object):
                              name='GenericsAPI.standardize_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.standardize_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.transform_matrix,
+                             name='GenericsAPI.transform_matrix',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.transform_matrix'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.file_to_attribute_mapping,
                              name='GenericsAPI.file_to_attribute_mapping',
                              types=[dict])
