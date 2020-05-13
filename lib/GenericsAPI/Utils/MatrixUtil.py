@@ -842,7 +842,7 @@ class MatrixUtil:
 
         filtered_df = None
         if abundance_filtering_params is not None:
-            df = self._filtering_matrix(
+            (df, removed_row_ids, removed_col_ids) = self._filtering_matrix(
                                         df,
                                         row_threshold=abundance_filtering_params.get(
                                                         'abundance_filtering_row_threshold', 0),
