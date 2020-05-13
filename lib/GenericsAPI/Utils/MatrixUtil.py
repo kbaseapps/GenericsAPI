@@ -169,7 +169,7 @@ class MatrixUtil:
             viewer_name = 'AbundanceFilteredMatrixViewer'
             tab_def_content += '''\n<button class="tablinks" '''
             tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Abundance Filtered Matrix</button>\n'''
+            tab_def_content += '''>Filtered Abundance Matrix</button>\n'''
             filtered_matrix_report_files = os.listdir(filtered_matrix_dir)
             filtered_matrix_index_page = None
             for filtered_matrix_report_file in filtered_matrix_report_files:
