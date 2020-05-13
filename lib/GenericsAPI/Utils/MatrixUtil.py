@@ -126,6 +126,112 @@ class MatrixUtil:
             writer.book = load_workbook(file_path)
             df.to_excel(writer, sheet_name=sheet_name)
 
+    def _generate_tab_content(self, index_page, viewer_name):
+        tab_content = ''
+
+        if index_page:
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(index_page)
+            tab_content += 'style="border:none;"></iframe>'
+            tab_content += '\n</div>\n'
+        else:
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '''\n<p style="color:red;" >'''
+            tab_content += '''Matrix is too large to be displayed.</p>\n'''
+            tab_content += '\n</div>\n'
+
+        return tab_content
+
+    def _generate_trans_visualization_content(self, output_directory, original_matrix_dir,
+                                              filtered_matrix_dir, relative_abundance_matrix_dir,
+                                              standardize_matrix_dir,
+                                              ratio_transformed_matrix_dir):
+        tab_def_content = ''
+        tab_content = ''
+
+        tab_def_content += '''
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'OriginalMatrixViewer')" id="defaultOpen">Original Matrix</button>
+        '''
+        original_matrix_report_files = os.listdir(original_matrix_dir)
+        original_matrix_index_page = None
+        for original_matrix_report_file in original_matrix_report_files:
+            if original_matrix_report_file.endswith('.html'):
+                original_matrix_index_page = original_matrix_report_file
+
+            shutil.copy2(os.path.join(original_matrix_dir, original_matrix_report_file),
+                         output_directory)
+        tab_content += self._generate_tab_content(original_matrix_index_page,
+                                                  'OriginalMatrixViewer')
+
+        if filtered_matrix_dir is not None:
+            viewer_name = 'AbundanceFilteredMatrixViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Abundance Filtered Matrix</button>\n'''
+            filtered_matrix_report_files = os.listdir(filtered_matrix_dir)
+            filtered_matrix_index_page = None
+            for filtered_matrix_report_file in filtered_matrix_report_files:
+                if filtered_matrix_report_file.endswith('.html'):
+                    filtered_matrix_index_page = filtered_matrix_report_file
+
+                shutil.copy2(os.path.join(filtered_matrix_dir, filtered_matrix_report_file),
+                             output_directory)
+            tab_content += self._generate_tab_content(filtered_matrix_index_page, viewer_name)
+
+        if relative_abundance_matrix_dir is not None:
+            viewer_name = 'RelativeAbundanceMatrixViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Relative Abundance Matrix</button>\n'''
+            relative_abundance_matrix_report_files = os.listdir(relative_abundance_matrix_dir)
+            relative_abundance_matrix_index_page = None
+            for relative_abundance_matrix_report_file in relative_abundance_matrix_report_files:
+                if relative_abundance_matrix_report_file.endswith('.html'):
+                    relative_abundance_matrix_index_page = relative_abundance_matrix_report_file
+
+                shutil.copy2(os.path.join(relative_abundance_matrix_dir,
+                                          relative_abundance_matrix_report_file),
+                             output_directory)
+            tab_content += self._generate_tab_content(relative_abundance_matrix_index_page,
+                                                      viewer_name)
+
+        if standardize_matrix_dir is not None:
+            viewer_name = 'StandardizeMatrixViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Standardized Matrix</button>\n'''
+            standardize_matrix_report_files = os.listdir(standardize_matrix_dir)
+            standardize_matrix_index_page = None
+            for standardize_matrix_report_file in standardize_matrix_report_files:
+                if standardize_matrix_report_file.endswith('.html'):
+                    standardize_matrix_index_page = standardize_matrix_report_file
+
+                shutil.copy2(os.path.join(standardize_matrix_dir, standardize_matrix_report_file),
+                             output_directory)
+            tab_content += self._generate_tab_content(standardize_matrix_index_page, viewer_name)
+
+        if ratio_transformed_matrix_dir is not None:
+            viewer_name = 'RatioTransformedMatrixViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Log Ratio Transformed Matrix</button>\n'''
+            ratio_transformed_matrix_report_files = os.listdir(ratio_transformed_matrix_dir)
+            ratio_transformed_matrix_index_page = None
+            for ratio_transformed_matrix_report_file in ratio_transformed_matrix_report_files:
+                if ratio_transformed_matrix_report_file.endswith('.html'):
+                    ratio_transformed_matrix_index_page = ratio_transformed_matrix_report_file
+
+                shutil.copy2(os.path.join(ratio_transformed_matrix_dir,
+                                          ratio_transformed_matrix_report_file),
+                             output_directory)
+            tab_content += self._generate_tab_content(ratio_transformed_matrix_index_page,
+                                                      viewer_name)
+
+        tab_def_content += '\n</div>\n'
+        return tab_def_content + tab_content
+
     def _generate_visualization_content(self, output_directory, heatmap_dir):
         tab_def_content = ''
         tab_content = ''
@@ -160,6 +266,44 @@ class MatrixUtil:
 
         return tab_def_content + tab_content
 
+    def _generate_transform_html_report(self, original_matrix_dir, filtered_matrix_dir,
+                                        relative_abundance_matrix_dir,
+                                        standardize_matrix_dir,
+                                        ratio_transformed_matrix_dir):
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'transform_matrix_viewer_report.html')
+
+        visualization_content = self._generate_trans_visualization_content(
+                                                                    output_directory,
+                                                                    original_matrix_dir,
+                                                                    filtered_matrix_dir,
+                                                                    relative_abundance_matrix_dir,
+                                                                    standardize_matrix_dir,
+                                                                    ratio_transformed_matrix_dir)
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Compute Correlation App'
+                            })
+        return html_report
+
     def _generate_heatmap_html_report(self, heatmap_dir):
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -191,21 +335,63 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name,
+    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name, original_matrix_df,
                                    filtered_df, relative_abundance_df,
                                    standardize_df, ratio_transformed_df):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
-        data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
-        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(result_directory)
-        tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
-                                                                            str(uuid.uuid4())))
-        data_df.to_csv(tsv_file_path)
-        heatmap_dir = self.report_util.build_heatmap_html({
-                                                'tsv_file_path': tsv_file_path})['html_dir']
+        data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(data_tsv_directory)
+        logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
+        original_matrix_tsv_path = os.path.join(data_tsv_directory,
+                                                'original_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+        original_matrix_df.to_csv(original_matrix_tsv_path)
+        original_matrix_dir = self.report_util.build_heatmap_html({
+                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
+        filtered_matrix_dir = None
+        if filtered_df is not None:
+            filtered_matrix_tsv_path = os.path.join(data_tsv_directory,
+                                                    'filtered_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            filtered_df.to_csv(filtered_matrix_tsv_path)
+            filtered_matrix_dir = self.report_util.build_heatmap_html({
+                                            'tsv_file_path': filtered_matrix_tsv_path})['html_dir']
 
-        output_html_files = self._generate_heatmap_html_report(heatmap_dir)
+        relative_abundance_matrix_dir = None
+        if relative_abundance_df is not None:
+            relative_abundance_matrix_tsv_path = os.path.join(
+                                                    data_tsv_directory,
+                                                    'relative_abundance_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            relative_abundance_df.to_csv(relative_abundance_matrix_tsv_path)
+            relative_abundance_matrix_dir = self.report_util.build_heatmap_html({
+                                'tsv_file_path': relative_abundance_matrix_tsv_path})['html_dir']
+
+        standardize_matrix_dir = None
+        if standardize_df is not None:
+            standardize_matrix_tsv_path = os.path.join(data_tsv_directory,
+                                                       'standardize_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            standardize_df.to_csv(standardize_matrix_tsv_path)
+            standardize_matrix_dir = self.report_util.build_heatmap_html({
+                                        'tsv_file_path': standardize_matrix_tsv_path})['html_dir']
+
+        ratio_transformed_matrix_dir = None
+        if ratio_transformed_df is not None:
+            ratio_transformed_matrix_tsv_path = os.path.join(
+                                                    data_tsv_directory,
+                                                    'ratio_transformed_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            ratio_transformed_df.to_csv(ratio_transformed_matrix_tsv_path)
+            ratio_transformed_matrix_dir = self.report_util.build_heatmap_html({
+                                'tsv_file_path': ratio_transformed_matrix_tsv_path})['html_dir']
+
+        output_html_files = self._generate_transform_html_report(original_matrix_dir,
+                                                                 filtered_matrix_dir,
+                                                                 relative_abundance_matrix_dir,
+                                                                 standardize_matrix_dir,
+                                                                 ratio_transformed_matrix_dir)
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -839,6 +1025,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
+        original_matrix_df = df.copy(deep=True)
 
         filtered_df = None
         if abundance_filtering_params is not None:
@@ -895,12 +1082,13 @@ class MatrixUtil:
         new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
-        report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
-                                              data=new_matrix_data)
+        # report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
+        #                                       data=new_matrix_data)
 
-        # report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
-        #                                                 filtered_df, relative_abundance_df,
-        #                                                 standardize_df, ratio_transformed_df)
+        report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
+                                                        original_matrix_df,
+                                                        filtered_df, relative_abundance_df,
+                                                        standardize_df, ratio_transformed_df)
 
         returnVal.update(report_output)
 
