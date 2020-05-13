@@ -131,7 +131,7 @@ class MatrixUtil:
 
         if index_page:
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1200px" width="100%" '
             tab_content += 'src="{}" '.format(index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -254,7 +254,7 @@ class MatrixUtil:
 
         if heatmap_index_page:
             tab_content += '''\n<div id="MatrixViewer" class="tabcontent">'''
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1200px" width="100%" '
             tab_content += 'src="{}" '.format(heatmap_index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -398,7 +398,7 @@ class MatrixUtil:
                          'workspace_name': workspace_name,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 1500,
+                         'html_window_height': 1300,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -441,7 +441,7 @@ class MatrixUtil:
                              'workspace_name': workspace_name,
                              'html_links': output_html_files,
                              'direct_html_link_index': 0,
-                             'html_window_height': 1500,
+                             'html_window_height': 1300,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
 
         else:
