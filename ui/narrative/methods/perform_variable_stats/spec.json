@@ -1,0 +1,254 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id" : "attribute_mapping_obj_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
+      }
+    },
+    {
+      "id" : "dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "dist_metric",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "euclidean" ],
+      "field_type" : "dropdown",
+      "dropdown_options" : {
+        "options": [
+          {
+            "value": "braycurtis",
+            "display": "braycurtis"
+          },{
+            "value": "canberra",
+            "display": "canberra"
+          },{
+            "value": "chebyshev",
+            "display": "chebyshev"
+          },{
+            "value": "cityblock",
+            "display": "cityblock"
+          },{
+            "value": "correlation",
+            "display": "correlation"
+          },{
+            "value": "cosine",
+            "display": "cosine"
+          },{
+            "value": "dice",
+            "display": "dice"
+          },{
+            "value": "euclidean",
+            "display": "euclidean"
+          },{
+            "value": "hamming",
+            "display": "hamming"
+          },{
+            "value": "jaccard",
+            "display": "jaccard"
+          },{
+            "value": "kulsinski",
+            "display": "kulsinski"
+          },{
+            "value": "matching",
+            "display": "matching"
+          },{
+            "value": "rogerstanimoto",
+            "display": "rogerstanimoto"
+          },{
+            "value": "russellrao",
+            "display": "russellrao"
+          },{
+            "value": "sokalmichener",
+            "display": "sokalmichener"
+          },{
+            "value": "sokalsneath",
+            "display": "sokalsneath"
+          },{
+            "value": "sqeuclidean",
+            "display": "sqeuclidean"
+          },{
+            "value": "yule",
+            "display": "yule"
+          }
+      ]}
+    },
+    {
+      "id" : "grouping",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "textsubdata",
+      "textsubdata_options" : {
+        "subdata_selection": {
+          "parameter_id" : "attribute_mapping_obj_ref",
+          "subdata_included" : ["attributes/[*]/attribute"],
+          "path_to_subdata": ["attributes"],
+          "selection_id": "attribute"
+          },
+        "multiselection":false,
+        "show_src_obj":false,
+        "allow_custom":false
+      }
+    },
+    {
+      "id" : "permutations",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "99" ],
+      "field_type" : "text",
+      "text_options" : {
+        "validate_as": "int"
+      }
+    },
+    {
+      "id": "perform_anosim",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["1"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "perform_permanova",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["1"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id": "perform_permdisp",
+      "optional":false,
+      "advanced":false,
+      "allow_multiple":false,
+      "default_values":["1"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "perform_variable_stats_matrix",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
+        },
+        {
+          "input_parameter" : "input_matrix_ref",
+          "target_property" : "input_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "dist_metric",
+          "target_property" : "dist_metric"
+        },
+        {
+          "input_parameter" : "dimension",
+          "target_property" : "dimension"
+        },
+        {
+          "input_parameter" : "permutations",
+          "target_property" : "permutations"
+        },
+        {
+          "input_parameter" : "grouping",
+          "target_property" : "grouping"
+        },
+        {
+          "input_parameter" : "perform_anosim",
+          "target_property" : "perform_anosim"
+        },
+        {
+          "input_parameter" : "perform_permanova",
+          "target_property" : "perform_permanova"
+        },
+        {
+          "input_parameter" : "perform_permdisp",
+          "target_property" : "perform_permdisp"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

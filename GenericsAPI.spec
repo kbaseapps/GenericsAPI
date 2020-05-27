@@ -281,10 +281,10 @@ module GenericsAPI {
   typedef structure {
       obj_ref input_matrix_ref;
       int workspace_id;
-      string dimension;
       string dist_metric;
-      int permutations;
+      string dimension;
       string grouping;
+      int permutations;
       boolean perform_anosim;
       boolean perform_permanova;
       boolean perform_permdisp;
