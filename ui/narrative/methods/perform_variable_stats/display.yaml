@@ -1,0 +1,96 @@
+name     : Perform Categorical Variable Statistics Analysis
+subtitle : Perform Categorical Variable Stats analysis on Matrix object
+tooltip  : Perform Categorical Variable Stats analysis on Matrix object
+
+icon: analysis.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Matrix Object
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    attribute_mapping_obj_ref:
+        ui-name: |
+            AttributeMapping Object
+        short-hint : |
+            Select associated KBaseExperiments.AttributeMapping object
+        long-hint  : |
+            Select associated KBaseExperiments.AttributeMapping object
+
+    dist_metric :
+        ui-name : |
+            Distance Metric To Use For Calculating Distance Matrix
+        short-hint : |
+            Distance Metric To Use For Calculating Distance Matrix
+        long-hint  : |
+            Distance Metric To Use For Calculating Distance Matrix
+
+    dimension:
+        ui-name: |
+            Perform Analysis On
+        short-hint : |
+            Perform analysis on column or row
+        long-hint  : |
+            Perform analysis on column or row
+
+    grouping:
+        ui-name: |
+            Group Vectors By
+        short-hint : |
+            Select an attribute for grouping
+        long-hint  : |
+            Select an attribute for grouping
+
+    permutations:
+        ui-name: |
+            Permutations To Use For Significance
+        short-hint : |
+            Number of permutations to use when assessing statistical significance
+        long-hint  : |
+            Number of permutations to use when assessing statistical significance
+
+    perform_anosim:
+        ui-name: |
+            Perform Analysis of Similarities (ANOSIM)
+        short-hint : |
+            Test for significant differences between groups using ANOSIM
+        long-hint  : |
+            Test for significant differences between groups using ANOSIM
+
+    perform_permanova:
+        ui-name: |
+            Perform Permutational Multivariate Analysis of Variance (PERMANOVA)
+        short-hint : |
+            Test for significant differences between groups using PERMANOVA
+        long-hint  : |
+            Test for significant differences between groups using PERMANOVA
+
+    perform_permdisp:
+        ui-name: |
+            Perform Homogeneity of Multivariate Variance (PERMDISP)
+        short-hint : |
+            Test for Homogeneity of Multivariate Groups Disperisons using Marti
+        long-hint  : |
+            Test for Homogeneity of Multivariate Groups Disperisons using Marti
+
+description : |
+    <p>  Perform Categorical Variable Stats analysis on Matrix object</p>

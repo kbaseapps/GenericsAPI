@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "adeeab7d4f64a2e3c19d2d00de98dcc9084a15c6"
+    GIT_COMMIT_HASH = "4975716306c77a60eb0479fe732777e9aa8483b3"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -383,6 +383,34 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method transform_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def perform_variable_stats_matrix(self, ctx, params):
+        """
+        :param params: instance of type "VariableStatsParams" -> structure:
+           parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "workspace_id" of Long, parameter
+           "dimension" of String, parameter "dist_metric" of String,
+           parameter "permutations" of Long, parameter "grouping" of String,
+           parameter "perform_anosim" of type "boolean" (A boolean - 0 for
+           false, 1 for true.), parameter "perform_permanova" of type
+           "boolean" (A boolean - 0 for false, 1 for true.), parameter
+           "perform_permdisp" of type "boolean" (A boolean - 0 for false, 1
+           for true.)
+        :returns: instance of type "VariableStatsOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN perform_variable_stats_matrix
+        returnVal = self.matrix_util.perform_variable_stats_matrix(params)
+        #END perform_variable_stats_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method perform_variable_stats_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
