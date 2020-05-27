@@ -278,6 +278,25 @@ module GenericsAPI {
 
   funcdef transform_matrix (TransformMatrixParams params) returns (TransformMatrixOutput returnVal) authentication required;
 
+  typedef structure {
+      obj_ref input_matrix_ref;
+      int workspace_id;
+      string dimension;
+      string dist_metric;
+      int permutations;
+      string grouping;
+      boolean perform_anosim;
+      boolean perform_permanova;
+      boolean perform_permdisp;
+  } VariableStatsParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+  } VariableStatsOutput;
+
+  funcdef perform_variable_stats_matrix (VariableStatsParams params) returns (VariableStatsOutput returnVal) authentication required;
+
 
   /* ATTRIBUTE MAPPING */
 

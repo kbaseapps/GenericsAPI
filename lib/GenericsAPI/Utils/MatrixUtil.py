@@ -15,7 +15,7 @@ from xlrd.biffh import XLRDError
 from sklearn import preprocessing
 from skbio.stats.composition import ilr, clr
 from skbio import DistanceMatrix
-from skbio.stats.distance import anosim, permanova
+from skbio.stats.distance import anosim, permanova, permdisp
 import scipy.spatial.distance as dist
 
 
@@ -147,6 +147,78 @@ class MatrixUtil:
 
         return tab_content
 
+    def _generate_variable_stat_tab_content(self, res, viewer_name):
+        tab_content = ''
+
+        tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
+        tab_content += '''<table>\n'''
+        for key, value in res.items():
+            tab_content += '''<tr>\n'''
+            tab_content += '''<td>{}</td>\n'''.format(key)
+            tab_content += '''<td>{}</td>\n'''.format(value)
+            tab_content += '''</tr>\n'''
+        tab_content += '''</table>\n'''
+        tab_content += '\n</div>\n'
+
+        return tab_content
+
+    def _generate_variable_stats_visualization_content(self, anosim_res,
+                                                       permanova_res, permdisp_res):
+        tab_def_content = ''
+        tab_content = ''
+
+        first_tab_token = False
+
+        if anosim_res is not None:
+            viewer_name = 'anosim_res'
+
+            first_tab_token = True
+            tab_def_content += '''\n<div class="tab">\n'''
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += ''' id="defaultOpen"'''
+            tab_def_content += '''>Analysis of Similarities</button>\n'''
+
+            tab_content += self._generate_variable_stat_tab_content(anosim_res, viewer_name)
+
+        if permanova_res is not None:
+
+            viewer_name = 'permanova_res'
+
+            if first_tab_token:
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += '''>Permutational Multivariate Analysis of Variance</button>\n'''
+            else:
+                first_tab_token = True
+                tab_def_content += '''\n<div class="tab">\n'''
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += ''' id="defaultOpen"'''
+                tab_def_content += '''>Permutational Multivariate Analysis of Variance</button>\n'''
+
+            tab_content += self._generate_variable_stat_tab_content(permanova_res, viewer_name)
+
+        if permdisp_res is not None:
+            viewer_name = 'permdisp_res'
+
+            if first_tab_token:
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += '''>Homogeneity Multivariate Analysis of Variance</button>\n'''
+            else:
+                first_tab_token = True
+                tab_def_content += '''\n<div class="tab">\n'''
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += ''' id="defaultOpen"'''
+                tab_def_content += '''>Homogeneity Multivariate Analysis of Variance</button>\n'''
+
+            tab_content += self._generate_variable_stat_tab_content(permdisp_res, viewer_name)
+
+        tab_def_content += '\n</div>\n'
+        return tab_def_content + tab_content
+
     def _generate_trans_visualization_content(self, output_directory, original_matrix_dir,
                                               filtered_matrix_dir, relative_abundance_matrix_dir,
                                               standardize_matrix_dir,
@@ -269,6 +341,58 @@ class MatrixUtil:
             tab_content += '\n</div>\n'
 
         return tab_def_content + tab_content
+
+    def _generate_variable_stats_html_report(self, anosim_res, permanova_res, permdisp_res):
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'variable_stats_viewer_report.html')
+
+        visualization_content = self._generate_variable_stats_visualization_content(anosim_res,
+                                                                                    permanova_res,
+                                                                                    permdisp_res)
+
+        table_style_content = '''
+                                table {
+                                  font-family: arial, sans-serif;
+                                  border-collapse: collapse;
+                                  width: 66%;
+                                }
+
+                                td, th {
+                                  border: 1px solid #dddddd;
+                                  text-align: left;
+                                  padding: 8px;
+                                }
+
+                                tr:nth-child(even) {
+                                  background-color: #dddddd;
+                                }
+
+                                </style>'''
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                report_template = report_template.replace('</style>',
+                                                          table_style_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Compute Correlation App'
+                            })
+        return html_report
 
     def _generate_transform_html_report(self, original_matrix_dir, filtered_matrix_dir,
                                         relative_abundance_matrix_dir,
@@ -404,6 +528,27 @@ class MatrixUtil:
                          'direct_html_link_index': 0,
                          'html_window_height': 1300,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
+    def _generate_variable_stats_report(self, workspace_id,
+                                        anosim_res, permanova_res, permdisp_res):
+
+        output_html_files = self._generate_variable_stats_html_report(anosim_res,
+                                                                      permanova_res,
+                                                                      permdisp_res)
+
+        report_params = {'message': '',
+                         'workspace_id': workspace_id,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 600,
+                         'report_object_name': 'variable_stats_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
@@ -963,6 +1108,12 @@ class MatrixUtil:
 
         return dict(permanova_res)
 
+    def _run_permdisp(self, dm, grouping, permutations):
+
+        permdisp_res = permdisp(dm, grouping, permutations=permutations)
+
+        return dict(permdisp_res)
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -1037,6 +1188,68 @@ class MatrixUtil:
 
         return {'new_matrix_obj_ref': new_matrix_obj_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
+
+    def perform_variable_stats_matrix(self, params):
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        dimension = params.get('dimension', 'col')
+        dist_metric = params.get('dist_metric', 'euclidean')
+        permutations = params.get('permutations', 0)
+        grouping = params.get('grouping')
+        perform_anosim = params.get('perform_anosim', True)
+        perform_permanova = params.get('perform_permanova', True)
+        perform_permdisp = params.get('perform_permdisp', True)
+
+        if not bool(perform_anosim or perform_permanova or perform_permdisp):
+            raise ValueError('Please select at least one algorithm to perform')
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_data = input_matrix_obj['data']
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+
+        dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
+
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if not am_ref:
+            raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+
+        am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
+        attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
+
+        if grouping not in attribute_names:
+            raise ValueError('Cannot find {} in {} attribute mapping'.format(grouping, dimension))
+
+        attri_pos = attribute_names.index(grouping)
+
+        instances = am_data.get('instances')
+
+        grouping_names = [instance[attri_pos] for instance in instances.values()]
+
+        anosim_res = None
+        if perform_anosim:
+            anosim_res = self._run_anosim(dm, grouping_names, permutations)
+
+        permanova_res = None
+        if perform_permanova:
+            permanova_res = self._run_permanova(dm, grouping_names, permutations)
+
+        permdisp_res = None
+        if perform_permdisp:
+            permdisp_res = self._run_permdisp(dm, grouping_names, permutations)
+
+        report_output = self._generate_variable_stats_report(workspace_id,
+                                                             anosim_res,
+                                                             permanova_res,
+                                                             permdisp_res)
+
+        return report_output
 
     def transform_matrix(self, params):
         """
