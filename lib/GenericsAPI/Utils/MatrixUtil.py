@@ -14,6 +14,10 @@ from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
 from sklearn import preprocessing
 from skbio.stats.composition import ilr, clr
+from skbio import DistanceMatrix
+from skbio.stats.distance import anosim, permanova
+import scipy.spatial.distance as dist
+
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -920,6 +924,45 @@ class MatrixUtil:
 
         return relative_abundance_df
 
+    def _create_distance_matrix(self, df, dist_metric='euclidean', dimension='col'):
+        '''
+        dist_metric: The distance metric to use. Default set to 'euclidean'.
+                     The distance function can be
+                     ["braycurtis", "canberra", "chebyshev", "cityblock", "correlation", "cosine",
+                      "dice", "euclidean", "hamming", "jaccard", "kulsinski", "matching",
+                      "rogerstanimoto", "russellrao", "sokalmichener", "sokalsneath",
+                      "sqeuclidean", "yule"]
+        '''
+
+        # calculate distance matrix
+        logging.info('start calculating distance matrix')
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+        values = df.values
+        labels = df.index.tolist()
+        Y = dist.pdist(values, metric=dist_metric)
+
+        dist_matrix = dist.squareform(Y)
+
+        dm = DistanceMatrix(dist_matrix, labels)
+
+        return dm
+
+    def _run_anosim(self, dm, grouping, permutations):
+
+        anosim_res = anosim(dm, grouping, permutations=permutations)
+
+        return dict(anosim_res)
+
+    def _run_permanova(self, dm, grouping, permutations):
+
+        permanova_res = permanova(dm, grouping, permutations=permutations)
+
+        return dict(permanova_res)
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -1081,9 +1124,6 @@ class MatrixUtil:
 
         new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
-
-        # report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
-        #                                       data=new_matrix_data)
 
         report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
                                                         original_matrix_df,
