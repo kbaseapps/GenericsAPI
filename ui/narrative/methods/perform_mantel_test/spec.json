@@ -10,25 +10,14 @@
   },
   "parameters" : [
     {
-      "id" : "input_matrix_ref",
+      "id" : "input_matrix_refs",
       "optional" : false,
       "advanced" : false,
-      "allow_multiple" : false,
+      "allow_multiple" : true,
       "default_values" : [ "" ],
       "field_type" : "text",
       "text_options" : {
         "valid_ws_types" : ["KBaseMatrices"]
-      }
-    },
-    {
-      "id" : "attribute_mapping_obj_ref",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseExperiments.AttributeMapping"]
       }
     },
     {
@@ -120,22 +109,29 @@
       ]}
     },
     {
-      "id" : "grouping",
+      "id" : "correlation_method",
       "optional" : false,
       "advanced" : false,
       "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "textsubdata",
-      "textsubdata_options" : {
-        "subdata_selection": {
-          "parameter_id" : "attribute_mapping_obj_ref",
-          "subdata_included" : ["attributes/[*]/attribute"],
-          "path_to_subdata": ["attributes"],
-          "selection_id": "attribute"
+      "default_values" : ["pearson"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Pearson",
+              "value": "pearson"
           },
-        "multiselection":false,
-        "show_src_obj":false,
-        "allow_custom":false
+          {
+              "display": "Spearman",
+              "value": "spearman"
+          },
+          {
+              "display": "Kendalltau",
+              "value": "kendalltau"
+          }
+        ]
       }
     },
     {
@@ -149,40 +145,30 @@
         "validate_as": "int"
       }
     },
-    {
-      "id": "perform_anosim",
-      "optional":false,
-      "advanced":false,
-      "allow_multiple":false,
-      "default_values":["1"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-      }
-    },
-    {
-      "id": "perform_permanova",
-      "optional":false,
-      "advanced":false,
-      "allow_multiple":false,
-      "default_values":["1"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-      }
-    },
-    {
-      "id": "perform_permdisp",
-      "optional":false,
-      "advanced":false,
-      "allow_multiple":false,
-      "default_values":["1"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
+        {
+      "id" : "alternative_hypothesis",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["two-sided"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "two-sided",
+              "value": "two-sided"
+          },
+          {
+              "display": "greater",
+              "value": "greater"
+          },
+          {
+              "display": "less",
+              "value": "less"
+          }
+        ]
       }
     }
   ],
@@ -190,20 +176,15 @@
     "service-mapping" : {
       "url" : "",
       "name" : "GenericsAPI",
-      "method" : "perform_variable_stats_matrix",
+      "method" : "perform_mantel_test",
       "input_mapping" : [
         {
           "narrative_system_variable": "workspace_id",
           "target_property": "workspace_id"
         },
         {
-          "input_parameter" : "input_matrix_ref",
-          "target_property" : "input_matrix_ref",
-          "target_type_transform": "resolved-ref"
-        },
-        {
-          "input_parameter" : "attribute_mapping_obj_ref",
-          "target_property" : "attribute_mapping_obj_ref",
+          "input_parameter" : "input_matrix_refs",
+          "target_property" : "input_matrix_refs",
           "target_type_transform": "resolved-ref"
         },
         {
@@ -219,20 +200,12 @@
           "target_property" : "permutations"
         },
         {
-          "input_parameter" : "grouping",
-          "target_property" : "grouping"
+          "input_parameter" : "correlation_method",
+          "target_property" : "correlation_method"
         },
         {
-          "input_parameter" : "perform_anosim",
-          "target_property" : "perform_anosim"
-        },
-        {
-          "input_parameter" : "perform_permanova",
-          "target_property" : "perform_permanova"
-        },
-        {
-          "input_parameter" : "perform_permdisp",
-          "target_property" : "perform_permdisp"
+          "input_parameter" : "alternative_hypothesis",
+          "target_property" : "alternative_hypothesis"
         }
       ],
       "output_mapping" : [

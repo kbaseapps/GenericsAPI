@@ -161,6 +161,44 @@ class MatrixUtil:
 
         return tab_content
 
+    def _generate_mantel_test_visualization_content(self, pwmantel_res):
+        tab_def_content = ''
+        tab_content = ''
+
+        viewer_name = 'pwmantel_res'
+
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Mantel Test</button>\n'''
+        tab_def_content += '\n</div>\n'
+
+        tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
+        tab_content += '''<table>\n'''
+
+        # add table headers
+        tab_content += '''<tr>\n'''
+        tab_content += '''<th>dm1</th>\n'''
+        tab_content += '''<th>dm2</th>\n'''
+        for col in pwmantel_res.columns:
+            tab_content += '''<th>{}</th>\n'''.format(col)
+        tab_content += '''</tr>\n'''
+
+        # add table contents
+        for idx, values in enumerate(pwmantel_res.values):
+            tab_content += '''<tr>\n'''
+            tab_content += '''<td>{}</td>\n'''.format(pwmantel_res.index[idx][0])
+            tab_content += '''<td>{}</td>\n'''.format(pwmantel_res.index[idx][1])
+            for value in values:
+                tab_content += '''<td>{}</td>\n'''.format(value)
+            tab_content += '''</tr>\n'''
+
+        tab_content += '''</table>\n'''
+        tab_content += '\n</div>\n'
+
+        return tab_def_content + tab_content
+
     def _generate_variable_stats_visualization_content(self, anosim_res,
                                                        permanova_res, permdisp_res):
         tab_def_content = ''
@@ -341,6 +379,56 @@ class MatrixUtil:
 
         return tab_def_content + tab_content
 
+    def _generate_mantel_test_html_report(self, pwmantel_res):
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'variable_stats_viewer_report.html')
+
+        visualization_content = self._generate_mantel_test_visualization_content(pwmantel_res)
+
+        table_style_content = '''
+                                table {
+                                  font-family: arial, sans-serif;
+                                  border-collapse: collapse;
+                                  width: 66%;
+                                }
+
+                                td, th {
+                                  border: 1px solid #dddddd;
+                                  text-align: left;
+                                  padding: 8px;
+                                }
+
+                                tr:nth-child(even) {
+                                  background-color: #dddddd;
+                                }
+
+                                </style>'''
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                report_template = report_template.replace('</style>',
+                                                          table_style_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Mantel Test App'
+                            })
+        return html_report
+
     def _generate_variable_stats_html_report(self, anosim_res, permanova_res, permdisp_res):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -389,7 +477,7 @@ class MatrixUtil:
         html_report.append({'shock_id': report_shock_id,
                             'name': os.path.basename(result_file_path),
                             'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for Compute Correlation App'
+                            'description': 'HTML summary report for Variable Stats App'
                             })
         return html_report
 
@@ -427,7 +515,7 @@ class MatrixUtil:
         html_report.append({'shock_id': report_shock_id,
                             'name': os.path.basename(result_file_path),
                             'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for Compute Correlation App'
+                            'description': 'HTML summary report for Transform Matrix App'
                             })
         return html_report
 
@@ -458,7 +546,7 @@ class MatrixUtil:
         html_report.append({'shock_id': report_shock_id,
                             'name': os.path.basename(result_file_path),
                             'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for Compute Correlation App'
+                            'description': 'HTML summary report for Heatmap App'
                             })
         return html_report
 
@@ -527,6 +615,23 @@ class MatrixUtil:
                          'direct_html_link_index': 0,
                          'html_window_height': 1300,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
+    def _generate_mantel_test_report(self, workspace_id, pwmantel_res):
+        output_html_files = self._generate_mantel_test_html_report(pwmantel_res)
+
+        report_params = {'message': '',
+                         'workspace_id': workspace_id,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 600,
+                         'report_object_name': 'mantel_test_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
@@ -1113,7 +1218,7 @@ class MatrixUtil:
 
         return dict(permdisp_res)
 
-    def _run_mantel_tests(self, dms, labels, permutations, correlation_method='pearson',
+    def _run_mantel_tests(self, dms, labels, permutations=0, correlation_method='pearson',
                           alternative_hypothesis='two-sided'):
 
         pwmantel_res = pwmantel(dms, labels=labels, permutations=permutations,
@@ -1195,6 +1300,42 @@ class MatrixUtil:
 
         return {'new_matrix_obj_ref': new_matrix_obj_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
+
+    def perform_mantel_test(self, params):
+
+        input_matrix_refs = params.get('input_matrix_refs')
+        workspace_id = params.get('workspace_id')
+        dimension = params.get('dimension', 'col')
+        dist_metric = params.get('dist_metric', 'euclidean')
+
+        correlation_method = params.get('correlation_method', 'pearson')
+        permutations = params.get('permutations', 0)
+        alternative_hypothesis = params.get('alternative_hypothesis', 'two-sided')
+
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        dms = list()
+        labels = list()
+        for input_matrix_ref in input_matrix_refs:
+            input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+            input_matrix_info = input_matrix_obj['info']
+            input_matrix_name = input_matrix_info[1]
+            labels.append(input_matrix_name)
+
+            data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+            df = pd.read_json(data_matrix)
+
+            dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
+            dms.append(dm)
+
+        pwmantel_res = self._run_mantel_tests(dms, labels, permutations=permutations,
+                                              correlation_method=correlation_method,
+                                              alternative_hypothesis=alternative_hypothesis)
+
+        report_output = self._generate_mantel_test_report(workspace_id, pwmantel_res)
+
+        return report_output
 
     def perform_variable_stats_matrix(self, params):
 

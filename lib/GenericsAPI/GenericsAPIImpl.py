@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "4975716306c77a60eb0479fe732777e9aa8483b3"
+    GIT_COMMIT_HASH = "46783931d32f59fbb2d1a5819815df6936da0dd8"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -362,13 +362,13 @@ class GenericsAPI:
         :param params: instance of type "TransformMatrixParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "new_matrix_name" of
-           String, parameter "abundance_filtering_params" of mapping from
-           String to String, parameter "standardization_params" of mapping
-           from String to String, parameter "ratio_transformation_params" of
-           mapping from String to String, parameter
-           "perform_relative_abundance" of type "boolean" (A boolean - 0 for
-           false, 1 for true.)
+           (workspace name of the object), parameter "workspace_id" of Long,
+           parameter "new_matrix_name" of String, parameter
+           "abundance_filtering_params" of mapping from String to String,
+           parameter "standardization_params" of mapping from String to
+           String, parameter "ratio_transformation_params" of mapping from
+           String to String, parameter "perform_relative_abundance" of type
+           "boolean" (A boolean - 0 for false, 1 for true.)
         :returns: instance of type "TransformMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -391,11 +391,12 @@ class GenericsAPI:
         """
         :param params: instance of type "VariableStatsParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "workspace_id" of Long, parameter
-           "dimension" of String, parameter "dist_metric" of String,
-           parameter "permutations" of Long, parameter "grouping" of String,
-           parameter "perform_anosim" of type "boolean" (A boolean - 0 for
-           false, 1 for true.), parameter "perform_permanova" of type
+           reference), parameter "attribute_mapping_obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_id" of
+           Long, parameter "dist_metric" of String, parameter "dimension" of
+           String, parameter "grouping" of String, parameter "permutations"
+           of Long, parameter "perform_anosim" of type "boolean" (A boolean -
+           0 for false, 1 for true.), parameter "perform_permanova" of type
            "boolean" (A boolean - 0 for false, 1 for true.), parameter
            "perform_permdisp" of type "boolean" (A boolean - 0 for false, 1
            for true.)
@@ -411,6 +412,30 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method perform_variable_stats_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def perform_mantel_test(self, ctx, params):
+        """
+        :param params: instance of type "MantelTestParams" -> structure:
+           parameter "input_matrix_refs" of list of type "obj_ref" (An X/Y/Z
+           style reference), parameter "workspace_id" of Long, parameter
+           "dist_metric" of String, parameter "dimension" of String,
+           parameter "correlation_method" of String, parameter "permutations"
+           of Long, parameter "alternative_hypothesis" of String
+        :returns: instance of type "MantelTestOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN perform_mantel_test
+        returnVal = self.matrix_util.perform_mantel_test(params)
+        #END perform_mantel_test
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method perform_mantel_test return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

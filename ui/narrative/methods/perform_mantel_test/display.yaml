@@ -1,0 +1,72 @@
+name     : Perform Mantel Test Analysis
+subtitle : Compute correlation between distance matrices using the Mantel test
+tooltip  : Compute correlation between distance matrices using the Mantel test
+
+icon: analysis.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_refs :
+        ui-name: |
+            Matrix Objects
+        short-hint : |
+            One of KBaseMatrices object
+        long-hint  : |
+            One of KBaseMatrices object
+
+    dimension:
+        ui-name: |
+            Perform Analysis On
+        short-hint : |
+            Perform analysis on column or row
+        long-hint  : |
+            Perform analysis on column or row
+
+    dist_metric :
+        ui-name : |
+            Distance Metric To Use For Calculating Distance Matrix
+        short-hint : |
+            Distancse Metric To Use For Calculating Distance Matrix
+        long-hint  : |
+            Distance Metric To Use For Calculating Distance Matrix
+
+    correlation_method:
+        ui-name: |
+            Correlation Method
+        short-hint : |
+            Method used to compute the correlation between distance matrices
+        long-hint  : |
+            Method used to compute the correlation between distance matrices
+
+    permutations:
+        ui-name: |
+            Permutations To Use For Significance
+        short-hint : |
+            Number of permutations to use when assessing statistical significance
+        long-hint  : |
+            Number of permutations to use when assessing statistical significance
+
+    alternative_hypothesis:
+        ui-name: |
+            Alternative Hypothesis
+        short-hint : |
+            Alternative hypothesis to use when calculating statistical significance.
+        long-hint  : |
+            Alternative hypothesis to use when calculating statistical significance.
+
+description : |
+    <p>  Compute correlation between distance matrices using the Mantel test</p>
