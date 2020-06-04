@@ -1321,6 +1321,9 @@ class MatrixUtil:
         if dimension not in ['col', 'row']:
             raise ValueError('Please use "col" or "row" for input dimension')
 
+        if len(input_matrix_refs) < 2:
+            raise ValueError('Please provide at least 2 matrices to perform mentel test')
+
         dms = list()
         labels = list()
         for input_matrix_ref in input_matrix_refs:
