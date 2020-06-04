@@ -190,6 +190,7 @@ class MatrixUtil:
             tab_content += '''<tr>\n'''
             tab_content += '''<td>{}</td>\n'''.format(pwmantel_res.index[idx][0])
             tab_content += '''<td>{}</td>\n'''.format(pwmantel_res.index[idx][1])
+            values[0] = round(values[0], 4)
             for value in values:
                 tab_content += '''<td>{}</td>\n'''.format(value)
             tab_content += '''</tr>\n'''
@@ -394,7 +395,7 @@ class MatrixUtil:
                                 table {
                                   font-family: arial, sans-serif;
                                   border-collapse: collapse;
-                                  width: 66%;
+                                  width: 100%;
                                 }
 
                                 td, th {
@@ -1201,18 +1202,21 @@ class MatrixUtil:
         return dm
 
     def _run_anosim(self, dm, grouping, permutations):
+        logging.info('start performing anosim')
 
         anosim_res = anosim(dm, grouping, permutations=permutations)
 
         return dict(anosim_res)
 
     def _run_permanova(self, dm, grouping, permutations):
+        logging.info('start performing permanova')
 
         permanova_res = permanova(dm, grouping, permutations=permutations)
 
         return dict(permanova_res)
 
     def _run_permdisp(self, dm, grouping, permutations):
+        logging.info('start performing permdisp')
 
         permdisp_res = permdisp(dm, grouping, permutations=permutations)
 
@@ -1220,6 +1224,8 @@ class MatrixUtil:
 
     def _run_mantel_tests(self, dms, labels, permutations=0, correlation_method='pearson',
                           alternative_hypothesis='two-sided'):
+
+        logging.info('start performing mantel test')
 
         pwmantel_res = pwmantel(dms, labels=labels, permutations=permutations,
                                 method=correlation_method, alternative=alternative_hypothesis)
