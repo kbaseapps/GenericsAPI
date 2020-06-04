@@ -15,9 +15,8 @@ from xlrd.biffh import XLRDError
 from sklearn import preprocessing
 from skbio.stats.composition import ilr, clr
 from skbio import DistanceMatrix
-from skbio.stats.distance import anosim, permanova, permdisp
+from skbio.stats.distance import anosim, permanova, permdisp, pwmantel
 import scipy.spatial.distance as dist
-
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -207,7 +206,7 @@ class MatrixUtil:
                 tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
                 tab_def_content += '''>Homogeneity Multivariate Analysis of Variance</button>\n'''
             else:
-                first_tab_token = True
+                # first_tab_token = True
                 tab_def_content += '''\n<div class="tab">\n'''
                 tab_def_content += '''\n<button class="tablinks" '''
                 tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
@@ -1113,6 +1112,14 @@ class MatrixUtil:
         permdisp_res = permdisp(dm, grouping, permutations=permutations)
 
         return dict(permdisp_res)
+
+    def _run_mantel_tests(self, dms, labels, permutations, correlation_method='pearson',
+                          alternative_hypothesis='two-sided'):
+
+        pwmantel_res = pwmantel(dms, labels=labels, permutations=permutations,
+                                method=correlation_method, alternative=alternative_hypothesis)
+
+        return pwmantel_res
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
