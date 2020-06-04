@@ -263,6 +263,7 @@ module GenericsAPI {
   typedef structure {
       obj_ref input_matrix_ref;
       workspace_name workspace_name;
+      int workspace_id;
       string new_matrix_name;
       mapping<string, string> abundance_filtering_params;
       mapping<string, string> standardization_params;
@@ -280,6 +281,7 @@ module GenericsAPI {
 
   typedef structure {
       obj_ref input_matrix_ref;
+      obj_ref attribute_mapping_obj_ref;
       int workspace_id;
       string dist_metric;
       string dimension;
@@ -296,6 +298,24 @@ module GenericsAPI {
   } VariableStatsOutput;
 
   funcdef perform_variable_stats_matrix (VariableStatsParams params) returns (VariableStatsOutput returnVal) authentication required;
+
+
+  typedef structure {
+      list<obj_ref> input_matrix_refs;
+      int workspace_id;
+      string dist_metric;
+      string dimension;
+      string correlation_method;
+      int permutations;
+      string alternative_hypothesis;
+  } MantelTestParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+  } MantelTestOutput;
+
+  funcdef perform_mantel_test (MantelTestParams params) returns (MantelTestOutput returnVal) authentication required;
 
 
   /* ATTRIBUTE MAPPING */
