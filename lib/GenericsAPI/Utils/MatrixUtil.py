@@ -179,8 +179,8 @@ class MatrixUtil:
 
         # add table headers
         tab_content += '''<tr>\n'''
-        tab_content += '''<th>dm1</th>\n'''
-        tab_content += '''<th>dm2</th>\n'''
+        tab_content += '''<th>Distance Matrix 1</th>\n'''
+        tab_content += '''<th>Distance Matrix 2</th>\n'''
         for col in pwmantel_res.columns:
             tab_content += '''<th>{}</th>\n'''.format(col)
         tab_content += '''</tr>\n'''
