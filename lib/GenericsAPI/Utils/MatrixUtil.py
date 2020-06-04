@@ -631,7 +631,7 @@ class MatrixUtil:
                          'workspace_id': workspace_id,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 600,
+                         'html_window_height': 300,
                          'report_object_name': 'mantel_test_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -652,7 +652,7 @@ class MatrixUtil:
                          'workspace_id': workspace_id,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 600,
+                         'html_window_height': 450,
                          'report_object_name': 'variable_stats_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
