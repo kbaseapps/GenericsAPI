@@ -387,7 +387,7 @@ class MatrixUtil:
         html_report = list()
 
         self._mkdir_p(output_directory)
-        result_file_path = os.path.join(output_directory, 'variable_stats_viewer_report.html')
+        result_file_path = os.path.join(output_directory, 'mantel_test_viewer_report.html')
 
         visualization_content = self._generate_mantel_test_visualization_content(pwmantel_res)
 
