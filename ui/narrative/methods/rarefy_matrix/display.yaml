@@ -1,0 +1,48 @@
+name     : Rarefy Matrix
+subtitle : Generating randomly rarefied matrix from input matrix
+tooltip  : Generating randomly rarefied matrix from input matrix
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Input Matrix
+        short-hint : |
+            Input matrix whose data needs to be rarefied
+        long-hint  : |
+            Input matrix whose data needs to be rarefied
+
+    new_matrix_name:
+        ui-name: |
+            Rarefied Matrix Name
+        short-hint : |
+            Output rarefied matrix name
+        long-hint  : |
+            Output rarefied matrix name
+
+    seed_number:
+        ui-name: |
+            Seed Number
+        short-hint : |
+            Seed Number
+        long-hint  : |
+            Seed Number
+
+description : |
+    <p> Generating randomly rarefied matrix from input matrix </p>

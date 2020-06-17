@@ -1,0 +1,96 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["active","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+      "id": "seed_number",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["7"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int"
+      }
+    },
+    {
+      "id" : "new_matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseMatrices"],
+          "is_output_name" : true
+        }
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "perform_rarefy",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
+        },
+        {
+          "input_parameter" : "input_matrix_ref",
+          "target_property" : "input_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "seed_number",
+          "target_property" : "seed_number"
+        },
+        {
+          "input_parameter" : "new_matrix_name",
+          "target_property" : "new_matrix_name"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "new_matrix_obj_ref"],
+            "target_property": "new_matrix_obj_ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

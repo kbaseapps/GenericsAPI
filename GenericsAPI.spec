@@ -281,6 +281,21 @@ module GenericsAPI {
 
   typedef structure {
       obj_ref input_matrix_ref;
+      int workspace_id;
+      string new_matrix_name;
+      int seed_number;
+  } RarefyMatrixParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+      obj_ref new_matrix_obj_ref;
+  } RarefyMatrixOutput;
+
+  funcdef perform_rarefy (RarefyMatrixParams params) returns (RarefyMatrixOutput returnVal) authentication required;
+
+  typedef structure {
+      obj_ref input_matrix_ref;
       obj_ref attribute_mapping_obj_ref;
       int workspace_id;
       string dist_metric;
