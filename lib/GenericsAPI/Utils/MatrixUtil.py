@@ -19,6 +19,8 @@ from skbio.stats.distance import anosim, permanova, permdisp, pwmantel
 import scipy.spatial.distance as dist
 import rpy2.robjects.packages as rpackages
 import rpy2.robjects as ro
+from rpy2.robjects import pandas2ri, numpy2ri
+from rpy2.robjects.conversion import localconverter
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -1470,11 +1472,13 @@ class MatrixUtil:
         run_seed = (not seed_number == 'do_not_seed')
 
         vegan = rpackages.importr('vegan')
+        numpy2ri.activate()
 
         logging.info('Start executing rrarefy')
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
-        random_rare = vegan.rrarefy(df, raremax)
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            random_rare = vegan.rrarefy(df, raremax)
         random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
 
         # generating plots
@@ -1486,13 +1490,16 @@ class MatrixUtil:
         ro.r("jpeg('{}')".format(rarecurve_image))
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
-        vegan.rarecurve(df, sample=raremax, step=20, col="blue", cex=0.6)
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            vegan.rarecurve(df, sample=raremax, step=20, col="blue", cex=0.6)
         ro.r('dev.off()')
 
         logging.info('Start generating expected species richness vs raw abundance plot')
-        Srare = vegan.rarefy(df, raremax)
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            Srare = vegan.rarefy(df, raremax)
         specnumber = ro.r['specnumber']
-        S = specnumber(df)
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            S = specnumber(df)
         obs_vs_rare_image = os.path.join(result_directory, 'obs_vs_rare.jpg')
         ro.r("jpeg('{}')".format(obs_vs_rare_image))
         plot = ro.r['plot']
