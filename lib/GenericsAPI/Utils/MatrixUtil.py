@@ -1471,7 +1471,7 @@ class MatrixUtil:
 
         vegan = rpackages.importr('vegan')
 
-        self.logging('Start executing rrarefy')
+        logging.info('Start executing rrarefy')
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
         random_rare = vegan.rrarefy(df, raremax)
@@ -1481,7 +1481,7 @@ class MatrixUtil:
         result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(result_directory)
 
-        self.logging('Start generating rarecurve plot')
+        logging.info('Start generating rarecurve plot')
         rarecurve_image = os.path.join(result_directory, 'rarecurve.jpg')
         ro.r("jpeg('{}')".format(rarecurve_image))
         if run_seed:
@@ -1489,7 +1489,7 @@ class MatrixUtil:
         vegan.rarecurve(df, sample=raremax, step=20, col="blue", cex=0.6)
         ro.r('dev.off()')
 
-        self.logging('Start generating expected species richness vs raw abundance plot')
+        logging.info('Start generating expected species richness vs raw abundance plot')
         Srare = vegan.rarefy(df, raremax)
         specnumber = ro.r['specnumber']
         S = specnumber(df)
