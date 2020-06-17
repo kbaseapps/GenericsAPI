@@ -158,14 +158,14 @@ class SampleServiceTest(unittest.TestCase):
         attributes = am_data['attributes']
         attri_names = [attribute['attribute'] for attribute in attributes]
 
-        attri_names_expected = ['id', 'type', 'parent', 'Latitude', 'Collection date', 'Longitude',
-                                'Related Identifiers', 'Current archive contact',
-                                'Collection method', 'Navigation type', 'Relation Type',
-                                'Current archive', 'Locality Description',
-                                'Name of physiographic feature', 'Field program/cruise',
-                                'Material', 'Purpose', 'Coordinate Precision?',
-                                'Location Description', 'Primary physiographic feature',
-                                'Collector/Chief Scientist']
+        attri_names_expected = ['id', 'type', 'parent', 'id', 'name', 'latitude',
+                                'collection_date', 'longitude', 'field_program_cruise',
+                                'name_of_physiographic_feature', 'collector_chief_scientist',
+                                'related_identifiers', 'purpose', 'current_archive_contact',
+                                'material', 'primary_physiographic_feature',
+                                'coordinate_precision?', 'locality_description', 'relation_type',
+                                'current_archive', 'collection_method', 'location_description',
+                                'navigation_type']
 
         self.assertCountEqual(attri_names, attri_names_expected)
 

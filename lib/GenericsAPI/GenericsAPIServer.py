@@ -378,6 +378,10 @@ class Application(object):
                              name='GenericsAPI.transform_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.transform_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.perform_rarefy,
+                             name='GenericsAPI.perform_rarefy',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.perform_rarefy'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.perform_variable_stats_matrix,
                              name='GenericsAPI.perform_variable_stats_matrix',
                              types=[dict])

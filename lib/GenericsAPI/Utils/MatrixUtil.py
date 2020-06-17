@@ -17,6 +17,8 @@ from skbio.stats.composition import ilr, clr
 from skbio import DistanceMatrix
 from skbio.stats.distance import anosim, permanova, permdisp, pwmantel
 import scipy.spatial.distance as dist
+import rpy2.robjects.packages as rpackages
+import rpy2.robjects as ro
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -257,6 +259,65 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
+    def _generate_rarefy_visualization_content(self, output_directory, original_matrix_dir,
+                                               rarefied_matrix_dir, rarecurve_image,
+                                               obs_vs_rare_image):
+        tab_def_content = ''
+        tab_content = ''
+
+        tab_def_content += '''
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'OriginalMatrixViewer')" id="defaultOpen">Original Matrix</button>
+        '''
+        original_matrix_report_files = os.listdir(original_matrix_dir)
+        original_matrix_index_page = None
+        for original_matrix_report_file in original_matrix_report_files:
+            if original_matrix_report_file.endswith('.html'):
+                original_matrix_index_page = original_matrix_report_file
+
+            shutil.copy2(os.path.join(original_matrix_dir, original_matrix_report_file),
+                         output_directory)
+        tab_content += self._generate_tab_content(original_matrix_index_page,
+                                                  'OriginalMatrixViewer')
+
+        viewer_name = 'RarefiedMatrixViewer'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Rarefied Matrix</button>\n'''
+        rarefied_matrix_report_files = os.listdir(rarefied_matrix_dir)
+        rarefied_matrix_index_page = None
+        for rarefied_matrix_report_file in rarefied_matrix_report_files:
+            if rarefied_matrix_report_file.endswith('.html'):
+                rarefied_matrix_index_page = rarefied_matrix_report_file
+
+            shutil.copy2(os.path.join(rarefied_matrix_dir, rarefied_matrix_report_file),
+                         output_directory)
+        tab_content += self._generate_tab_content(rarefied_matrix_index_page, viewer_name)
+
+        rarecurve_image_name = os.path.basename(rarecurve_image)
+        shutil.copy2(rarecurve_image,
+                     os.path.join(output_directory, rarecurve_image_name))
+
+        obs_vs_rare_image_name = os.path.basename(obs_vs_rare_image)
+        shutil.copy2(obs_vs_rare_image,
+                     os.path.join(output_directory, obs_vs_rare_image_name))
+
+        viewer_name = 'RarecurvePlot'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Rarecurve Plot</button>\n'''
+
+        tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+        tab_content += '''\n<img src="{}" '''.format(rarecurve_image_name)
+        tab_content += '''alt="rarecurve" width="600" height="400">\n'''
+        tab_content += '''<br>\n<br>\n'''
+        tab_content += '''\n<img src="{}" '''.format(obs_vs_rare_image_name)
+        tab_content += '''alt="rarecurve" width="600" height="400">\n'''
+        tab_content += '\n</div>\n'
+
+        tab_def_content += '\n</div>\n'
+        return tab_def_content + tab_content
+
     def _generate_trans_visualization_content(self, output_directory, original_matrix_dir,
                                               filtered_matrix_dir, relative_abundance_matrix_dir,
                                               standardize_matrix_dir,
@@ -482,6 +543,41 @@ class MatrixUtil:
                             })
         return html_report
 
+    def _generate_rarefy_html_report(self, original_matrix_dir, rarefied_matrix_dir,
+                                     rarecurve_image, obs_vs_rare_image):
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'rarefy_matrix_viewer_report.html')
+
+        visualization_content = self._generate_rarefy_visualization_content(
+                                                                    output_directory,
+                                                                    original_matrix_dir,
+                                                                    rarefied_matrix_dir,
+                                                                    rarecurve_image,
+                                                                    obs_vs_rare_image)
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Transform Matrix App'
+                            })
+        return html_report
+
     def _generate_transform_html_report(self, original_matrix_dir, filtered_matrix_dir,
                                         relative_abundance_matrix_dir,
                                         standardize_matrix_dir,
@@ -550,6 +646,48 @@ class MatrixUtil:
                             'description': 'HTML summary report for Heatmap App'
                             })
         return html_report
+
+    def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id, original_matrix_df,
+                                random_rare_df, rarecurve_image, obs_vs_rare_image):
+
+        objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Randomly Rarefied Matrix'}]
+
+        data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(data_tsv_directory)
+        logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
+        original_matrix_tsv_path = os.path.join(data_tsv_directory,
+                                                'original_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+        original_matrix_df.to_csv(original_matrix_tsv_path)
+        original_matrix_dir = self.report_util.build_heatmap_html({
+                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
+
+        rarefied_matrix_tsv_path = os.path.join(data_tsv_directory,
+                                                'rarefied_matrix_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+        random_rare_df.to_csv(rarefied_matrix_tsv_path)
+        rarefied_matrix_dir = self.report_util.build_heatmap_html({
+                                            'tsv_file_path': rarefied_matrix_tsv_path})['html_dir']
+
+        output_html_files = self._generate_rarefy_html_report(original_matrix_dir,
+                                                              rarefied_matrix_dir,
+                                                              rarecurve_image,
+                                                              obs_vs_rare_image)
+
+        report_params = {'message': '',
+                         'objects_created': objects_created,
+                         'workspace_id': workspace_id,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 1300,
+                         'report_object_name': 'rarefy_matrix_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
 
     def _generate_transform_report(self, new_matrix_obj_ref, workspace_name, original_matrix_df,
                                    filtered_df, relative_abundance_df,
@@ -1306,6 +1444,87 @@ class MatrixUtil:
 
         return {'new_matrix_obj_ref': new_matrix_obj_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
+
+    def perform_rarefy(self, params):
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        new_matrix_name = params.get('new_matrix_name')
+
+        seed_number = params.get('seed_number', 'do_not_seed')
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        original_matrix_df = df.copy(deep=True)
+
+        raremax = int(min(df.sum(axis=1)))
+
+        run_seed = (not seed_number == 'do_not_seed')
+
+        vegan = rpackages.importr('vegan')
+
+        self.logging('Start executing rrarefy')
+        if run_seed:
+            ro.r('set.seed({})'.format(seed_number))
+        random_rare = vegan.rrarefy(df, raremax)
+        random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
+
+        # generating plots
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+
+        self.logging('Start generating rarecurve plot')
+        rarecurve_image = os.path.join(result_directory, 'rarecurve.jpg')
+        ro.r("jpeg('{}')".format(rarecurve_image))
+        if run_seed:
+            ro.r('set.seed({})'.format(seed_number))
+        vegan.rarecurve(df, sample=raremax, step=20, col="blue", cex=0.6)
+        ro.r('dev.off()')
+
+        self.logging('Start generating expected species richness vs raw abundance plot')
+        Srare = vegan.rarefy(df, raremax)
+        specnumber = ro.r['specnumber']
+        S = specnumber(df)
+        obs_vs_rare_image = os.path.join(result_directory, 'obs_vs_rare.jpg')
+        ro.r("jpeg('{}')".format(obs_vs_rare_image))
+        plot = ro.r['plot']
+        plot(S, Srare, xlab="Observed No. of Species", ylab="Rarefied No. of Species")
+        ro.r('dev.off()')
+
+        new_matrix_data = {'row_ids': random_rare_df.index.tolist(),
+                           'col_ids': random_rare_df.columns.tolist(),
+                           'values': random_rare_df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        logging.info("Saving new rarefy matrix object")
+        info = self.dfu.save_objects({
+            "id": workspace_id,
+            "objects": [{
+                "type": input_matrix_info[2],
+                "data": input_matrix_data,
+                "name": new_matrix_name
+            }]
+        })[0]
+
+        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
+
+        report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
+                                                     original_matrix_df, random_rare_df,
+                                                     rarecurve_image, obs_vs_rare_image)
+
+        returnVal.update(report_output)
+
+        return returnVal
 
     def perform_mantel_test(self, params):
 
