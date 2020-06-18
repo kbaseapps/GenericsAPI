@@ -311,10 +311,10 @@ class MatrixUtil:
 
         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
         tab_content += '''\n<img src="{}" '''.format(rarecurve_image_name)
-        tab_content += '''alt="rarecurve" width="600" height="400">\n'''
+        tab_content += '''alt="rarecurve" width="600" height="600">\n'''
         tab_content += '''<br>\n<br>\n'''
         tab_content += '''\n<img src="{}" '''.format(obs_vs_rare_image_name)
-        tab_content += '''alt="rarecurve" width="600" height="400">\n'''
+        tab_content += '''alt="rarecurve" width="600" height="600">\n'''
         tab_content += '\n</div>\n'
 
         tab_def_content += '\n</div>\n'
