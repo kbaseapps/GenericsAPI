@@ -53,6 +53,10 @@
           {
               "display": "Spearman Rank",
               "value": "spearman"
+          },
+          {
+              "display": "Mutual Information",
+              "value": "mutual_info"
           }
         ]
       }

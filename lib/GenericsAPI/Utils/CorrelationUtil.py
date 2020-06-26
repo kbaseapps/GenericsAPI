@@ -12,12 +12,13 @@ from matplotlib import pyplot as plt
 from plotly.offline import plot
 from scipy import stats
 from natsort import natsorted
+from sklearn import metrics
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
-CORR_METHOD = ['pearson', 'kendall', 'spearman']  # correlation method
+CORR_METHOD = ['pearson', 'kendall', 'spearman', 'mutual_info']  # correlation method
 HIDDEN_SEARCH_THRESHOLD = 1500
 
 
@@ -612,6 +613,10 @@ class CorrelationUtil:
                     corr_value, p_value = stats.spearmanr(value_array_1, value_array_2)
                 elif method == 'kendall':
                     corr_value, p_value = stats.kendalltau(value_array_1, value_array_2)
+                elif method == 'mutual_info':
+                    corr_value = metrics.adjusted_mutual_info_score(value_array_1, value_array_2)
+                    # p_value = stats.linregress(value_array_1, value_array_2)[3]
+                    p_value = 0
                 else:
                     err_msg = 'Input correlation method [{}] is not available.\n'.format(method)
                     err_msg += 'Please choose one of {}'.format(CORR_METHOD)
@@ -764,7 +769,7 @@ class CorrelationUtil:
         matrix_ref_2: object reference of a matrix
         workspace_name: workspace name objects to be saved to
         corr_matrix_name: correlation matrix object name
-        method: correlation method, one of ['pearson', 'kendall', 'spearman']
+        method: correlation method, one of ['pearson', 'kendall', 'spearman', 'mutual_info']
         plot_corr_matrix: plot correlation matrix in report, default False
         compute_significance: also compute Significance in addition to correlation matrix
         """
