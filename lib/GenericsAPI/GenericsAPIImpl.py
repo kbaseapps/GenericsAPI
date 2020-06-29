@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -32,7 +32,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.7"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "9b4cc18f2ccb91db098c3c39f5524ae7f3fd70a3"
+    GIT_COMMIT_HASH = "c4eaeb680fd4736306eb34470818a8c446d71139"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -392,7 +392,8 @@ class GenericsAPI:
         :param params: instance of type "RarefyMatrixParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_id" of Long, parameter
-           "new_matrix_name" of String, parameter "seed_number" of Long
+           "new_matrix_name" of String, parameter "seed_number" of Long,
+           parameter "dimension" of String
         :returns: instance of type "RarefyMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
