@@ -1453,6 +1453,7 @@ class MatrixUtil:
         new_matrix_name = params.get('new_matrix_name')
 
         seed_number = params.get('seed_number', 'do_not_seed')
+        dimension = params.get('dimension', 'col')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -1467,6 +1468,11 @@ class MatrixUtil:
         df = pd.read_json(data_matrix)
         original_matrix_df = df.copy(deep=True)
 
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+
         raremax = int(min(df.sum(axis=1)))
 
         run_seed = (not seed_number == 'do_not_seed')
@@ -1480,6 +1486,9 @@ class MatrixUtil:
         with localconverter(ro.default_converter + pandas2ri.converter):
             random_rare = vegan.rrarefy(df, raremax)
         random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
+
+        if dimension == 'col':
+            random_rare_df = random_rare_df.T
 
         # generating plots
         result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
