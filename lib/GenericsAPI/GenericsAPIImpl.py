@@ -30,9 +30,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "c4eaeb680fd4736306eb34470818a8c446d71139"
+    GIT_COMMIT_HASH = "e5a7c9fc2952bf44ebf8ec76d92322f00b606b3e"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
