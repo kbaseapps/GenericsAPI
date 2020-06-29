@@ -284,6 +284,7 @@ module GenericsAPI {
       int workspace_id;
       string new_matrix_name;
       int seed_number;
+      string dimension;
   } RarefyMatrixParams;
 
   typedef structure {

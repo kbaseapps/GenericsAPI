@@ -21,7 +21,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-
+    
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -30,9 +30,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "9b4cc18f2ccb91db098c3c39f5524ae7f3fd70a3"
+    GIT_COMMIT_HASH = "e5a7c9fc2952bf44ebf8ec76d92322f00b606b3e"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -392,7 +392,8 @@ class GenericsAPI:
         :param params: instance of type "RarefyMatrixParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_id" of Long, parameter
-           "new_matrix_name" of String, parameter "seed_number" of Long
+           "new_matrix_name" of String, parameter "seed_number" of Long,
+           parameter "dimension" of String
         :returns: instance of type "RarefyMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
