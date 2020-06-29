@@ -36,6 +36,14 @@ parameters :
         long-hint  : |
             Output rarefied matrix name
 
+    dimension:
+        ui-name: |
+            Perform Rarefying Algorithm On
+        short-hint : |
+            Rarefy matrix on row or column
+        long-hint  : |
+            Rarefy matrix on row or column
+
     seed_number:
         ui-name: |
             Seed Number
