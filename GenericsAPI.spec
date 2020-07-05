@@ -296,6 +296,17 @@ module GenericsAPI {
   funcdef perform_rarefy (RarefyMatrixParams params) returns (RarefyMatrixOutput returnVal) authentication required;
 
   typedef structure {
+      string taxonomic_str;
+  } ProcessTaxonomicStrParams;
+
+  typedef structure {
+      string origin_taxonomic_str;
+      string processed_taxonomic_str;
+  } ProcessTaxonomicStrOutput;
+
+  funcdef process_taxonomic_str (ProcessTaxonomicStrParams params) returns (ProcessTaxonomicStrOutput returnVal) authentication required;
+
+  typedef structure {
       obj_ref input_matrix_ref;
       obj_ref attribute_mapping_obj_ref;
       int workspace_id;

@@ -382,6 +382,10 @@ class Application(object):
                              name='GenericsAPI.perform_rarefy',
                              types=[dict])
         self.method_authentication['GenericsAPI.perform_rarefy'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.process_taxonomic_str,
+                             name='GenericsAPI.process_taxonomic_str',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.process_taxonomic_str'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.perform_variable_stats_matrix,
                              name='GenericsAPI.perform_variable_stats_matrix',
                              types=[dict])

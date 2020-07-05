@@ -16,6 +16,7 @@ from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.SampleServiceUtil import SampleServiceUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
+from GenericsAPI.Utils.TaxonUtil import TaxonUtil
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
@@ -822,6 +823,7 @@ class BiomUtil:
         self.sampleservice_util = SampleServiceUtil(config)
         self.attr_util = AttributesUtil(config)
         self.matrix_util = MatrixUtil(config)
+        self.taxon_util = TaxonUtil(self.config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
         self.taxon_wsname = config['taxon-workspace-name']
