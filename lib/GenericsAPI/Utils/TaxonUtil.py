@@ -66,7 +66,7 @@ class TaxonUtil:
         return processed_taxonomic_str
 
     def __init__(self, config):
-        self.taxon_wsname = config['taxon-workspace-name']
+        self.taxon_wsname = config.get('taxon-workspace-name')
 
     def process_taxonomic_str(self, taxonomic_str):
         logging.info('start processing taxonomic string: {}'.format(taxonomic_str))
