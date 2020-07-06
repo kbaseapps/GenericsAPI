@@ -582,8 +582,20 @@ class BiomUtil:
         attribute_keys = metadata_df.columns.tolist()
         data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
+        if 'taxonomy' in attribute_keys:
+            data['attributes'].append({'attribute': 'kbase_taxonomy', 'source': 'upload'})
+
         for axis_id in axis_ids:
             data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
+            if 'taxonomy' in attribute_keys:
+                kbase_taxonomy = None
+                taxonomy_index = attribute_keys.index('taxonomy')
+                taxonomy_str = metadata_df.loc[axis_id].tolist()[taxonomy_index]
+                kbase_taxonomy = self.taxon_util.process_taxonomic_str(taxonomy_str)
+                data['instances'][axis_id].append(kbase_taxonomy)
+
+        print('fdsafasdfsda')
+        print(data)
 
         logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
