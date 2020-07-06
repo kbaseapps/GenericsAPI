@@ -66,6 +66,8 @@ class TaxonUtil:
         return processed_taxonomic_str
 
     def __init__(self, config):
+        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
+                            level=logging.INFO)
         self.taxon_wsname = config.get('taxon-workspace-name')
 
     def process_taxonomic_str(self, taxonomic_str):
@@ -82,11 +84,11 @@ class TaxonUtil:
                 return taxonomic_str
 
             # count non-alphanumeric characters
-            delimiters = re.sub(r'\w+', '', taxonomic_str)
+            delimiters = re.sub(r'[a-zA-Z0-9]+', '', taxonomic_str)
             delimiters = ''.join(set(delimiters))
 
             if len(delimiters) == 1:
-                return taxonomic_str
+                return taxonomic_str.replace(delimiters, ';')
 
             delimiter = csv.Sniffer().sniff(taxonomic_str).delimiter
             lineage = [x.strip() for x in taxonomic_str.split(delimiter)]
