@@ -12,6 +12,7 @@ from GenericsAPI.Utils.NetworkUtil import NetworkUtil
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.Utils.DataTableUtil import DataTableUtil
 from GenericsAPI.Utils.TemplateUtil import TemplateUtil
+from GenericsAPI.Utils.TaxonUtil import TaxonUtil
 #END_HEADER
 
 
@@ -32,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.8"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "e5a7c9fc2952bf44ebf8ec76d92322f00b606b3e"
+    GIT_COMMIT_HASH = "62ef7e537ea7ff3c8f355a05f61f48bc60044790"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -54,6 +55,7 @@ class GenericsAPI:
         self.pca_util = PCAUtil(self.config)
         self.data_table_util = DataTableUtil(self.config)
         self.template_util = TemplateUtil(self.config)
+        self.taxon_util = TaxonUtil(self.config)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
@@ -408,6 +410,33 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method perform_rarefy return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def process_taxonomic_str(self, ctx, params):
+        """
+        :param params: instance of type "ProcessTaxonomicStrParams" ->
+           structure: parameter "taxonomic_str" of String
+        :returns: instance of type "ProcessTaxonomicStrOutput" -> structure:
+           parameter "origin_taxonomic_str" of String, parameter
+           "processed_taxonomic_str" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN process_taxonomic_str
+
+        taxonomic_str = params.get('taxonomic_str')
+        processed_taxonomic_str = self.taxon_util.process_taxonomic_str(taxonomic_str)
+
+        returnVal = {'origin_taxonomic_str': taxonomic_str,
+                     'processed_taxonomic_str': processed_taxonomic_str}
+
+        #END process_taxonomic_str
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method process_taxonomic_str return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

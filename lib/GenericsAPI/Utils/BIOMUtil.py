@@ -16,6 +16,7 @@ from GenericsAPI.Utils.AttributeUtils import AttributesUtil
 from GenericsAPI.Utils.SampleServiceUtil import SampleServiceUtil
 from GenericsAPI.Utils.DataUtil import DataUtil
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
+from GenericsAPI.Utils.TaxonUtil import TaxonUtil
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
@@ -581,8 +582,17 @@ class BiomUtil:
         attribute_keys = metadata_df.columns.tolist()
         data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
+        if 'taxonomy' in attribute_keys:
+            data['attributes'].append({'attribute': 'kbase_taxonomy', 'source': 'upload'})
+
         for axis_id in axis_ids:
             data['instances'][axis_id] = metadata_df.loc[axis_id].tolist()
+            if 'taxonomy' in attribute_keys:
+                kbase_taxonomy = None
+                taxonomy_index = attribute_keys.index('taxonomy')
+                taxonomy_str = metadata_df.loc[axis_id].tolist()[taxonomy_index]
+                kbase_taxonomy = self.taxon_util.process_taxonomic_str(taxonomy_str)
+                data['instances'][axis_id].append(kbase_taxonomy)
 
         logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
@@ -822,6 +832,7 @@ class BiomUtil:
         self.sampleservice_util = SampleServiceUtil(config)
         self.attr_util = AttributesUtil(config)
         self.matrix_util = MatrixUtil(config)
+        self.taxon_util = TaxonUtil(config)
         self.matrix_types = [x.split(".")[1].split('-')[0]
                              for x in self.data_util.list_generic_types()]
         self.taxon_wsname = config['taxon-workspace-name']
