@@ -594,9 +594,6 @@ class BiomUtil:
                 kbase_taxonomy = self.taxon_util.process_taxonomic_str(taxonomy_str)
                 data['instances'][axis_id].append(kbase_taxonomy)
 
-        print('fdsafasdfsda')
-        print(data)
-
         logging.info('start saving AttributeMapping object: {}'.format(obj_name))
         info = self.dfu.save_objects({
             "id": ws_id,
