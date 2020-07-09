@@ -175,7 +175,7 @@ class NetworkUtil:
         edge_trace_neg = go.Scatter(x=[], y=[], line=dict(width=0.6, color='#888'),
                                     hoverinfo='text', mode='lines', name='negative correlation')
 
-        for edge in graph.edges(data=True):
+        for edge in list(graph.edges(data=True)):
             x0, y0 = nodes[edge[0]]['pos']
             x1, y1 = nodes[edge[1]]['pos']
             if edge[2]['weight'] >= 0:
@@ -198,13 +198,22 @@ class NetworkUtil:
             node_trace['x'] += tuple([x])
             node_trace['y'] += tuple([y])
 
+        nodes_list = list(nodes.keys())
+
         # color and text Node points
+        maker_color = [None] * len(nodes_list)
+        node_text = [None] * len(nodes_list)
         for node, adjacencies in enumerate(graph.adjacency()):
-            node_trace['marker']['color'] += tuple([len(adjacencies[1])])
+            node_info = adjacencies[0]
+            pos = nodes_list.index(node_info)
+            maker_color[pos] = len(adjacencies[1])
             node_info = adjacencies[0]
             connections = list(adjacencies[1].keys())
             node_info += ', {} connections'.format(len(connections))
-            node_trace['text'] += tuple([node_info])
+            node_text[pos] = node_info
+
+        node_trace['marker']['color'] = maker_color
+        node_trace['text'] = node_text
 
         # create network graph
         fig = go.Figure(data=[edge_trace_pos, edge_trace_neg, node_trace],
@@ -381,7 +390,7 @@ class NetworkUtil:
         """
 
         logging.info('--->\nrunning NetworkUtil.build_network\n' +
-            'params:\n{}'.format(json.dumps(params, indent=1)))
+                     'params:\n{}'.format(json.dumps(params, indent=1)))
 
         params = self._process_build_nx_params(params)
 
