@@ -88,7 +88,10 @@ class TaxonUtil:
             delimiters = ''.join(set(delimiters))
 
             if len(delimiters) == 1:
-                return taxonomic_str.replace(delimiters, ';')
+                if taxonomic_str.endswith(delimiters):
+                    return taxonomic_str.replace(delimiters, ';')
+                else:
+                    return taxonomic_str.replace(delimiters, ';') + ';'
 
             delimiter = csv.Sniffer().sniff(taxonomic_str).delimiter
             lineage = [x.strip() for x in taxonomic_str.split(delimiter)]
@@ -103,7 +106,11 @@ class TaxonUtil:
                 taxon_level_delimiter = None
 
             if taxon_level_delimiter is None:
-                return taxonomic_str
+                if taxonomic_str.endswith(delimiter):
+                    return taxonomic_str.replace(delimiter, ';')
+                else:
+                    return taxonomic_str.replace(delimiter, ';') + ';'
+                # return taxonomic_str
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
 

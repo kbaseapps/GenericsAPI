@@ -15,7 +15,7 @@ from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
-class GenericsAPITest(unittest.TestCase):
+class ImportMatrixTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

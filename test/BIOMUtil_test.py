@@ -18,7 +18,7 @@ from installed_clients.WorkspaceClient import Workspace as workspaceService
 from installed_clients.sample_uploaderClient import sample_uploader
 
 
-class GenericsAPITest(unittest.TestCase):
+class BioMultiTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
