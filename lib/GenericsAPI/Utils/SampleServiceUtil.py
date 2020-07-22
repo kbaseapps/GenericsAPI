@@ -171,10 +171,11 @@ class SampleServiceUtil:
                     attributes_user = self._fetch_attri_from_meta(meta_user)
                     attributes += attributes_user
 
+            sample_data['sample_id'] = sample_id
             sample_datas.append(sample_data)
 
         attributes = [i for n, i in enumerate(attributes) if i not in attributes[n + 1:]]
-        attributes = [{'attribute': 'id', 'source': 'SampleService'},
+        attributes = [{'attribute': 'sample_id', 'source': 'SampleService'},
                       {'attribute': 'type', 'source': 'SampleService'},
                       {'attribute': 'parent', 'source': 'SampleService'}] + attributes
 
@@ -186,6 +187,8 @@ class SampleServiceUtil:
             instance = list()
             node_tree = sample_data.get('node_tree', [{}])
 
+            sample_id = sample_data.get('sample_id')
+
             for node in node_tree:
 
                 meta_controlled = node.get('meta_controlled')
@@ -194,7 +197,9 @@ class SampleServiceUtil:
                 for attribute in attributes:
                     attri_name = attribute['attribute']
 
-                    if attri_name in ['id', 'type', 'parent']:
+                    if attri_name == 'sample_id':
+                        instance.append(sample_id)
+                    elif attri_name in ['type', 'parent']:
                         instance.append(node.get(attri_name))
                     else:
                         if meta_user:
