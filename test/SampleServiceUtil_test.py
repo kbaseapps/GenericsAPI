@@ -165,9 +165,10 @@ class SampleServiceTest(unittest.TestCase):
                                 'material', 'primary_physiographic_feature',
                                 'coordinate_precision?', 'locality_description', 'relation_type',
                                 'current_archive', 'collection_method', 'location_description',
-                                'navigation_type']
+                                'navigation_type', 'collection_date_precision']
 
-        self.assertCountEqual(attri_names, attri_names_expected)
+        self.assertTrue(set(attri_names_expected).issubset(set(attri_names)))
+        # self.assertCountEqual(attri_names, attri_names_expected)
 
         instances = am_data['instances']
         sample_names = instances.keys()
