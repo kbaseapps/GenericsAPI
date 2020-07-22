@@ -34,7 +34,7 @@ class TaxonUtilTest(unittest.TestCase):
 
         taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;(UBA11576)'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;(UBA11576)'
+        expect_processed_taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;(UBA11576);'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Sinobacteraceae;Nevskia;'
@@ -44,12 +44,17 @@ class TaxonUtilTest(unittest.TestCase):
 
         taxonomic_str = 'A,B,C,D,E,F'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'A;B;C;D;E;F'
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'A,B,C,D;E,(F)'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;B;C;D;E;(F);'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'A;B;C;D;E;F'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'A;B;C;D;E;F'
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'd:A,p:B,c:C,o:D,f:E,g:F'

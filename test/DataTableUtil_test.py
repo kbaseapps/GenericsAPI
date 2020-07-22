@@ -15,7 +15,7 @@ from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
-class CorrUtilTest(unittest.TestCase):
+class DataTableTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
