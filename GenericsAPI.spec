@@ -326,6 +326,21 @@ module GenericsAPI {
 
   funcdef perform_variable_stats_matrix (VariableStatsParams params) returns (VariableStatsOutput returnVal) authentication required;
 
+  typedef structure {
+      obj_ref input_matrix_ref;
+      obj_ref attribute_mapping_obj_ref;
+      int workspace_id;
+      string dimension;
+      string grouping;
+      int permutations;
+  } SimperParams;
+
+  typedef structure {
+      string report_name;
+      string report_ref;
+  } SimperOutput;
+
+  funcdef perform_simper (SimperParams params) returns (SimperOutput returnVal) authentication required;
 
   typedef structure {
       list<obj_ref> input_matrix_refs;

@@ -22,7 +22,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.8"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "62ef7e537ea7ff3c8f355a05f61f48bc60044790"
+    GIT_COMMIT_HASH = "2be1ff5d633b166f24842799c423c54389335181"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -466,6 +466,30 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method perform_variable_stats_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def perform_simper(self, ctx, params):
+        """
+        :param params: instance of type "SimperParams" -> structure:
+           parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "attribute_mapping_obj_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_id" of
+           Long, parameter "dimension" of String, parameter "grouping" of
+           String, parameter "permutations" of Long
+        :returns: instance of type "SimperOutput" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN perform_simper
+        returnVal = self.matrix_util.perform_simper(params)
+        #END perform_simper
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method perform_simper return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

@@ -1553,6 +1553,7 @@ class MatrixUtil:
         workspace_id = params.get('workspace_id')
         grouping = params.get('grouping')
         dimension = params.get('dimension', 'col')
+        permutations = int(params.get('permutations', 0))
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_data = input_matrix_obj['data']
@@ -1577,7 +1578,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_matrix_df = df.copy(deep=True)
+        # original_matrix_df = df.copy(deep=True)
 
         if dimension == 'col':
             df = df.T
@@ -1588,7 +1589,7 @@ class MatrixUtil:
         numpy2ri.activate()
 
         with localconverter(ro.default_converter + pandas2ri.converter):
-            simper_ret = vegan.simper(df, grouping_names)
+            simper_ret = vegan.simper(df, grouping_names, permutations=permutations)
             simper_sum = vegan.summary_simper(simper_ret)
 
         report_output = self._generate_simper_report(workspace_id, simper_ret, simper_sum)
