@@ -390,6 +390,10 @@ class Application(object):
                              name='GenericsAPI.perform_variable_stats_matrix',
                              types=[dict])
         self.method_authentication['GenericsAPI.perform_variable_stats_matrix'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.perform_simper,
+                             name='GenericsAPI.perform_simper',
+                             types=[dict])
+        self.method_authentication['GenericsAPI.perform_simper'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.perform_mantel_test,
                              name='GenericsAPI.perform_mantel_test',
                              types=[dict])
