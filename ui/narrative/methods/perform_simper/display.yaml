@@ -54,7 +54,7 @@ parameters :
 
     permutations:
         ui-name: |
-            Permutations To Use For Significance
+            Number Of Permutations
         short-hint : |
             Number of permutations to use when assessing statistical significance
         long-hint  : |
