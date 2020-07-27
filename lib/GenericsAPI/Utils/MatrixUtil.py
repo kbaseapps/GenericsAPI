@@ -150,6 +150,16 @@ class MatrixUtil:
 
         return tab_content
 
+    def _generate_simper_tab_content(self, res, viewer_name):
+        tab_content = ''
+
+        tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
+        html = '''<pre class="tab">''' + str(res).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '\n</div>\n'
+
+        return tab_content
+
     def _generate_variable_stat_tab_content(self, res, viewer_name):
         tab_content = ''
 
@@ -202,6 +212,29 @@ class MatrixUtil:
         tab_content += '''</table>\n'''
         tab_content += '\n</div>\n'
 
+        return tab_def_content + tab_content
+
+    def _generate_simper_visualization_content(self, simper_ret, simper_sum):
+        tab_def_content = ''
+        tab_content = ''
+
+        viewer_name = 'simper_ret'
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Most Influential Species</button>\n'''
+
+        tab_content += self._generate_simper_tab_content(simper_ret, viewer_name)
+
+        viewer_name = 'simper_sum'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Similarity Percentage Summary</button>\n'''
+
+        tab_content += self._generate_simper_tab_content(simper_sum, viewer_name)
+
+        tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
     def _generate_variable_stats_visualization_content(self, anosim_res,
@@ -493,6 +526,57 @@ class MatrixUtil:
                             })
         return html_report
 
+    def _generate_simper_html_report(self, simper_ret, simper_sum):
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'simper_viewer_report.html')
+
+        visualization_content = self._generate_simper_visualization_content(simper_ret,
+                                                                            simper_sum)
+
+        table_style_content = '''
+                                table {
+                                  font-family: arial, sans-serif;
+                                  border-collapse: collapse;
+                                  width: 66%;
+                                }
+
+                                td, th {
+                                  border: 1px solid #dddddd;
+                                  text-align: left;
+                                  padding: 8px;
+                                }
+
+                                tr:nth-child(even) {
+                                  background-color: #dddddd;
+                                }
+
+                                </style>'''
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                report_template = report_template.replace('</style>',
+                                                          table_style_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Simper App'
+                            })
+        return html_report
+
     def _generate_variable_stats_html_report(self, anosim_res, permanova_res, permdisp_res):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -773,6 +857,23 @@ class MatrixUtil:
                          'direct_html_link_index': 0,
                          'html_window_height': 300,
                          'report_object_name': 'mantel_test_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url, token=self.token)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
+    def _generate_simper_report(self, workspace_id, simper_ret, simper_sum):
+        output_html_files = self._generate_simper_html_report(simper_ret, simper_sum)
+
+        report_params = {'message': '',
+                         'workspace_id': workspace_id,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 450,
+                         'report_object_name': 'simper_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
@@ -1446,6 +1547,53 @@ class MatrixUtil:
 
         return {'new_matrix_obj_ref': new_matrix_obj_ref,
                 'report_name': output['name'], 'report_ref': output['ref']}
+
+    def perform_simper(self, params):
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        grouping = params.get('grouping')
+        dimension = params.get('dimension', 'col')
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_data = input_matrix_obj['data']
+
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if not am_ref:
+            raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+
+        am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
+        attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
+
+        if grouping not in attribute_names:
+            raise ValueError('Cannot find {} in {} attribute mapping'.format(grouping, dimension))
+
+        attri_pos = attribute_names.index(grouping)
+        instances = am_data.get('instances')
+        grouping_names = [instance[attri_pos] for instance in instances.values()]
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        original_matrix_df = df.copy(deep=True)
+
+        if dimension == 'col':
+            df = df.T
+
+        df.fillna(0, inplace=True)
+
+        vegan = rpackages.importr('vegan')
+        numpy2ri.activate()
+
+        with localconverter(ro.default_converter + pandas2ri.converter):
+            simper_ret = vegan.simper(df, grouping_names)
+            simper_sum = vegan.summary_simper(simper_ret)
+
+        report_output = self._generate_simper_report(workspace_id, simper_ret, simper_sum)
+
+        return report_output
 
     def perform_rarefy(self, params):
         input_matrix_ref = params.get('input_matrix_ref')

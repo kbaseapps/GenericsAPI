@@ -110,7 +110,6 @@ class TaxonUtil:
                     return taxonomic_str.replace(delimiter, ';')
                 else:
                     return taxonomic_str.replace(delimiter, ';') + ';'
-                # return taxonomic_str
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
 
