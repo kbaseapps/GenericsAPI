@@ -1,6 +1,6 @@
-name     : Perform Similarity Percentage(SIMPER) Statistics Analysis
-subtitle : Perform Similarity Percentage(SIMPER) Statistics Analysis
-tooltip  : Perform Similarity Percentage(SIMPER) Statistics Analysis
+name     : Perform Similarity Percentage (SIMPER) Statistics Analysis
+subtitle : Perform Similarity Percentage (SIMPER) Statistics Analysis
+tooltip  : Perform Similarity Percentage (SIMPER) Statistics Analysis
 
 icon: analysis.png
 
@@ -54,7 +54,7 @@ parameters :
 
     permutations:
         ui-name: |
-            Permutations To Use For Significance
+            Number Of Permutations
         short-hint : |
             Number of permutations to use when assessing statistical significance
         long-hint  : |
