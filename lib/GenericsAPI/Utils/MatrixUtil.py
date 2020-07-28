@@ -1578,7 +1578,6 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        # original_matrix_df = df.copy(deep=True)
 
         if dimension == 'col':
             df = df.T
