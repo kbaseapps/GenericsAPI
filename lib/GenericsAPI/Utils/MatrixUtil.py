@@ -1549,6 +1549,7 @@ class MatrixUtil:
                 'report_name': output['name'], 'report_ref': output['ref']}
 
     def perform_simper(self, params):
+        logging.info('Start performing SIMPER with {}'.format(params))
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_id = params.get('workspace_id')
         grouping = params.get('grouping')
@@ -1575,6 +1576,7 @@ class MatrixUtil:
         attri_pos = attribute_names.index(grouping)
         instances = am_data.get('instances')
         grouping_names = [instance[attri_pos] for instance in instances.values()]
+        logging.info('Fetched {} for {} from attributes'.format(grouping_names, grouping))
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
@@ -1596,6 +1598,7 @@ class MatrixUtil:
         return report_output
 
     def perform_rarefy(self, params):
+        logging.info('Start performing rarefying matrix with {}'.format(params))
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
@@ -1692,6 +1695,8 @@ class MatrixUtil:
 
     def perform_mantel_test(self, params):
 
+        logging.info('Start performing mantel test with {}'.format(params))
+
         input_matrix_refs = params.get('input_matrix_refs')
         workspace_id = params.get('workspace_id')
         dimension = params.get('dimension', 'col')
@@ -1731,6 +1736,8 @@ class MatrixUtil:
 
     def perform_variable_stats_matrix(self, params):
 
+        logging.info('Start performing variable statistics with {}'.format(params))
+
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_id = params.get('workspace_id')
         dimension = params.get('dimension', 'col')
@@ -1767,10 +1774,9 @@ class MatrixUtil:
             raise ValueError('Cannot find {} in {} attribute mapping'.format(grouping, dimension))
 
         attri_pos = attribute_names.index(grouping)
-
         instances = am_data.get('instances')
-
         grouping_names = [instance[attri_pos] for instance in instances.values()]
+        logging.info('Fetched {} for {} from attributes'.format(grouping_names, grouping))
 
         anosim_res = None
         if perform_anosim:
@@ -1795,6 +1801,8 @@ class MatrixUtil:
         """
         transform a matrix
         """
+
+        logging.info('Start performing transformation with {}'.format(params))
 
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_name = params.get('workspace_name')
