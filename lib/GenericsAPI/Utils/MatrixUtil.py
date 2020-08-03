@@ -255,7 +255,7 @@ class MatrixUtil:
 
         tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
 
-        tab_content += '<iframe height="900px" width="100%" '
+        tab_content += '<iframe height="500px" width="100%" '
         tab_content += 'src="{}" '.format(simper_plot_name)
         tab_content += 'style="border:none;"></iframe>\n<p></p>\n'
 
@@ -268,12 +268,20 @@ class MatrixUtil:
         tab_def_content = ''
         tab_content = ''
 
-        viewer_name = 'simper_ret'
+        viewer_name = 'simper_plot'
         tab_def_content += '''\n<div class="tab">\n'''
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Most Influential Species</button>\n'''
+        tab_def_content += '''>Most Influential Specie Bar Plot</button>\n'''
+
+        tab_content += self._generate_simper_plot_content(viewer_name, species_stats,
+                                                          grouping_names, output_directory)
+
+        viewer_name = 'simper_ret'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Most Influential Species Info</button>\n'''
 
         tab_content += self._generate_simper_tab_content(simper_ret, viewer_name)
 
@@ -283,14 +291,6 @@ class MatrixUtil:
         tab_def_content += '''>Similarity Percentage Summary</button>\n'''
 
         tab_content += self._generate_simper_tab_content(simper_sum, viewer_name)
-
-        viewer_name = 'simper_plot'
-        tab_def_content += '''\n<button class="tablinks" '''
-        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-        tab_def_content += '''>Most Influential Specie Bar Plot</button>\n'''
-
-        tab_content += self._generate_simper_plot_content(viewer_name, species_stats,
-                                                          grouping_names, output_directory)
 
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
