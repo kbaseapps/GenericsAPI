@@ -21,6 +21,8 @@ import rpy2.robjects.packages as rpackages
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri, numpy2ri
 from rpy2.robjects.conversion import localconverter
+import plotly.graph_objects as go
+from plotly.offline import plot
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -214,7 +216,55 @@ class MatrixUtil:
 
         return tab_def_content + tab_content
 
-    def _generate_simper_visualization_content(self, simper_ret, simper_sum):
+    def _generate_simper_plot(self, species_stats, grouping_names):
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating plotly simper plot in {}'.format(output_directory))
+        self._mkdir_p(output_directory)
+        simper_plot_path = os.path.join(output_directory, 'SimperPlot.html')
+
+        species = list(species_stats.keys())
+
+        plot_data = list()
+        for grouping_name in set(grouping_names):
+            y_values = list()
+            for species_name in species:
+                species_data = species_stats[species_name]
+                y_values.append(species_data[grouping_name])
+
+            plot_data.append(go.Bar(name=str(grouping_name), x=species, y=y_values))
+
+        fig = go.Figure(data=plot_data)
+        fig.update_layout(barmode='group',
+                          xaxis=dict(title='species'),
+                          yaxis=dict(title='average abundance count'))
+        plot(fig, filename=simper_plot_path)
+
+        return simper_plot_path
+
+    def _generate_simper_plot_content(self, viewer_name, species_stats, grouping_names,
+                                      output_directory):
+
+        simper_plot_path = self._generate_simper_plot(species_stats, grouping_names)
+
+        simper_plot_name = 'SimperPlot.html'
+        shutil.copy2(simper_plot_path,
+                     os.path.join(output_directory, simper_plot_name))
+
+        tab_content = ''
+
+        tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
+
+        tab_content += '<iframe height="900px" width="100%" '
+        tab_content += 'src="{}" '.format(simper_plot_name)
+        tab_content += 'style="border:none;"></iframe>\n<p></p>\n'
+
+        tab_content += '\n</div>\n'
+
+        return tab_content
+
+    def _generate_simper_visualization_content(self, simper_ret, simper_sum,
+                                               species_stats, grouping_names, output_directory):
         tab_def_content = ''
         tab_content = ''
 
@@ -233,6 +283,14 @@ class MatrixUtil:
         tab_def_content += '''>Similarity Percentage Summary</button>\n'''
 
         tab_content += self._generate_simper_tab_content(simper_sum, viewer_name)
+
+        viewer_name = 'simper_plot'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Most Influential Specie Bar Plot</button>\n'''
+
+        tab_content += self._generate_simper_plot_content(viewer_name, species_stats,
+                                                          grouping_names, output_directory)
 
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
@@ -526,7 +584,7 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_simper_html_report(self, simper_ret, simper_sum):
+    def _generate_simper_html_report(self, simper_ret, simper_sum, species_stats, grouping_names):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -536,7 +594,10 @@ class MatrixUtil:
         result_file_path = os.path.join(output_directory, 'simper_viewer_report.html')
 
         visualization_content = self._generate_simper_visualization_content(simper_ret,
-                                                                            simper_sum)
+                                                                            simper_sum,
+                                                                            species_stats,
+                                                                            grouping_names,
+                                                                            output_directory)
 
         table_style_content = '''
                                 table {
@@ -865,8 +926,10 @@ class MatrixUtil:
 
         return report_output
 
-    def _generate_simper_report(self, workspace_id, simper_ret, simper_sum):
-        output_html_files = self._generate_simper_html_report(simper_ret, simper_sum)
+    def _generate_simper_report(self, workspace_id, simper_ret, simper_sum,
+                                species_stats, grouping_names):
+        output_html_files = self._generate_simper_html_report(simper_ret, simper_sum,
+                                                              species_stats, grouping_names)
 
         report_params = {'message': '',
                          'workspace_id': workspace_id,
@@ -1473,6 +1536,36 @@ class MatrixUtil:
 
         return pwmantel_res
 
+    def _generate_species_stats(self, df, simper_ret, grouping_names):
+        logging.info('start calculating species stats')
+        target_cols = [col for col in df.columns if col in str(simper_ret)]
+
+        species_stats = dict()
+        for target_col in target_cols:
+            logging.info('start calculating {} stats'.format(target_col))
+            dist_grouping_names = set(grouping_names)
+            average_abun = dict()
+
+            abun_values = df.loc[:, target_col]
+            for dist_grouping_name in dist_grouping_names:
+                grouping_name_pos = [index for index, value in enumerate(grouping_names)
+                                     if value == dist_grouping_name]
+                total_abun = 0
+                try:
+                    for pos in grouping_name_pos:
+                        total_abun += abun_values[pos]
+                except Exception:
+                    warning_msg = 'got unexpected error calculating total abundance value\n'
+                    warning_msg += 'grouping_name_pos: {}\n'.format(grouping_name_pos)
+                    warning_msg += 'abundance_values: {}\n'.format(abun_values)
+                    warning_msg += 'returning 0 as total abundance value\n'
+                    logging.warning(warning_msg)
+                average_abun[dist_grouping_name] = float(total_abun)/len(grouping_name_pos)
+
+            species_stats[target_col] = average_abun
+
+        return species_stats
+
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -1593,7 +1686,10 @@ class MatrixUtil:
             simper_ret = vegan.simper(df, grouping_names, permutations=permutations)
             simper_sum = vegan.summary_simper(simper_ret)
 
-        report_output = self._generate_simper_report(workspace_id, simper_ret, simper_sum)
+        species_stats = self._generate_species_stats(df, simper_ret, grouping_names)
+
+        report_output = self._generate_simper_report(workspace_id, simper_ret, simper_sum,
+                                                     species_stats, grouping_names)
 
         return report_output
 
