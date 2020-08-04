@@ -273,7 +273,7 @@ class MatrixUtil:
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Most Influential Specie Bar Plot</button>\n'''
+        tab_def_content += '''>Most Influential Species Bar Plot</button>\n'''
 
         tab_content += self._generate_simper_plot_content(viewer_name, species_stats,
                                                           grouping_names, output_directory)
