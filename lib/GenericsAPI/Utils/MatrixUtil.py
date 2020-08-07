@@ -10,6 +10,7 @@ import traceback
 import sys
 
 import pandas as pd
+import numpy as np
 from openpyxl import load_workbook
 from xlrd.biffh import XLRDError
 from sklearn import preprocessing
@@ -228,11 +229,14 @@ class MatrixUtil:
         plot_data = list()
         for grouping_name in set(grouping_names):
             y_values = list()
+            y_error = list()
             for species_name in species:
                 species_data = species_stats[species_name]
-                y_values.append(species_data[grouping_name])
+                y_values.append(species_data[grouping_name][0])
+                y_error.append(species_data[grouping_name][1])
 
-            plot_data.append(go.Bar(name=str(grouping_name), x=species, y=y_values))
+            plot_data.append(go.Bar(name=str(grouping_name), x=species, y=y_values,
+                                    error_y=dict(type='data', array=y_error)))
 
         fig = go.Figure(data=plot_data)
         fig.update_layout(barmode='group',
@@ -1560,17 +1564,22 @@ class MatrixUtil:
             for dist_grouping_name in dist_grouping_names:
                 grouping_name_pos = [index for index, value in enumerate(grouping_names)
                                      if value == dist_grouping_name]
-                total_abun = 0
+                filtered_abun_values = []
+                for pos in grouping_name_pos:
+                    filtered_abun_values.append(abun_values[pos])
+
+                mean = 0
+                std = 0
                 try:
-                    for pos in grouping_name_pos:
-                        total_abun += abun_values[pos]
+                    mean = round(np.mean(filtered_abun_values), 2)
+                    std = round(np.std(filtered_abun_values), 2)
                 except Exception:
-                    warning_msg = 'got unexpected error calculating total abundance value\n'
+                    warning_msg = 'got unexpected error calculating mean/std abundance value\n'
                     warning_msg += 'grouping_name_pos: {}\n'.format(grouping_name_pos)
                     warning_msg += 'abundance_values: {}\n'.format(abun_values)
-                    warning_msg += 'returning 0 as total abundance value\n'
+                    warning_msg += 'returning 0 as mean/std abundance value\n'
                     logging.warning(warning_msg)
-                average_abun[dist_grouping_name] = float(total_abun)/len(grouping_name_pos)
+                average_abun[dist_grouping_name] = [mean, std]
 
             species_stats[target_col] = average_abun
 
