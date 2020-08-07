@@ -1536,9 +1536,19 @@ class MatrixUtil:
 
         return pwmantel_res
 
+    def _compute_target_cols(self, df, simper_ret, grouping_names):
+        target_cols = [col for col in df.columns if col in str(simper_ret)]
+
+        if len(target_cols) > 10:
+            # choose first few most influential species from each condition pair
+            pass
+
+        return target_cols
+
     def _generate_species_stats(self, df, simper_ret, grouping_names):
         logging.info('start calculating species stats')
-        target_cols = [col for col in df.columns if col in str(simper_ret)]
+
+        target_cols = self._compute_target_cols(df, simper_ret, grouping_names)
 
         species_stats = dict()
         for target_col in target_cols:
