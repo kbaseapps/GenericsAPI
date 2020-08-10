@@ -1542,10 +1542,32 @@ class MatrixUtil:
 
     def _compute_target_cols(self, df, simper_ret, grouping_names):
         target_cols = [col for col in df.columns if col in str(simper_ret)]
+        target_cols = list(set(target_cols))
 
-        if len(target_cols) > 10:
-            # choose first few most influential species from each condition pair
-            pass
+        try:
+            max_target_col_len = 18
+            if len(target_cols) > max_target_col_len:
+                # choose first few most influential species from each condition pair
+                comp_group_len = len(simper_ret)
+                num_choosen_col = max_target_col_len//comp_group_len
+                target_cols = list()
+                for comp_group in simper_ret:
+                    species_pos = list(comp_group.names).index('species')
+                    ord_pos = list(comp_group.names).index('ord')
+
+                    species = list(comp_group[species_pos])
+                    ord_list = list(comp_group[ord_pos])
+
+                    target_species_pos = [i - 1 for i in ord_list[:num_choosen_col]]
+
+                    for p in target_species_pos:
+                        target_cols.append(species[p])
+
+                target_cols = list(set(target_cols))
+
+        except Exception:
+            warning_msg = 'got unexpected error fetching most influential species'
+            logging.warning(warning_msg)
 
         return target_cols
 
