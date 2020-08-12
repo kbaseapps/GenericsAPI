@@ -44,6 +44,14 @@ parameters :
         long-hint  : |
             Remove all rows with values below or equal the threshold
 
+    abundance_filtering_row_sum_threshold:
+        ui-name: |
+            Remove Rows With Sum Below Or Equal To
+        short-hint : |
+            Remove all rows with sum below or equal the threshold
+        long-hint  : |
+            Remove all rows with sum below or equal the threshold
+
     abundance_filtering_columns_threshold:
         ui-name: |
             Remove Columns With All Values Below Or Equal To
@@ -51,6 +59,14 @@ parameters :
             Remove all columns with values below or equal the threshold
         long-hint  : |
             Remove all columns with values below or equal the threshold
+
+    abundance_filtering_columns_sum_threshold:
+        ui-name: |
+            Remove Columns With Sum Below Or Equal To
+        short-hint : |
+            Remove all columns with sum below or equal the threshold
+        long-hint  : |
+            Remove all columns with sum below or equal the threshold
 
     perform_relative_abundance:
         ui-name: |
