@@ -1453,7 +1453,7 @@ class MatrixUtil:
         removed_row_ids = list(row_check[row_check == False].index)
         df = df.loc[row_check]
 
-        logging.info("Removing columns with values all below {}".format(row_threshold))
+        logging.info("Removing columns with values all below {}".format(columns_threshold))
         col_check = (df > columns_threshold).any(axis=0)
         removed_col_ids = list(col_check[col_check == False].index)
         df = df.loc[:, col_check]
