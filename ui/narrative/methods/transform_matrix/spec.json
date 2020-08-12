@@ -32,11 +32,33 @@
       }
     },
     {
+      "id": "abundance_filtering_row_sum_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["10000"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
       "id": "abundance_filtering_columns_threshold",
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
       "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id": "abundance_filtering_columns_sum_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["10000"],
       "field_type" : "text",
       "text_options": {
           "validate_as": "float"
@@ -162,7 +184,9 @@
       "id": "abundance_filtering_params",
       "parameters": [
         "abundance_filtering_row_threshold",
-        "abundance_filtering_columns_threshold"
+        "abundance_filtering_columns_threshold",
+        "abundance_filtering_row_sum_threshold",
+        "abundance_filtering_columns_sum_threshold"
       ],
       "optional": true,
       "allow_multiple": false,

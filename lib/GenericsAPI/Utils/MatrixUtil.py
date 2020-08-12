@@ -1446,7 +1446,8 @@ class MatrixUtil:
 
         return df, removed_row_ids, removed_col_ids
 
-    def _filtering_matrix(self, df, row_threshold=0, columns_threshold=0):
+    def _filtering_matrix(self, df, row_threshold=0, columns_threshold=0,
+                          row_sum_threshold=10000, columns_sum_threshold=10000):
 
         logging.info("Removing rows with values all below {}".format(row_threshold))
         row_check = (df > row_threshold).any(axis=1)
@@ -1456,6 +1457,16 @@ class MatrixUtil:
         logging.info("Removing columns with values all below {}".format(columns_threshold))
         col_check = (df > columns_threshold).any(axis=0)
         removed_col_ids = list(col_check[col_check == False].index)
+        df = df.loc[:, col_check]
+
+        logging.info("Removing rows with sum below {}".format(row_sum_threshold))
+        row_check = df.sum(axis=1) > row_sum_threshold
+        removed_row_ids += list(row_check[row_check == False].index)
+        df = df.loc[row_check]
+
+        logging.info("Removing columns with sum below {}".format(columns_sum_threshold))
+        col_check = df.sum(axis=0) > columns_sum_threshold
+        removed_col_ids += list(col_check[col_check == False].index)
         df = df.loc[:, col_check]
 
         return df, removed_row_ids, removed_col_ids
@@ -1975,7 +1986,13 @@ class MatrixUtil:
                                         row_threshold=abundance_filtering_params.get(
                                                         'abundance_filtering_row_threshold', 0),
                                         columns_threshold=abundance_filtering_params.get(
-                                                    'abundance_filtering_columns_threshold', 0))
+                                                    'abundance_filtering_columns_threshold', 0),
+                                        row_sum_threshold=abundance_filtering_params.get(
+                                                    'abundance_filtering_row_sum_threshold',
+                                                    10000),
+                                        columns_sum_threshold=abundance_filtering_params.get(
+                                                    'abundance_filtering_columns_sum_threshold',
+                                                    10000))
             filtered_df = df.copy(deep=True)
 
         relative_abundance_df = None
