@@ -1452,21 +1452,27 @@ class MatrixUtil:
         logging.info("Removing rows with values all below {}".format(row_threshold))
         row_check = (df > row_threshold).any(axis=1)
         removed_row_ids = list(row_check[row_check == False].index)
+        logging.info("Removed rows: {}".format(removed_row_ids))
         df = df.loc[row_check]
 
         logging.info("Removing columns with values all below {}".format(columns_threshold))
         col_check = (df > columns_threshold).any(axis=0)
         removed_col_ids = list(col_check[col_check == False].index)
+        logging.info("Removed columns: {}".format(removed_col_ids))
         df = df.loc[:, col_check]
 
         logging.info("Removing rows with sum below {}".format(row_sum_threshold))
         row_check = df.sum(axis=1) > row_sum_threshold
-        removed_row_ids += list(row_check[row_check == False].index)
+        additional_removed_row_ids = list(row_check[row_check == False].index)
+        removed_row_ids += additional_removed_row_ids
+        logging.info("Removed rows: {}".format(additional_removed_row_ids))
         df = df.loc[row_check]
 
         logging.info("Removing columns with sum below {}".format(columns_sum_threshold))
         col_check = df.sum(axis=0) > columns_sum_threshold
-        removed_col_ids += list(col_check[col_check == False].index)
+        additional_removed_col_ids = list(col_check[col_check == False].index)
+        removed_col_ids += additional_removed_col_ids
+        logging.info("Removed columns: {}".format(additional_removed_col_ids))
         df = df.loc[:, col_check]
 
         return df, removed_row_ids, removed_col_ids
