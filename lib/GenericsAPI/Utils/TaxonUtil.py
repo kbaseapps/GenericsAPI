@@ -115,7 +115,7 @@ class TaxonUtil:
                 raise ValueError('input taxonomic string is not a str type')
 
             # remove whitespaces
-            # taxonomic_str = taxonomic_str.replace(' ', '').replace('\t', '')
+            taxonomic_str = taxonomic_str.strip()
 
             if taxonomic_str.isalpha():
                 return taxonomic_str + ';'
