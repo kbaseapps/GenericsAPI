@@ -92,6 +92,7 @@ class TaxonUtil:
         return taxonomic_str
 
     def _remove_root(self, taxonomic_str, delimiter=';'):
+        # make sure taxonomic str starting with one of ROOT_CANDIDATES
         remove_root = False
 
         for root_candidate in self.ROOT_CANDIDATES:
@@ -107,10 +108,12 @@ class TaxonUtil:
                     starting_name = scientific_name
                     break
             if starting_name:
-                msg = 'Removing root scientific names.\n'
-                msg += 'New starting scientific name is [{}]'.format(starting_name)
-                logging.info(msg)
-                scientific_names = scientific_names[scientific_names.index(starting_name):]
+                idx = scientific_names.index(starting_name)
+                if idx != 0:
+                    msg = 'Removing root scientific name(s)\n'
+                    msg += 'New starting scientific name is [{}]'.format(starting_name)
+                    logging.info(msg)
+                    scientific_names = scientific_names[idx:]
             taxonomic_str = delimiter.join(scientific_names)
 
         return taxonomic_str
