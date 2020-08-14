@@ -136,3 +136,8 @@ class TaxonUtilTest(unittest.TestCase):
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
         expect_processed_taxonomic_str = 'Bacteria;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'root;Bacteria;Proteobacteria;Alphaproteobacteria'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Bacteria;Proteobacteria;Alphaproteobacteria;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
