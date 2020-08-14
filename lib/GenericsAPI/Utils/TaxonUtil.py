@@ -55,6 +55,8 @@ class TaxonUtil:
         if processed_taxonomic_str.count(';') == 7:
             processed_taxonomic_str = self._prepend_genus_name(processed_taxonomic_str)
 
+        processed_taxonomic_str = self._remove_root(processed_taxonomic_str)
+
         logging.info('converted taxonomic string: {}'.format(processed_taxonomic_str))
 
         return processed_taxonomic_str
@@ -73,7 +75,7 @@ class TaxonUtil:
 
     def _prepend_genus_name(self, taxonomic_str, delimiter=';'):
         # prepend genus name to species epithet if missing
-        scientific_names = taxonomic_str.split(';')
+        scientific_names = taxonomic_str.split(delimiter)
         genus_name = scientific_names[-3]
         species_name = scientific_names[-2]
 
@@ -84,6 +86,31 @@ class TaxonUtil:
             scientific_names[-2] = species_name
 
         taxonomic_str = delimiter.join(scientific_names)
+
+        return taxonomic_str
+
+    def _remove_root(self, taxonomic_str, delimiter=';'):
+        remove_root = False
+
+        root_candidates = ['bacteria', 'archaea', 'viridae', 'eukaryota', 'virus', 'eukarya']
+        for root_candidate in root_candidates:
+            if root_candidate in taxonomic_str.lower():
+                remove_root = True
+                break
+
+        if remove_root:
+            scientific_names = taxonomic_str.split(delimiter)
+            starting_name = ''
+            for scientific_name in scientific_names:
+                if scientific_name.lower() in root_candidates:
+                    starting_name = scientific_name
+                    break
+            if starting_name:
+                msg = 'Removing root scientific names.\n'
+                msg += 'New starting scientific name is [{}]'.format(starting_name)
+                logging.info(msg)
+                scientific_names = scientific_names[scientific_names.index(starting_name):]
+            taxonomic_str = delimiter.join(scientific_names)
 
         return taxonomic_str
 
@@ -99,6 +126,8 @@ class TaxonUtil:
         # prepend genus name to species epithet if missing
         if taxonomic_str.count(';') == 7:
             taxonomic_str = self._prepend_genus_name(taxonomic_str)
+
+        taxonomic_str = self._remove_root(taxonomic_str)
 
         return taxonomic_str
 
