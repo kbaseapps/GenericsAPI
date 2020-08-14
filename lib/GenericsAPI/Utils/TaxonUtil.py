@@ -6,6 +6,8 @@ import re
 
 class TaxonUtil:
 
+    ROOT_CANDIDATES = ['bacteria', 'archaea', 'viridae', 'eukaryota', 'virus', 'eukarya']
+
     def _fetch_taxon_level(self, taxon_char):
 
         taxon_level_mapping = {'l': 'Life', 'd': 'Domain', 'k': 'Kingdom', 'p': 'Phylum',
@@ -92,8 +94,7 @@ class TaxonUtil:
     def _remove_root(self, taxonomic_str, delimiter=';'):
         remove_root = False
 
-        root_candidates = ['bacteria', 'archaea', 'viridae', 'eukaryota', 'virus', 'eukarya']
-        for root_candidate in root_candidates:
+        for root_candidate in self.ROOT_CANDIDATES:
             if root_candidate in taxonomic_str.lower():
                 remove_root = True
                 break
@@ -102,7 +103,7 @@ class TaxonUtil:
             scientific_names = taxonomic_str.split(delimiter)
             starting_name = ''
             for scientific_name in scientific_names:
-                if scientific_name.lower() in root_candidates:
+                if scientific_name.lower() in self.ROOT_CANDIDATES:
                     starting_name = scientific_name
                     break
             if starting_name:
