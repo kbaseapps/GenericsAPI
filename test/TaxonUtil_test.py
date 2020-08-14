@@ -32,9 +32,14 @@ class TaxonUtilTest(unittest.TestCase):
         expect_processed_taxonomic_str = 'Bacteria;Firmicutes;Bacilli;;Streptococcaceae;Streptococcus;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
+        taxonomic_str = 'd:Bacteria,p:Firmicutes,c:Bacilli,f:Streptococcaceae,g:Streptococcus,s:species'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Bacteria;Firmicutes;Bacilli;;Streptococcaceae;Streptococcus;Streptococcus species;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
         taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;(UBA11576)'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;(UBA11576);'
+        expect_processed_taxonomic_str = 'Archaea;Nanoarchaeota;Woesearchaeia;UBA12501;UBA11576;UBA11576;UBA11576 (UBA11576);'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Sinobacteraceae;Nevskia;'
@@ -52,9 +57,24 @@ class TaxonUtilTest(unittest.TestCase):
         expect_processed_taxonomic_str = 'A;B;C;D;E;F;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
+        taxonomic_str = 'A;B;C;D;E;F;G;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;F G;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'A;B;C;D;E;F;f G'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;f G;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
         taxonomic_str = 'A,B,C,D;E,(F)'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
         expect_processed_taxonomic_str = 'A;B;C;D;E;(F);'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'A;B;C;D;E;F;G;H'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;G;H;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'A;B;C;D;E;F'
@@ -72,14 +92,24 @@ class TaxonUtilTest(unittest.TestCase):
         expect_processed_taxonomic_str = 'A;B;C;;D;F;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
+        taxonomic_str = 'd:A,p:unclassified B,c:C,f:D,g:F;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;;C;;D;F;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
         taxonomic_str = 'k__A; p__B; c__C; o__D; f__E; g__F; s__G'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'A;B;C;D;E;F;G;'
+        expect_processed_taxonomic_str = 'A;B;C;D;E;F;F G;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'k__A; p__B; f__E; g__F; s__G'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'A;B;;;E;F;G;'
+        expect_processed_taxonomic_str = 'A;B;;;E;F;F G;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'k__A; p__B; f__unclassified E; g__F; s__G'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'A;B;;;;F;F G;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
         taxonomic_str = 'k__A; p__B; c__; o__; f__; g__; s__'

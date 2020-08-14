@@ -77,6 +77,12 @@ class TaxonUtil:
         genus_name = scientific_names[-3]
         species_name = scientific_names[-2]
 
+        if not species_name.lower().startswith(genus_name.lower()):
+            logging.info("prepend genus name [{}] to species epithet [{}]".format(genus_name,
+                                                                                  species_name))
+            species_name = genus_name + ' ' + species_name
+            scientific_names[-2] = species_name
+
         taxonomic_str = delimiter.join(scientific_names)
 
         return taxonomic_str
