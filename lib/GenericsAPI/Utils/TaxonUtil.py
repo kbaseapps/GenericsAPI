@@ -47,7 +47,31 @@ class TaxonUtil:
         # remove empty trailing slots
         processed_taxonomic_str = processed_taxonomic_str.rstrip(';') + ';'
 
+        # remove unclassified scientific names
+        if 'unclassified' in processed_taxonomic_str.lower():
+            processed_taxonomic_str = self._remove_unclassified(processed_taxonomic_str)
+
+        # prepend genus name to species epithet if missing
+        if processed_taxonomic_str.count(';') == 7:
+            scientific_names = processed_taxonomic_str.split(';')
+            genus_name = scientific_names[-3]
+            species_name = scientific_names[-2]
+
+            processed_taxonomic_str = ';'.join(scientific_names)
+
         logging.info('converted taxonomic string: {}'.format(processed_taxonomic_str))
+
+        return processed_taxonomic_str
+
+    def _remove_unclassified(self, taxonomic_str, delimiter=';'):
+        # remove unclassified scientific names
+        scientific_names = taxonomic_str.split(delimiter)
+        for idx, scientific_name in enumerate(scientific_names):
+            if 'unclassified' in scientific_name.lower():
+                logging.info('removing unclassified scientific name: {}'.format(
+                                                                            scientific_names[idx]))
+                scientific_names[idx] = ''
+        processed_taxonomic_str = ';'.join(scientific_names)
 
         return processed_taxonomic_str
 
@@ -81,7 +105,7 @@ class TaxonUtil:
                 raise ValueError('input taxonomic string is not a str type')
 
             # remove whitespaces
-            taxonomic_str = taxonomic_str.replace(' ', '').replace('\t', '')
+            # taxonomic_str = taxonomic_str.replace(' ', '').replace('\t', '')
 
             if taxonomic_str.isalpha():
                 return taxonomic_str + ';'
@@ -92,9 +116,12 @@ class TaxonUtil:
 
             if len(delimiters) == 1:
                 if taxonomic_str.endswith(delimiters):
-                    return taxonomic_str.replace(delimiters, ';')
+                    taxonomic_str = taxonomic_str.replace(delimiters, ';')
                 else:
-                    return taxonomic_str.replace(delimiters, ';') + ';'
+                    taxonomic_str = taxonomic_str.replace(delimiters, ';') + ';'
+                if 'unclassified' in taxonomic_str.lower():
+                    taxonomic_str = self._remove_unclassified(taxonomic_str)
+                return taxonomic_str
 
             delimiter = csv.Sniffer().sniff(taxonomic_str).delimiter
             lineage = [x.strip() for x in taxonomic_str.split(delimiter)]
@@ -110,9 +137,12 @@ class TaxonUtil:
 
             if taxon_level_delimiter is None:
                 if taxonomic_str.endswith(delimiter):
-                    return taxonomic_str.replace(delimiter, ';')
+                    taxonomic_str = taxonomic_str.replace(delimiter, ';')
                 else:
-                    return taxonomic_str.replace(delimiter, ';') + ';'
+                    taxonomic_str = taxonomic_str.replace(delimiter, ';') + ';'
+                if 'unclassified' in taxonomic_str.lower():
+                    taxonomic_str = self._remove_unclassified(taxonomic_str)
+                return taxonomic_str
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
 

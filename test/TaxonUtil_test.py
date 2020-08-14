@@ -42,6 +42,11 @@ class TaxonUtilTest(unittest.TestCase):
         expect_processed_taxonomic_str = 'Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Sinobacteraceae;Nevskia;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
+        taxonomic_str = 'Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;unclassified Halobacteriaceae;Halobacteriaceae archaeon TNN10;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;;Halobacteriaceae archaeon TNN10;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
         taxonomic_str = 'A,B,C,D,E,F'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
         expect_processed_taxonomic_str = 'A;B;C;D;E;F;'
@@ -79,5 +84,15 @@ class TaxonUtilTest(unittest.TestCase):
 
         taxonomic_str = 'k__A; p__B; c__; o__; f__; g__; s__'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
-        expect_processed_taxonomic_str = 'A;B;;;;;;'
+        expect_processed_taxonomic_str = 'A;B;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'Bacteria;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Bacteria;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'Bacteria'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Bacteria;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
