@@ -44,6 +44,9 @@ class TaxonUtil:
             processed_taxonomic_str += (taxon_level_diff - 1) * ';'
             processed_taxonomic_str += scientific_name + ';'
 
+        # remove empty trailing slots
+        processed_taxonomic_str = processed_taxonomic_str.rstrip(';') + ';'
+
         logging.info('converted taxonomic string: {}'.format(processed_taxonomic_str))
 
         return processed_taxonomic_str
@@ -112,6 +115,9 @@ class TaxonUtil:
                     return taxonomic_str.replace(delimiter, ';') + ';'
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
+
+
+
 
         except Exception:
             logging.warning('failed to process taxonomic string')
