@@ -53,11 +53,7 @@ class TaxonUtil:
 
         # prepend genus name to species epithet if missing
         if processed_taxonomic_str.count(';') == 7:
-            scientific_names = processed_taxonomic_str.split(';')
-            genus_name = scientific_names[-3]
-            species_name = scientific_names[-2]
-
-            processed_taxonomic_str = ';'.join(scientific_names)
+            processed_taxonomic_str = self._prepend_genus_name(processed_taxonomic_str)
 
         logging.info('converted taxonomic string: {}'.format(processed_taxonomic_str))
 
@@ -71,26 +67,34 @@ class TaxonUtil:
                 logging.info('removing unclassified scientific name: {}'.format(
                                                                             scientific_names[idx]))
                 scientific_names[idx] = ''
-        processed_taxonomic_str = ';'.join(scientific_names)
+        taxonomic_str = delimiter.join(scientific_names)
 
-        return processed_taxonomic_str
+        return taxonomic_str
 
-    def _convert_taxonomic_str2(self, lineage, taxon_level_delimiter):
-        logging.info('start converting lineage: {} with taxon level delimiter [{}]'.format(
-                                                                            lineage,
-                                                                            taxon_level_delimiter))
+    def _prepend_genus_name(self, taxonomic_str, delimiter=';'):
+        # prepend genus name to species epithet if missing
+        scientific_names = taxonomic_str.split(';')
+        genus_name = scientific_names[-3]
+        species_name = scientific_names[-2]
 
-        processed_taxonomic_str = ''
+        taxonomic_str = delimiter.join(scientific_names)
 
-        for taxon_str in lineage:
-            taxon_str = taxon_str.rstrip(';')
-            taxon_items = taxon_str.split(taxon_level_delimiter)
+        return taxonomic_str
 
-            scientific_name = taxon_items[-1]
+    def _process_taxonomic_str(self, taxonomic_str, delimiter):
 
-            processed_taxonomic_str += scientific_name + ';'
+        if taxonomic_str.endswith(delimiter):
+            taxonomic_str = taxonomic_str.replace(delimiter, ';')
+        else:
+            taxonomic_str = taxonomic_str.replace(delimiter, ';') + ';'
+        # remove unclassified scientific names
+        if 'unclassified' in taxonomic_str.lower():
+            taxonomic_str = self._remove_unclassified(taxonomic_str)
+        # prepend genus name to species epithet if missing
+        if taxonomic_str.count(';') == 7:
+            taxonomic_str = self._prepend_genus_name(taxonomic_str)
 
-        return processed_taxonomic_str
+        return taxonomic_str
 
     def __init__(self, config):
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
@@ -115,12 +119,7 @@ class TaxonUtil:
             delimiters = ''.join(set(delimiters))
 
             if len(delimiters) == 1:
-                if taxonomic_str.endswith(delimiters):
-                    taxonomic_str = taxonomic_str.replace(delimiters, ';')
-                else:
-                    taxonomic_str = taxonomic_str.replace(delimiters, ';') + ';'
-                if 'unclassified' in taxonomic_str.lower():
-                    taxonomic_str = self._remove_unclassified(taxonomic_str)
+                taxonomic_str = self._process_taxonomic_str(taxonomic_str, delimiters)
                 return taxonomic_str
 
             delimiter = csv.Sniffer().sniff(taxonomic_str).delimiter
@@ -136,12 +135,7 @@ class TaxonUtil:
                 taxon_level_delimiter = None
 
             if taxon_level_delimiter is None:
-                if taxonomic_str.endswith(delimiter):
-                    taxonomic_str = taxonomic_str.replace(delimiter, ';')
-                else:
-                    taxonomic_str = taxonomic_str.replace(delimiter, ';') + ';'
-                if 'unclassified' in taxonomic_str.lower():
-                    taxonomic_str = self._remove_unclassified(taxonomic_str)
+                taxonomic_str = self._process_taxonomic_str(taxonomic_str, delimiter)
                 return taxonomic_str
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
