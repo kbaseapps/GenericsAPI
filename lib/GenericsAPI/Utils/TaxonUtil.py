@@ -84,7 +84,7 @@ class TaxonUtil:
             taxonomic_str = taxonomic_str.replace(' ', '').replace('\t', '')
 
             if taxonomic_str.isalpha():
-                return taxonomic_str
+                return taxonomic_str + ';'
 
             # count non-alphanumeric characters
             delimiters = re.sub(r'[a-zA-Z0-9]+', '', taxonomic_str)
@@ -115,9 +115,6 @@ class TaxonUtil:
                     return taxonomic_str.replace(delimiter, ';') + ';'
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
-
-
-
 
         except Exception:
             logging.warning('failed to process taxonomic string')
