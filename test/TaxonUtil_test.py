@@ -52,6 +52,16 @@ class TaxonUtilTest(unittest.TestCase):
         expect_processed_taxonomic_str = 'Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;;Halobacteriaceae archaeon TNN10;'
         self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
 
+        taxonomic_str = 'root;cellular organisms;Archaea;Euryarchaeota;Stenosarchaea group;Halobacteria;Natrialbales;Natrialbaceae;Natronorubrum;Natronorubrum sp. Wadi Natrun-19;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Archaea;Euryarchaeota;Stenosarchaea group;Halobacteria;Natrialbales;Natrialbaceae;Natronorubrum;Natronorubrum sp. Wadi Natrun-19;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
+        taxonomic_str = 'root;cellular organisms;Archaea;Euryarchaeota;Stenosarchaea group;Halobacteria;Halobacteriales;Halobacteriaceae;unclassified Halobacteriaceae;Halobacteriaceae archaeon TNN10;'
+        processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
+        expect_processed_taxonomic_str = 'Archaea;Euryarchaeota;Stenosarchaea group;Halobacteria;Halobacteriales;Halobacteriaceae;;Halobacteriaceae archaeon TNN10;'
+        self.assertEqual(processed_taxonomic_str, expect_processed_taxonomic_str)
+
         taxonomic_str = 'A,B,C,D,E,F'
         processed_taxonomic_str = self.getTaxonUtil().process_taxonomic_str(taxonomic_str)
         expect_processed_taxonomic_str = 'A;B;C;D;E;F;'
