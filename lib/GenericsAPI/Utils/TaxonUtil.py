@@ -6,6 +6,8 @@ import re
 
 class TaxonUtil:
 
+    ROOT_CANDIDATES = ['bacteria', 'archaea', 'viridae', 'eukaryota', 'virus', 'eukarya']
+
     def _fetch_taxon_level(self, taxon_char):
 
         taxon_level_mapping = {'l': 'Life', 'd': 'Domain', 'k': 'Kingdom', 'p': 'Phylum',
@@ -44,26 +46,94 @@ class TaxonUtil:
             processed_taxonomic_str += (taxon_level_diff - 1) * ';'
             processed_taxonomic_str += scientific_name + ';'
 
+        # remove empty trailing slots
+        processed_taxonomic_str = processed_taxonomic_str.rstrip(';') + ';'
+
+        # remove unclassified scientific names
+        if 'unclassified' in processed_taxonomic_str.lower():
+            processed_taxonomic_str = self._remove_unclassified(processed_taxonomic_str)
+
+        # prepend genus name to species epithet if missing
+        if processed_taxonomic_str.count(';') == 7:
+            processed_taxonomic_str = self._prepend_genus_name(processed_taxonomic_str)
+
+        processed_taxonomic_str = self._remove_root(processed_taxonomic_str)
+
         logging.info('converted taxonomic string: {}'.format(processed_taxonomic_str))
 
         return processed_taxonomic_str
 
-    def _convert_taxonomic_str2(self, lineage, taxon_level_delimiter):
-        logging.info('start converting lineage: {} with taxon level delimiter [{}]'.format(
-                                                                            lineage,
-                                                                            taxon_level_delimiter))
+    def _remove_unclassified(self, taxonomic_str, delimiter=';'):
+        # remove unclassified scientific names
+        scientific_names = taxonomic_str.split(delimiter)
+        for idx, scientific_name in enumerate(scientific_names):
+            if 'unclassified' in scientific_name.lower():
+                logging.info('removing unclassified scientific name: {}'.format(
+                                                                            scientific_names[idx]))
+                scientific_names[idx] = ''
+        taxonomic_str = delimiter.join(scientific_names)
 
-        processed_taxonomic_str = ''
+        return taxonomic_str
 
-        for taxon_str in lineage:
-            taxon_str = taxon_str.rstrip(';')
-            taxon_items = taxon_str.split(taxon_level_delimiter)
+    def _prepend_genus_name(self, taxonomic_str, delimiter=';'):
+        # prepend genus name to species epithet if missing
+        scientific_names = taxonomic_str.split(delimiter)
+        genus_name = scientific_names[-3]
+        species_name = scientific_names[-2]
 
-            scientific_name = taxon_items[-1]
+        if not species_name.lower().startswith(genus_name.lower()):
+            logging.info("prepend genus name [{}] to species epithet [{}]".format(genus_name,
+                                                                                  species_name))
+            species_name = genus_name + ' ' + species_name
+            scientific_names[-2] = species_name
 
-            processed_taxonomic_str += scientific_name + ';'
+        taxonomic_str = delimiter.join(scientific_names)
 
-        return processed_taxonomic_str
+        return taxonomic_str
+
+    def _remove_root(self, taxonomic_str, delimiter=';'):
+        # make sure taxonomic str starting with one of ROOT_CANDIDATES
+        remove_root = False
+
+        for root_candidate in self.ROOT_CANDIDATES:
+            if root_candidate in taxonomic_str.lower():
+                remove_root = True
+                break
+
+        if remove_root:
+            scientific_names = taxonomic_str.split(delimiter)
+            starting_name = ''
+            for scientific_name in scientific_names:
+                if scientific_name.lower() in self.ROOT_CANDIDATES:
+                    starting_name = scientific_name
+                    break
+            if starting_name:
+                idx = scientific_names.index(starting_name)
+                if idx != 0:
+                    msg = 'Removing root scientific name(s)\n'
+                    msg += 'New starting scientific name is [{}]'.format(starting_name)
+                    logging.info(msg)
+                    scientific_names = scientific_names[idx:]
+            taxonomic_str = delimiter.join(scientific_names)
+
+        return taxonomic_str
+
+    def _process_taxonomic_str(self, taxonomic_str, delimiter):
+
+        if taxonomic_str.endswith(delimiter):
+            taxonomic_str = taxonomic_str.replace(delimiter, ';')
+        else:
+            taxonomic_str = taxonomic_str.replace(delimiter, ';') + ';'
+        # remove unclassified scientific names
+        if 'unclassified' in taxonomic_str.lower():
+            taxonomic_str = self._remove_unclassified(taxonomic_str)
+        # prepend genus name to species epithet if missing
+        if taxonomic_str.count(';') == 7:
+            taxonomic_str = self._prepend_genus_name(taxonomic_str)
+
+        taxonomic_str = self._remove_root(taxonomic_str)
+
+        return taxonomic_str
 
     def __init__(self, config):
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
@@ -78,20 +148,18 @@ class TaxonUtil:
                 raise ValueError('input taxonomic string is not a str type')
 
             # remove whitespaces
-            taxonomic_str = taxonomic_str.replace(' ', '').replace('\t', '')
+            taxonomic_str = taxonomic_str.strip()
 
             if taxonomic_str.isalpha():
-                return taxonomic_str
+                return taxonomic_str + ';'
 
             # count non-alphanumeric characters
             delimiters = re.sub(r'[a-zA-Z0-9]+', '', taxonomic_str)
             delimiters = ''.join(set(delimiters))
 
             if len(delimiters) == 1:
-                if taxonomic_str.endswith(delimiters):
-                    return taxonomic_str.replace(delimiters, ';')
-                else:
-                    return taxonomic_str.replace(delimiters, ';') + ';'
+                taxonomic_str = self._process_taxonomic_str(taxonomic_str, delimiters)
+                return taxonomic_str
 
             delimiter = csv.Sniffer().sniff(taxonomic_str).delimiter
             lineage = [x.strip() for x in taxonomic_str.split(delimiter)]
@@ -106,10 +174,8 @@ class TaxonUtil:
                 taxon_level_delimiter = None
 
             if taxon_level_delimiter is None:
-                if taxonomic_str.endswith(delimiter):
-                    return taxonomic_str.replace(delimiter, ';')
-                else:
-                    return taxonomic_str.replace(delimiter, ';') + ';'
+                taxonomic_str = self._process_taxonomic_str(taxonomic_str, delimiter)
+                return taxonomic_str
 
             processed_taxonomic_str = self._convert_taxonomic_str(lineage, taxon_level_delimiter)
 
