@@ -304,6 +304,17 @@ module GenericsAPI {
       string processed_taxonomic_str;
   } ProcessTaxonomicStrOutput;
 
+  /*
+  parse user's input taxonomic string into a standardized syntax (ideally, a 7 slot string)
+  general rules:
+      1. return original string if we cannot find a pattern to parse
+      2. return original string if user's taxonomic string has 8 or more than 8 slots
+         (string with replaced delimiters (e.g. commas replaced with semicolons))
+      3. append trailing semicolon (if missing) if user's taxonomic string has 6 slots
+      4. prepend genus name to species epithet IF missing (when s is specified or length = 7)
+      5. start parsed taxonomic string with one of:
+         Bacteria, Archaea, Viridae, Eukaryota; Virus; Eukarya; Viruses
+  */
   funcdef process_taxonomic_str (ProcessTaxonomicStrParams params) returns (ProcessTaxonomicStrOutput returnVal) authentication required;
 
   typedef structure {
