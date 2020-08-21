@@ -504,15 +504,28 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_visualization_content(self, output_directory, heatmap_dir):
+    def _generate_visualization_content(self, output_directory, heatmap_dir, data_df):
+        data_summary = data_df.T.describe().to_string()
+
         tab_def_content = ''
         tab_content = ''
 
-        tab_def_content += '''
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'MatrixViewer')" id="defaultOpen">Matrix Heatmap</button>
-        </div>
-        '''
+        viewer_name = 'data_summary'
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Aggregating Statistic</button>\n'''
+
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">\n'''.format(viewer_name)
+        html = '''<pre class="tab">''' + str(data_summary).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '\n</div>\n'
+
+        viewer_name = 'MatrixHeatmapViewer'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Matrix Heatmap</button>\n'''
 
         heatmap_report_files = os.listdir(heatmap_dir)
 
@@ -525,17 +538,18 @@ class MatrixUtil:
                          output_directory)
 
         if heatmap_index_page:
-            tab_content += '''\n<div id="MatrixViewer" class="tabcontent">'''
-            tab_content += '\n<iframe height="1200px" width="100%" '
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '\n<iframe height="900px" width="100%" '
             tab_content += 'src="{}" '.format(heatmap_index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
         else:
-            tab_content += '''\n<div id="MatrixViewer" class="tabcontent">'''
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
             tab_content += '''\n<p style="color:red;" >'''
             tab_content += '''Heatmap is too large to be displayed.</p>\n'''
             tab_content += '\n</div>\n'
 
+        tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
     def _generate_mantel_test_html_report(self, pwmantel_res):
@@ -767,7 +781,18 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_heatmap_html_report(self, heatmap_dir):
+    def _generate_heatmap_html_report(self, data):
+
+        logging.info('Start generating heatmap report page')
+
+        data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+        tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
+                                                                            str(uuid.uuid4())))
+        data_df.to_csv(tsv_file_path)
+        heatmap_dir = self.report_util.build_heatmap_html({
+                                                    'tsv_file_path': tsv_file_path})['html_dir']
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -778,7 +803,8 @@ class MatrixUtil:
         result_file_path = os.path.join(output_directory, 'matrix_viewer_report.html')
 
         visualization_content = self._generate_visualization_content(output_directory,
-                                                                     heatmap_dir)
+                                                                     heatmap_dir,
+                                                                     data_df)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -987,16 +1013,7 @@ class MatrixUtil:
                                     'description': 'Imported Column Attribute Mapping'})
 
         if data:
-            data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
-            result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-            self._mkdir_p(result_directory)
-            tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-            data_df.to_csv(tsv_file_path)
-            heatmap_dir = self.report_util.build_heatmap_html({
-                                                    'tsv_file_path': tsv_file_path})['html_dir']
-
-            output_html_files = self._generate_heatmap_html_report(heatmap_dir)
+            output_html_files = self._generate_heatmap_html_report(data)
 
             report_params = {'message': '',
                              'objects_created': objects_created,
