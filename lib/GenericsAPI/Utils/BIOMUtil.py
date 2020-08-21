@@ -663,7 +663,7 @@ class BiomUtil:
         tab_def_content += ''' id="defaultOpen"'''
         tab_def_content += '''>Aggregating Statistic</button>\n'''
 
-        tab_content += '''\n<div id="{}" class="tabcontent">\n'''.format(viewer_name)
+        tab_content += '''\n<div id="{}" class="tabcontent" style="width:100%;overflow:auto">\n'''.format(viewer_name)
         html = '''<pre class="tab">''' + str(data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '\n</div>\n'
