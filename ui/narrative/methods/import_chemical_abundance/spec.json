@@ -109,7 +109,7 @@
     {
       "id" : "sample_set_ref",
       "optional" : true,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text",
@@ -120,7 +120,7 @@
     {
       "id" : "row_attributemapping_ref",
       "optional" : true,
-      "advanced" : true,
+      "advanced" : false,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text",
