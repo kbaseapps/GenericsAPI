@@ -820,7 +820,7 @@ class MatrixUtil:
         html_report.append({'shock_id': report_shock_id,
                             'name': os.path.basename(result_file_path),
                             'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for Heatmap App'
+                            'description': 'HTML summary report for Import Matrix App'
                             })
         return html_report
 
