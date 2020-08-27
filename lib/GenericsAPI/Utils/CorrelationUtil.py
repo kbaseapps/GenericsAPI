@@ -128,20 +128,20 @@ class CorrelationUtil:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
             matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
-            if matrix_type == 'Amplicon':
-                amplicon_set_ref = res['data'].get('amplicon_set_ref')
-                if amplicon_set_ref:
-                    taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
+            # if matrix_type == 'Amplicon':
+            #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
+            #     if amplicon_set_ref:
+            #         taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
             columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
         elif len(original_matrix_ref) == 2:
             for matrix_ref in original_matrix_ref[::-1]:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
                 matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
-                if matrix_type == 'Amplicon':
-                    amplicon_set_ref = res['data'].get('amplicon_set_ref')
-                    if amplicon_set_ref:
-                        taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
+                # if matrix_type == 'Amplicon':
+                #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
+                #     if amplicon_set_ref:
+                #         taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
                 columns.append(matrix_type)
         else:
             links.columns = ['Variable 1', 'Variable 2']
