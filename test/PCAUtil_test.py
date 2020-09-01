@@ -220,7 +220,8 @@ class PCAUtilTest(unittest.TestCase):
         expected_sheet_names = ['principal_component_matrix']
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
-        df = xl.parse("principal_component_matrix")
+        df = pd.read_excel(os.path.join(output_directory, xl_files[0]), index_col=0,
+                           sheet_name="principal_component_matrix")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         expected_col = ['principal_component_1', 'principal_component_2']
         self.assertCountEqual(df.index.tolist(), expected_index)

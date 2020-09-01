@@ -386,7 +386,8 @@ class AttributeUtilsTest(unittest.TestCase):
         expected_sheet_names = ['ClusterSet']
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
-        df = xl.parse("ClusterSet")
+        df = pd.read_excel(os.path.join(output_directory, xl_files[0]), index_col=0,
+                           sheet_name="ClusterSet")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         expected_col = ['instance_1', 'instance_2', 'instance_3', 'instance_4', 'cluster']
         self.assertCountEqual(df.index.tolist(), expected_index)
@@ -413,7 +414,8 @@ class AttributeUtilsTest(unittest.TestCase):
         expected_sheet_names = ['ClusterSet']
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
-        df = xl.parse("ClusterSet")
+        df = pd.read_excel(os.path.join(output_directory, xl_files[0]), index_col=0,
+                           sheet_name="ClusterSet")
         expected_index = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1', 'cluster']
         self.assertCountEqual(df.index.tolist(), expected_index)

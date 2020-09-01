@@ -281,6 +281,7 @@ class AttributesUtil:
         except XLRDError:
             df = pd.read_csv(scratch_file_path, sep=None, dtype='str')
         df = df.replace('nan', '')
+        df.fillna('', inplace=True)
         if df.columns[1].lower() == "attribute ontology id":
             am_obj = self._df_to_am_obj(df)
         else:

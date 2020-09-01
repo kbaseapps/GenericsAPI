@@ -1066,7 +1066,7 @@ class MatrixUtil:
         """
 
         try:
-            df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df = pd.read_excel(file_path, sheet_name=sheet_name, index_col=0)
         except XLRDError:
             return ''
         else:
