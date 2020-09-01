@@ -298,13 +298,15 @@ class CorrUtilTest(unittest.TestCase):
         expected_sheet_names = ['coefficient_data', 'significance_data']
         self.assertCountEqual(xl.sheet_names, expected_sheet_names)
 
-        df = xl.parse("coefficient_data")
+        df = pd.read_excel(os.path.join(output_directory, xl_files[0]), index_col=0,
+                           sheet_name="coefficient_data")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         self.assertCountEqual(df.index.tolist(), expected_index)
         self.assertCountEqual(df.columns.tolist(), expected_col)
 
-        df = xl.parse("significance_data")
+        df = pd.read_excel(os.path.join(output_directory, xl_files[0]), index_col=0,
+                           sheet_name="significance_data")
         expected_index = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         expected_col = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
         self.assertCountEqual(df.index.tolist(), expected_index)
