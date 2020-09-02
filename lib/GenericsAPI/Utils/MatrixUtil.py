@@ -357,7 +357,7 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_rarefy_visualization_content(self, output_directory, original_matrix_dir,
+    def _generate_rarefy_visualization_content(self, output_directory,
                                                rarefied_matrix_dir, rarecurve_image,
                                                obs_vs_rare_image, random_rare_df):
         tab_def_content = ''
@@ -440,7 +440,7 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_trans_visualization_content(self, output_directory, original_matrix_dir,
+    def _generate_trans_visualization_content(self, output_directory,
                                               filtered_matrix_dir, relative_abundance_matrix_dir,
                                               standardize_matrix_dir,
                                               ratio_transformed_matrix_dir, transformed_matrix_df):
@@ -779,7 +779,7 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_rarefy_html_report(self, original_matrix_dir, rarefied_matrix_dir,
+    def _generate_rarefy_html_report(self, rarefied_matrix_dir,
                                      rarecurve_image, obs_vs_rare_image, random_rare_df):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -791,7 +791,6 @@ class MatrixUtil:
 
         visualization_content = self._generate_rarefy_visualization_content(
                                                                     output_directory,
-                                                                    original_matrix_dir,
                                                                     rarefied_matrix_dir,
                                                                     rarecurve_image,
                                                                     obs_vs_rare_image,
@@ -815,7 +814,7 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_transform_html_report(self, original_matrix_dir, filtered_matrix_dir,
+    def _generate_transform_html_report(self, filtered_matrix_dir,
                                         relative_abundance_matrix_dir,
                                         standardize_matrix_dir,
                                         ratio_transformed_matrix_dir, transformed_matrix_df):
@@ -829,7 +828,6 @@ class MatrixUtil:
 
         visualization_content = self._generate_trans_visualization_content(
                                                                     output_directory,
-                                                                    original_matrix_dir,
                                                                     filtered_matrix_dir,
                                                                     relative_abundance_matrix_dir,
                                                                     standardize_matrix_dir,
@@ -897,7 +895,7 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id, original_matrix_df,
+    def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id,
                                 random_rare_df, rarecurve_image, obs_vs_rare_image):
 
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Randomly Rarefied Matrix'}]
@@ -905,13 +903,6 @@ class MatrixUtil:
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(data_tsv_directory)
         logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
-        original_matrix_tsv_path = os.path.join(data_tsv_directory,
-                                                'original_matrix_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-        original_matrix_df.to_csv(original_matrix_tsv_path)
-        original_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
-
         rarefied_matrix_tsv_path = os.path.join(data_tsv_directory,
                                                 'rarefied_matrix_{}.tsv'.format(
                                                                                 str(uuid.uuid4())))
@@ -919,8 +910,7 @@ class MatrixUtil:
         rarefied_matrix_dir = self.report_util.build_heatmap_html({
                                             'tsv_file_path': rarefied_matrix_tsv_path})['html_dir']
 
-        output_html_files = self._generate_rarefy_html_report(original_matrix_dir,
-                                                              rarefied_matrix_dir,
+        output_html_files = self._generate_rarefy_html_report(rarefied_matrix_dir,
                                                               rarecurve_image,
                                                               obs_vs_rare_image,
                                                               random_rare_df)
@@ -940,20 +930,14 @@ class MatrixUtil:
 
         return report_output
 
-    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name, original_matrix_df,
+    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name,
                                    filtered_df, relative_abundance_df,
                                    standardize_df, ratio_transformed_df, transformed_matrix_df):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(data_tsv_directory)
-        logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
-        original_matrix_tsv_path = os.path.join(data_tsv_directory,
-                                                'original_matrix_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-        original_matrix_df.to_csv(original_matrix_tsv_path)
-        original_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
+
         filtered_matrix_dir = None
         if filtered_df is not None:
             filtered_matrix_tsv_path = os.path.join(data_tsv_directory,
@@ -992,8 +976,7 @@ class MatrixUtil:
             ratio_transformed_matrix_dir = self.report_util.build_heatmap_html({
                                 'tsv_file_path': ratio_transformed_matrix_tsv_path})['html_dir']
 
-        output_html_files = self._generate_transform_html_report(original_matrix_dir,
-                                                                 filtered_matrix_dir,
+        output_html_files = self._generate_transform_html_report(filtered_matrix_dir,
                                                                  relative_abundance_matrix_dir,
                                                                  standardize_matrix_dir,
                                                                  ratio_transformed_matrix_dir,
@@ -1863,7 +1846,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_matrix_df = df.copy(deep=True)
+        # original_matrix_df = df.copy(deep=True)
 
         if dimension == 'col':
             df = df.T
@@ -1932,7 +1915,7 @@ class MatrixUtil:
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
-                                                     original_matrix_df, random_rare_df,
+                                                     random_rare_df,
                                                      rarecurve_image, obs_vs_rare_image)
 
         returnVal.update(report_output)
@@ -2075,7 +2058,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_matrix_df = df.copy(deep=True)
+        # original_matrix_df = df.copy(deep=True)
 
         filtered_df = None
         if abundance_filtering_params is not None:
@@ -2139,7 +2122,6 @@ class MatrixUtil:
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
-                                                        original_matrix_df,
                                                         filtered_df, relative_abundance_df,
                                                         standardize_df, ratio_transformed_df, df)
 
