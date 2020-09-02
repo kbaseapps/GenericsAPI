@@ -691,8 +691,8 @@ class BiomUtil:
         tab_def_content += '''>Matrix Aggregating Statistic</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
-        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(data_df.index),
-                                                                    len(data_df.columns))
+        tab_content += '''\n<h5>Amplicon Matrix Size: {} x {}</h5>'''.format(len(data_df.index),
+                                                                             len(data_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
