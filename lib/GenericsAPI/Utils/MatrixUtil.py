@@ -24,6 +24,7 @@ from rpy2.robjects import pandas2ri, numpy2ri
 from rpy2.robjects.conversion import localconverter
 import plotly.graph_objects as go
 from plotly.offline import plot
+import plotly.express as px
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -356,31 +357,55 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_rarefy_visualization_content(self, output_directory, original_matrix_dir,
+    def _generate_rarefy_visualization_content(self, output_directory,
                                                rarefied_matrix_dir, rarecurve_image,
-                                               obs_vs_rare_image):
+                                               obs_vs_rare_image, random_rare_df):
         tab_def_content = ''
         tab_content = ''
 
-        tab_def_content += '''
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'OriginalMatrixViewer')" id="defaultOpen">Original Matrix</button>
-        '''
-        original_matrix_report_files = os.listdir(original_matrix_dir)
-        original_matrix_index_page = None
-        for original_matrix_report_file in original_matrix_report_files:
-            if original_matrix_report_file.endswith('.html'):
-                original_matrix_index_page = original_matrix_report_file
+        row_data_summary = random_rare_df.T.describe().to_string()
+        col_data_summary = random_rare_df.describe().to_string()
 
-            shutil.copy2(os.path.join(original_matrix_dir, original_matrix_report_file),
-                         output_directory)
-        tab_content += self._generate_tab_content(original_matrix_index_page,
-                                                  'OriginalMatrixViewer')
+        tab_def_content = ''
+        tab_content = ''
+
+        viewer_name = 'data_summary'
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Rarefied Matrix Aggregating Statistic</button>\n'''
+
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
+        html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '''\n<br>'''
+        tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
+        tab_content += '''\n<br>'''
+        tab_content += '''\n<h5>Column Aggregating Statistic</h5>'''
+        html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '\n</div>\n'
+
+        if False and len(random_rare_df.columns) <= 200:
+            viewer_name = 'MatrixLinearPlotViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Matrix Linear Plot</button>\n'''
+
+            linear_plot_page = self._generate_linear_plot(random_rare_df, output_directory)
+
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(linear_plot_page)
+            tab_content += 'style="border:none;"></iframe>'
+            tab_content += '\n</div>\n'
 
         viewer_name = 'RarefiedMatrixViewer'
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-        tab_def_content += '''>Rarefied Matrix</button>\n'''
+        tab_def_content += '''>Rarefied Matrix Heatmap</button>\n'''
         rarefied_matrix_report_files = os.listdir(rarefied_matrix_dir)
         rarefied_matrix_index_page = None
         for rarefied_matrix_report_file in rarefied_matrix_report_files:
@@ -415,27 +440,34 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_trans_visualization_content(self, output_directory, original_matrix_dir,
+    def _generate_trans_visualization_content(self, output_directory,
                                               filtered_matrix_dir, relative_abundance_matrix_dir,
                                               standardize_matrix_dir,
-                                              ratio_transformed_matrix_dir):
+                                              ratio_transformed_matrix_dir, transformed_matrix_df):
+        row_data_summary = transformed_matrix_df.T.describe().to_string()
+        col_data_summary = transformed_matrix_df.describe().to_string()
+
         tab_def_content = ''
         tab_content = ''
 
-        tab_def_content += '''
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'OriginalMatrixViewer')" id="defaultOpen">Original Matrix</button>
-        '''
-        original_matrix_report_files = os.listdir(original_matrix_dir)
-        original_matrix_index_page = None
-        for original_matrix_report_file in original_matrix_report_files:
-            if original_matrix_report_file.endswith('.html'):
-                original_matrix_index_page = original_matrix_report_file
+        viewer_name = 'data_summary'
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Transformed Matrix Aggregating Statistic</button>\n'''
 
-            shutil.copy2(os.path.join(original_matrix_dir, original_matrix_report_file),
-                         output_directory)
-        tab_content += self._generate_tab_content(original_matrix_index_page,
-                                                  'OriginalMatrixViewer')
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
+        html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '''\n<br>'''
+        tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
+        tab_content += '''\n<br>'''
+        tab_content += '''\n<h5>Column Aggregating Statistic</h5>'''
+        html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
+        tab_content += html
+        tab_content += '\n</div>\n'
 
         if filtered_matrix_dir is not None:
             viewer_name = 'AbundanceFilteredMatrixViewer'
@@ -504,7 +536,24 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_visualization_content(self, output_directory, heatmap_dir, data_df):
+    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance'):
+        linear_plot_path = 'linear_plot.html'
+
+        links = data_df.stack().reset_index()
+
+        col_names = links.columns
+        links.rename(columns={col_names[0]: row_name,
+                              col_names[1]: 'samples',
+                              col_names[2]: 'value'},
+                     inplace=True)
+        fig = px.line(links, x=row_name, y='value', color='samples')
+
+        plot(fig, filename=os.path.join(output_directory, linear_plot_path))
+
+        return linear_plot_path
+
+    def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
+                                        top_heatmap_dir, top_percent):
 
         row_data_summary = data_df.T.describe().to_string()
         col_data_summary = data_df.describe().to_string()
@@ -530,6 +579,51 @@ class MatrixUtil:
         html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '\n</div>\n'
+
+        if top_heatmap_dir:
+            viewer_name = 'TopHeatmapViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Top {} Percent Heatmap</button>\n'''.format(top_percent)
+
+            heatmap_report_files = os.listdir(top_heatmap_dir)
+
+            heatmap_index_page = None
+            for heatmap_report_file in heatmap_report_files:
+                if heatmap_report_file.endswith('.html'):
+                    heatmap_index_page = heatmap_report_file
+
+                shutil.copy2(os.path.join(top_heatmap_dir, heatmap_report_file),
+                             output_directory)
+
+            if heatmap_index_page:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
+
+                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(heatmap_index_page)
+                tab_content += 'style="border:none;"></iframe>'
+                tab_content += '\n</div>\n'
+            else:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                tab_content += '''\n<p style="color:red;" >'''
+                tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+                tab_content += '\n</div>\n'
+
+        if False and len(data_df.columns) <= 200:
+            viewer_name = 'MatrixLinearPlotViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Matrix Linear Plot</button>\n'''
+
+            linear_plot_page = self._generate_linear_plot(data_df, output_directory)
+
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(linear_plot_page)
+            tab_content += 'style="border:none;"></iframe>'
+            tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
         tab_def_content += '''\n<button class="tablinks" '''
@@ -717,8 +811,8 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_rarefy_html_report(self, original_matrix_dir, rarefied_matrix_dir,
-                                     rarecurve_image, obs_vs_rare_image):
+    def _generate_rarefy_html_report(self, rarefied_matrix_dir,
+                                     rarecurve_image, obs_vs_rare_image, random_rare_df):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -729,10 +823,10 @@ class MatrixUtil:
 
         visualization_content = self._generate_rarefy_visualization_content(
                                                                     output_directory,
-                                                                    original_matrix_dir,
                                                                     rarefied_matrix_dir,
                                                                     rarecurve_image,
-                                                                    obs_vs_rare_image)
+                                                                    obs_vs_rare_image,
+                                                                    random_rare_df)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -752,10 +846,10 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_transform_html_report(self, original_matrix_dir, filtered_matrix_dir,
+    def _generate_transform_html_report(self, filtered_matrix_dir,
                                         relative_abundance_matrix_dir,
                                         standardize_matrix_dir,
-                                        ratio_transformed_matrix_dir):
+                                        ratio_transformed_matrix_dir, transformed_matrix_df):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -766,11 +860,11 @@ class MatrixUtil:
 
         visualization_content = self._generate_trans_visualization_content(
                                                                     output_directory,
-                                                                    original_matrix_dir,
                                                                     filtered_matrix_dir,
                                                                     relative_abundance_matrix_dir,
                                                                     standardize_matrix_dir,
-                                                                    ratio_transformed_matrix_dir)
+                                                                    ratio_transformed_matrix_dir,
+                                                                    transformed_matrix_df)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -803,6 +897,16 @@ class MatrixUtil:
         heatmap_dir = self.report_util.build_heatmap_html({
                                                     'tsv_file_path': tsv_file_path})['html_dir']
 
+        top_heatmap_dir = None
+        top_percent = 100
+        if len(data_df.index) > 500:
+            display_count = 200  # roughly count for display items
+            top_percent = min(int(display_count / len(data_df.index) * 100), 100)
+            top_percent = max(top_percent, 1)
+            top_heatmap_dir = self.report_util.build_heatmap_html({
+                                                        'tsv_file_path': tsv_file_path,
+                                                        'top_percent': top_percent})['html_dir']
+
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -813,7 +917,9 @@ class MatrixUtil:
 
         visualization_content = self._generate_visualization_content(output_directory,
                                                                      heatmap_dir,
-                                                                     data_df)
+                                                                     data_df,
+                                                                     top_heatmap_dir,
+                                                                     top_percent)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -833,7 +939,7 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id, original_matrix_df,
+    def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id,
                                 random_rare_df, rarecurve_image, obs_vs_rare_image):
 
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Randomly Rarefied Matrix'}]
@@ -841,13 +947,6 @@ class MatrixUtil:
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(data_tsv_directory)
         logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
-        original_matrix_tsv_path = os.path.join(data_tsv_directory,
-                                                'original_matrix_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-        original_matrix_df.to_csv(original_matrix_tsv_path)
-        original_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
-
         rarefied_matrix_tsv_path = os.path.join(data_tsv_directory,
                                                 'rarefied_matrix_{}.tsv'.format(
                                                                                 str(uuid.uuid4())))
@@ -855,10 +954,10 @@ class MatrixUtil:
         rarefied_matrix_dir = self.report_util.build_heatmap_html({
                                             'tsv_file_path': rarefied_matrix_tsv_path})['html_dir']
 
-        output_html_files = self._generate_rarefy_html_report(original_matrix_dir,
-                                                              rarefied_matrix_dir,
+        output_html_files = self._generate_rarefy_html_report(rarefied_matrix_dir,
                                                               rarecurve_image,
-                                                              obs_vs_rare_image)
+                                                              obs_vs_rare_image,
+                                                              random_rare_df)
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -875,20 +974,14 @@ class MatrixUtil:
 
         return report_output
 
-    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name, original_matrix_df,
+    def _generate_transform_report(self, new_matrix_obj_ref, workspace_name,
                                    filtered_df, relative_abundance_df,
-                                   standardize_df, ratio_transformed_df):
+                                   standardize_df, ratio_transformed_df, transformed_matrix_df):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(data_tsv_directory)
-        logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
-        original_matrix_tsv_path = os.path.join(data_tsv_directory,
-                                                'original_matrix_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-        original_matrix_df.to_csv(original_matrix_tsv_path)
-        original_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': original_matrix_tsv_path})['html_dir']
+
         filtered_matrix_dir = None
         if filtered_df is not None:
             filtered_matrix_tsv_path = os.path.join(data_tsv_directory,
@@ -927,11 +1020,11 @@ class MatrixUtil:
             ratio_transformed_matrix_dir = self.report_util.build_heatmap_html({
                                 'tsv_file_path': ratio_transformed_matrix_tsv_path})['html_dir']
 
-        output_html_files = self._generate_transform_html_report(original_matrix_dir,
-                                                                 filtered_matrix_dir,
+        output_html_files = self._generate_transform_html_report(filtered_matrix_dir,
                                                                  relative_abundance_matrix_dir,
                                                                  standardize_matrix_dir,
-                                                                 ratio_transformed_matrix_dir)
+                                                                 ratio_transformed_matrix_dir,
+                                                                 transformed_matrix_df)
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -1797,7 +1890,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_matrix_df = df.copy(deep=True)
+        # original_matrix_df = df.copy(deep=True)
 
         if dimension == 'col':
             df = df.T
@@ -1866,7 +1959,7 @@ class MatrixUtil:
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
-                                                     original_matrix_df, random_rare_df,
+                                                     random_rare_df,
                                                      rarecurve_image, obs_vs_rare_image)
 
         returnVal.update(report_output)
@@ -2009,7 +2102,7 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_matrix_df = df.copy(deep=True)
+        # original_matrix_df = df.copy(deep=True)
 
         filtered_df = None
         if abundance_filtering_params is not None:
@@ -2073,9 +2166,8 @@ class MatrixUtil:
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_name,
-                                                        original_matrix_df,
                                                         filtered_df, relative_abundance_df,
-                                                        standardize_df, ratio_transformed_df)
+                                                        standardize_df, ratio_transformed_df, df)
 
         returnVal.update(report_output)
 
