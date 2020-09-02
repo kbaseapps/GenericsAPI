@@ -806,7 +806,8 @@ class BiomUtil:
                                                                             str(uuid.uuid4())))
         data_df.to_csv(tsv_file_path)
         heatmap_dir = self.report_util.build_heatmap_html({
-                                                    'tsv_file_path': tsv_file_path})['html_dir']
+                                                    'tsv_file_path': tsv_file_path,
+                                                    'cluster_data': True})['html_dir']
 
         top_heatmap_dir = None
         top_percent = 100
@@ -816,6 +817,7 @@ class BiomUtil:
             top_percent = max(top_percent, 1)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
+                                                        'sort_by_sum': True,
                                                         'top_percent': top_percent})['html_dir']
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
