@@ -536,8 +536,15 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance'):
+    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance',
+                              top_percent=100):
         linear_plot_path = 'linear_plot.html'
+
+        sum_order = data_df.sum(axis=1).sort_values(ascending=False).index
+        data_df = data_df.reindex(sum_order)
+
+        top_index = data_df.index[:int(data_df.index.size * top_percent / 100)]
+        data_df = data_df.loc[top_index]
 
         links = data_df.stack().reset_index()
 
@@ -612,18 +619,35 @@ class MatrixUtil:
                 tab_content += '\n</div>\n'
 
         if False and len(data_df.columns) <= 200:
-            viewer_name = 'MatrixLinearPlotViewer'
-            tab_def_content += '''\n<button class="tablinks" '''
-            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Matrix Linear Plot</button>\n'''
+            if top_heatmap_dir:
+                viewer_name = 'MatrixLinearPlotViewer'
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(top_percent)
 
-            linear_plot_page = self._generate_linear_plot(data_df, output_directory)
+                linear_plot_page = self._generate_linear_plot(data_df, output_directory,
+                                                              top_percent=top_percent)
 
-            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
-            tab_content += 'src="{}" '.format(linear_plot_page)
-            tab_content += 'style="border:none;"></iframe>'
-            tab_content += '\n</div>\n'
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
+                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(linear_plot_page)
+                tab_content += 'style="border:none;"></iframe>'
+                tab_content += '\n</div>\n'
+            else:
+                viewer_name = 'MatrixLinearPlotViewer'
+                tab_def_content += '''\n<button class="tablinks" '''
+                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+                tab_def_content += '''>Matrix Linear Plot</button>\n'''
+
+                linear_plot_page = self._generate_linear_plot(data_df, output_directory)
+
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(linear_plot_page)
+                tab_content += 'style="border:none;"></iframe>'
+                tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
         tab_def_content += '''\n<button class="tablinks" '''
