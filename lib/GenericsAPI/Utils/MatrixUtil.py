@@ -919,7 +919,8 @@ class MatrixUtil:
                                                                             str(uuid.uuid4())))
         data_df.to_csv(tsv_file_path)
         heatmap_dir = self.report_util.build_heatmap_html({
-                                                    'tsv_file_path': tsv_file_path})['html_dir']
+                                                    'tsv_file_path': tsv_file_path,
+                                                    'cluster_data': True})['html_dir']
 
         top_heatmap_dir = None
         top_percent = 100
@@ -929,6 +930,7 @@ class MatrixUtil:
             top_percent = max(top_percent, 1)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
+                                                        'sort_by_sum': True,
                                                         'top_percent': top_percent})['html_dir']
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -976,7 +978,8 @@ class MatrixUtil:
                                                                                 str(uuid.uuid4())))
         random_rare_df.to_csv(rarefied_matrix_tsv_path)
         rarefied_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': rarefied_matrix_tsv_path})['html_dir']
+                                            'tsv_file_path': rarefied_matrix_tsv_path,
+                                            'cluster_data': True})['html_dir']
 
         output_html_files = self._generate_rarefy_html_report(rarefied_matrix_dir,
                                                               rarecurve_image,
@@ -1013,7 +1016,8 @@ class MatrixUtil:
                                                                                 str(uuid.uuid4())))
             filtered_df.to_csv(filtered_matrix_tsv_path)
             filtered_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': filtered_matrix_tsv_path})['html_dir']
+                                            'tsv_file_path': filtered_matrix_tsv_path,
+                                            'cluster_data': True})['html_dir']
 
         relative_abundance_matrix_dir = None
         if relative_abundance_df is not None:
@@ -1023,7 +1027,8 @@ class MatrixUtil:
                                                                                 str(uuid.uuid4())))
             relative_abundance_df.to_csv(relative_abundance_matrix_tsv_path)
             relative_abundance_matrix_dir = self.report_util.build_heatmap_html({
-                                'tsv_file_path': relative_abundance_matrix_tsv_path})['html_dir']
+                                'tsv_file_path': relative_abundance_matrix_tsv_path,
+                                'cluster_data': True})['html_dir']
 
         standardize_matrix_dir = None
         if standardize_df is not None:
@@ -1032,7 +1037,8 @@ class MatrixUtil:
                                                                                 str(uuid.uuid4())))
             standardize_df.to_csv(standardize_matrix_tsv_path)
             standardize_matrix_dir = self.report_util.build_heatmap_html({
-                                        'tsv_file_path': standardize_matrix_tsv_path})['html_dir']
+                                        'tsv_file_path': standardize_matrix_tsv_path,
+                                        'cluster_data': True})['html_dir']
 
         ratio_transformed_matrix_dir = None
         if ratio_transformed_df is not None:
@@ -1042,7 +1048,8 @@ class MatrixUtil:
                                                                                 str(uuid.uuid4())))
             ratio_transformed_df.to_csv(ratio_transformed_matrix_tsv_path)
             ratio_transformed_matrix_dir = self.report_util.build_heatmap_html({
-                                'tsv_file_path': ratio_transformed_matrix_tsv_path})['html_dir']
+                                'tsv_file_path': ratio_transformed_matrix_tsv_path,
+                                'cluster_data': True})['html_dir']
 
         output_html_files = self._generate_transform_html_report(filtered_matrix_dir,
                                                                  relative_abundance_matrix_dir,
