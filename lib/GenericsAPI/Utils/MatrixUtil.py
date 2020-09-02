@@ -377,7 +377,8 @@ class MatrixUtil:
         tab_def_content += '''>Rarefied Matrix Aggregating Statistic</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
-        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(random_rare_df.index),
+        tab_content += '''\n<h5>Rarefied Matrix Size: {} x {}</h5>'''.format(
+                                                                    len(random_rare_df.index),
                                                                     len(random_rare_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
@@ -461,7 +462,7 @@ class MatrixUtil:
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
                                                                                     viewer_name)
-        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(
+        tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
                                                                 len(transformed_matrix_df.index),
                                                                 len(transformed_matrix_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
