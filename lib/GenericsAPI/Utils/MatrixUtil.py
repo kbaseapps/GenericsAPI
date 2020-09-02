@@ -552,7 +552,8 @@ class MatrixUtil:
 
         return linear_plot_path
 
-    def _generate_visualization_content(self, output_directory, heatmap_dir, data_df):
+    def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
+                                        top_heatmap_dir, top_percent):
 
         row_data_summary = data_df.T.describe().to_string()
         col_data_summary = data_df.describe().to_string()
@@ -579,7 +580,38 @@ class MatrixUtil:
         tab_content += html
         tab_content += '\n</div>\n'
 
-        if len(data_df.columns) <= 200:
+        if top_heatmap_dir:
+            viewer_name = 'TopHeatmapViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Top {} Percent Heatmap</button>\n'''.format(top_percent)
+
+            heatmap_report_files = os.listdir(top_heatmap_dir)
+
+            heatmap_index_page = None
+            for heatmap_report_file in heatmap_report_files:
+                if heatmap_report_file.endswith('.html'):
+                    heatmap_index_page = heatmap_report_file
+
+                shutil.copy2(os.path.join(top_heatmap_dir, heatmap_report_file),
+                             output_directory)
+
+            if heatmap_index_page:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
+
+                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(heatmap_index_page)
+                tab_content += 'style="border:none;"></iframe>'
+                tab_content += '\n</div>\n'
+            else:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                tab_content += '''\n<p style="color:red;" >'''
+                tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+                tab_content += '\n</div>\n'
+
+        if False and len(data_df.columns) <= 200:
             viewer_name = 'MatrixLinearPlotViewer'
             tab_def_content += '''\n<button class="tablinks" '''
             tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
@@ -865,6 +897,16 @@ class MatrixUtil:
         heatmap_dir = self.report_util.build_heatmap_html({
                                                     'tsv_file_path': tsv_file_path})['html_dir']
 
+        top_heatmap_dir = None
+        top_percent = 100
+        if len(data_df.index) > 500:
+            display_count = 200  # roughly count for display items
+            top_percent = min(int(display_count / len(data_df.index) * 100), 100)
+            top_percent = max(top_percent, 1)
+            top_heatmap_dir = self.report_util.build_heatmap_html({
+                                                        'tsv_file_path': tsv_file_path,
+                                                        'top_percent': top_percent})['html_dir']
+
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -875,7 +917,9 @@ class MatrixUtil:
 
         visualization_content = self._generate_visualization_content(output_directory,
                                                                      heatmap_dir,
-                                                                     data_df)
+                                                                     data_df,
+                                                                     top_heatmap_dir,
+                                                                     top_percent)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
