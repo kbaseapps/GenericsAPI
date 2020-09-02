@@ -536,7 +536,7 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
-    def _generate_linear_plot(data_df, output_directory, row_name='abundance'):
+    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance'):
         linear_plot_path = 'linear_plot.html'
 
         links = data_df.stack().reset_index()

@@ -651,7 +651,7 @@ class BiomUtil:
         })[0]
         return f'{info[6]}/{info[0]}/{info[4]}'
 
-    def _generate_linear_plot(data_df, output_directory, row_name='abundance'):
+    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance'):
         linear_plot_path = 'linear_plot.html'
 
         links = data_df.stack().reset_index()
