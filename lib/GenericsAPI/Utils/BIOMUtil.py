@@ -694,18 +694,19 @@ class BiomUtil:
         tab_content += html
         tab_content += '\n</div>\n'
 
-        viewer_name = 'MatrixLinearPlotViewer'
-        tab_def_content += '''\n<button class="tablinks" '''
-        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-        tab_def_content += '''>Matrix Linear Plot</button>\n'''
+        if len(data_df.columns) <= 200:
+            viewer_name = 'MatrixLinearPlotViewer'
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>Matrix Linear Plot</button>\n'''
 
-        linear_plot_page = self._generate_linear_plot(data_df, output_directory, row_name='OTU')
+            linear_plot_page = self._generate_linear_plot(data_df, output_directory, row_name='OTU')
 
-        tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-        tab_content += '\n<iframe height="900px" width="100%" '
-        tab_content += 'src="{}" '.format(linear_plot_page)
-        tab_content += 'style="border:none;"></iframe>'
-        tab_content += '\n</div>\n'
+            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(linear_plot_page)
+            tab_content += 'style="border:none;"></iframe>'
+            tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
         tab_def_content += '''\n<button class="tablinks" '''
