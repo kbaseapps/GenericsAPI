@@ -24,6 +24,7 @@ from rpy2.robjects import pandas2ri, numpy2ri
 from rpy2.robjects.conversion import localconverter
 import plotly.graph_objects as go
 from plotly.offline import plot
+import plotly.express as px
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -504,6 +505,22 @@ class MatrixUtil:
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
+    def _generate_linear_plot(data_df, output_directory, row_name='abundance'):
+        linear_plot_path = 'linear_plot.html'
+
+        links = data_df.stack().reset_index()
+
+        col_names = links.columns
+        links.rename(columns={col_names[0]: row_name,
+                              col_names[1]: 'samples',
+                              col_names[2]: 'value'},
+                     inplace=True)
+        fig = px.line(links, x=row_name, y='value', color='samples')
+
+        plot(fig, filename=os.path.join(output_directory, linear_plot_path))
+
+        return linear_plot_path
+
     def _generate_visualization_content(self, output_directory, heatmap_dir, data_df):
 
         row_data_summary = data_df.T.describe().to_string()
@@ -529,6 +546,19 @@ class MatrixUtil:
         tab_content += '''\n<h5>Column Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
+        tab_content += '\n</div>\n'
+
+        viewer_name = 'MatrixLinearPlotViewer'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Matrix Linear Plot</button>\n'''
+
+        linear_plot_page = self._generate_linear_plot(data_df, output_directory)
+
+        tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += 'src="{}" '.format(linear_plot_page)
+        tab_content += 'style="border:none;"></iframe>'
         tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
