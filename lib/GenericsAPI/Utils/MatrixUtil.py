@@ -991,7 +991,7 @@ class MatrixUtil:
                          'workspace_id': workspace_id,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 1300,
+                         'html_window_height': 660,
                          'report_object_name': 'rarefy_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -1062,7 +1062,7 @@ class MatrixUtil:
                          'workspace_name': workspace_name,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 1300,
+                         'html_window_height': 660,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
