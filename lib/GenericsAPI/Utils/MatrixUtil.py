@@ -405,7 +405,7 @@ class MatrixUtil:
         viewer_name = 'RarefiedMatrixViewer'
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-        tab_def_content += '''>Matrix Heatmap</button>\n'''
+        tab_def_content += '''>Rarefied Matrix Heatmap</button>\n'''
         rarefied_matrix_report_files = os.listdir(rarefied_matrix_dir)
         rarefied_matrix_index_page = None
         for rarefied_matrix_report_file in rarefied_matrix_report_files:
