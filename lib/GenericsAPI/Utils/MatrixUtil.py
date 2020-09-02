@@ -142,7 +142,7 @@ class MatrixUtil:
 
         if index_page:
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="1200px" width="100%" '
+            tab_content += '\n<iframe height="900px" width="100%" '
             tab_content += 'src="{}" '.format(index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -377,6 +377,8 @@ class MatrixUtil:
         tab_def_content += '''>Rarefied Matrix Aggregating Statistic</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(random_rare_df.index),
+                                                                    len(random_rare_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
@@ -457,7 +459,11 @@ class MatrixUtil:
         tab_def_content += ''' id="defaultOpen"'''
         tab_def_content += '''>Transformed Matrix Aggregating Statistic</button>\n'''
 
-        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
+                                                                                    viewer_name)
+        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(
+                                                                len(transformed_matrix_df.index),
+                                                                len(transformed_matrix_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
@@ -575,7 +581,10 @@ class MatrixUtil:
         tab_def_content += ''' id="defaultOpen"'''
         tab_def_content += '''>Matrix Aggregating Statistic</button>\n'''
 
-        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
+                                                                                    viewer_name)
+        tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(data_df.index),
+                                                                    len(data_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
