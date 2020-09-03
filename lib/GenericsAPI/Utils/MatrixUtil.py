@@ -1869,6 +1869,8 @@ class MatrixUtil:
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_data = input_matrix_obj['data']
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
 
         if dimension not in ['col', 'row']:
             raise ValueError('Please use "col" or "row" for input dimension')
@@ -1886,11 +1888,19 @@ class MatrixUtil:
 
         attri_pos = attribute_names.index(grouping)
         instances = am_data.get('instances')
-        grouping_names = [instance[attri_pos] for instance in instances.values()]
-        logging.info('Fetched {} for {} from attributes'.format(grouping_names, grouping))
+        if dimension == 'col':
+            items = df.columns
+        else:
+            items = df.index
+        grouping_names = list()
+        for item in items:
+            instance = instances.get(item)
+            if not instance:
+                raise ValueError('Cannot find instance for {} in attribute mapping'.format(item))
+            attri = instance[attri_pos]
+            grouping_names.append(attri)
 
-        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
-        df = pd.read_json(data_matrix)
+        logging.info('Fetched {} for {} from attributes'.format(grouping_names, grouping))
 
         if dimension == 'col':
             df = df.T
@@ -2089,7 +2099,17 @@ class MatrixUtil:
 
         attri_pos = attribute_names.index(grouping)
         instances = am_data.get('instances')
-        grouping_names = [instance[attri_pos] for instance in instances.values()]
+        if dimension == 'col':
+            items = df.columns
+        else:
+            items = df.index
+        grouping_names = list()
+        for item in items:
+            instance = instances.get(item)
+            if not instance:
+                raise ValueError('Cannot find instance for {} in attribute mapping'.format(item))
+            attri = instance[attri_pos]
+            grouping_names.append(attri)
         logging.info('Fetched {} for {} from attributes'.format(grouping_names, grouping))
 
         anosim_res = None
