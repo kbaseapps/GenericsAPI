@@ -1727,7 +1727,7 @@ class MatrixUtil:
                 # choose first few most influential species from each condition pair
                 comp_group_len = len(simper_ret)
                 num_choosen_col = max_target_col_len//comp_group_len
-                target_cols = list()
+                target_cols_fetched = list()
                 for comp_group in simper_ret:
                     species_pos = list(comp_group.names).index('species')
                     ord_pos = list(comp_group.names).index('ord')
@@ -1738,10 +1738,12 @@ class MatrixUtil:
                     target_species_pos = [i - 1 for i in ord_list[:num_choosen_col]]
 
                     for p in target_species_pos:
-                        target_cols.append(species[p])
+                        target_cols_fetched.append(species[p])
 
-                target_cols = list(set(target_cols))
+                target_cols_fetched = list(set(target_cols_fetched))
 
+            if target_cols_fetched:
+                target_cols = target_cols_fetched
         except Exception:
             warning_msg = 'got unexpected error fetching most influential species'
             logging.warning(warning_msg)
