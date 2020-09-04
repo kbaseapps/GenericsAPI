@@ -1726,7 +1726,7 @@ class MatrixUtil:
             if len(target_cols) > max_target_col_len:
                 # choose first few most influential species from each condition pair
                 comp_group_len = len(simper_ret)
-                num_choosen_col = max_target_col_len//comp_group_len
+                num_choosen_col = max(max_target_col_len//comp_group_len, 1)
                 target_cols = list()
                 for comp_group in simper_ret:
                     species_pos = list(comp_group.names).index('species')
