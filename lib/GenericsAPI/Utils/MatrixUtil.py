@@ -1567,6 +1567,10 @@ class MatrixUtil:
         if dimension == 'col':
             standardize_df = standardize_df.T
 
+        standardize_df.fillna(0, inplace=True)
+        standardize_df.replace(np.inf, 2 ** 32, inplace=True)
+        standardize_df.replace(-np.inf, -2 ** 32, inplace=True)
+
         return standardize_df
 
     def _ratio_trans_df(self, df, method='clr', dimension='col'):
@@ -1589,6 +1593,10 @@ class MatrixUtil:
 
         if dimension == 'col':
             ratio_transformed_df = ratio_transformed_df.T
+
+        ratio_transformed_df.fillna(0, inplace=True)
+        ratio_transformed_df.replace(np.inf, 2 ** 32, inplace=True)
+        ratio_transformed_df.replace(-np.inf, -2 ** 32, inplace=True)
 
         return ratio_transformed_df
 
@@ -1656,6 +1664,10 @@ class MatrixUtil:
 
         if dimension == 'col':
             relative_abundance_df = relative_abundance_df.T
+
+        relative_abundance_df.fillna(0, inplace=True)
+        relative_abundance_df.replace(np.inf, 2 ** 32, inplace=True)
+        relative_abundance_df.replace(-np.inf, -2 ** 32, inplace=True)
 
         return relative_abundance_df
 
