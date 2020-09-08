@@ -73,9 +73,17 @@ parameters :
         ui-name : |
             SamplesSet Reference
         short-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            Provide a SampleSet object associated with columns in matrix
         long-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            Provide a SampleSet object associated with columns in matrix
+
+    col_attributemapping_ref :
+        ui-name : |
+            Samples (Column) AttributeMapping Reference
+        short-hint : |
+            Provide a AttributeMapping with data about the samples
+        long-hint : |
+            Provide a AttributeMapping with data about the samples
 
     row_attributemapping_ref :
         ui-name : |
