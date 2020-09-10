@@ -83,7 +83,7 @@ class SampleServiceTest(unittest.TestCase):
         if hasattr(self.__class__, 'sample_set_ref'):
             return self.__class__.sample_set_ref
 
-        sample_set_file_name = 'ANLPW_JulySamples_IGSN_v2-forKB.csv'
+        sample_set_file_name = 'sample_set_test.xls'
         sample_set_file_path = os.path.join(self.scratch, sample_set_file_name)
         shutil.copy(os.path.join('data', sample_set_file_name), sample_set_file_path)
 
@@ -92,6 +92,7 @@ class SampleServiceTest(unittest.TestCase):
             'workspace_id': self.wsId,
             'sample_file': sample_set_file_path,
             'file_format': "SESAR",
+            'header_row_index': 2,
             'set_name': 'test1',
             'description': "this is a test sample set."
         }

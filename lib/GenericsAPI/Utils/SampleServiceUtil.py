@@ -2,6 +2,7 @@
 import json
 import requests
 import uuid
+import logging
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.SampleServiceClient import SampleService
@@ -28,6 +29,9 @@ class SampleServiceUtil:
         self.srv_wiz_url = config['srv-wiz-url']
         self.dfu = DataFileUtil(self.callback_url)
         self.sample_ser = SampleService(self.callback_url)
+
+        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
+                            level=logging.INFO)
 
     def get_sample_service_url(self):
 
@@ -74,6 +78,8 @@ class SampleServiceUtil:
         copied from sample_uploader
         (https://github.com/kbaseapps/sample_uploader/blob/master/lib/sample_uploader/utils/sample_utils.py#L79)
         """
+        logging.info('start saving sample')
+
         sample_url = self.get_sample_service_url()
         headers = {"Authorization": self.token}
         params = {
@@ -99,6 +105,8 @@ class SampleServiceUtil:
         """
         upsert sample data into existing sample
         """
+        logging.info('start upserting sample')
+
         old_sample = self.get_sample(sample_id)
 
         try:
@@ -117,6 +125,8 @@ class SampleServiceUtil:
                     'version': 1,
                     'node': 'root',}]
         """
+        logging.info('start creating data link')
+
         sample_url = self.get_sample_service_url()
         headers = {"Authorization": self.token}
         params = {
@@ -140,6 +150,8 @@ class SampleServiceUtil:
             raise RuntimeError(f"Error from SampleService - {resp_json['error']}")
 
     def sample_set_to_attribute_mapping(self, sample_set_ref):
+
+        logging.info('start converting sample set to attribute mapping')
 
         sample_set = self.dfu.get_objects(
                     {"object_refs": [sample_set_ref]})['data'][0]['data']
