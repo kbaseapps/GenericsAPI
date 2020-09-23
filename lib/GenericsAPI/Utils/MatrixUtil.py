@@ -976,7 +976,8 @@ class MatrixUtil:
         return html_report
 
     def _generate_rarefy_report(self, new_matrix_obj_ref, workspace_id,
-                                random_rare_df, rarecurve_image, obs_vs_rare_image):
+                                random_rare_df, rarecurve_image, obs_vs_rare_image,
+                                warnings):
 
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Randomly Rarefied Matrix'}]
 
@@ -1002,7 +1003,8 @@ class MatrixUtil:
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
                          'html_window_height': 660,
-                         'report_object_name': 'rarefy_matrix_' + str(uuid.uuid4())}
+                         'report_object_name': 'rarefy_matrix_' + str(uuid.uuid4()),
+                         'warnings': warnings}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)
@@ -1935,11 +1937,13 @@ class MatrixUtil:
 
     def perform_rarefy(self, params):
         logging.info('Start performing rarefying matrix with {}'.format(params))
+        warnings = []
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
 
         seed_number = params.get('seed_number', 'do_not_seed')
+        subsample_size = params.get('subsample_size')
         dimension = params.get('dimension', 'col')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
@@ -1960,9 +1964,22 @@ class MatrixUtil:
 
         df.fillna(0, inplace=True)
 
-        raremax = int(min(df.sum(axis=1)))
-
         run_seed = (not seed_number == 'do_not_seed')
+
+        raremax = int(min(df.sum(axis=1)))  # least sample size
+        if subsample_size is None:  # default behavior: use least sample size 
+            subsample_size = raremax
+        else:  # user-specified behavior, find any samples too small
+            unrarefied = df.index[df.sum(axis=1) < subsample_size].tolist()
+            if len(unrarefied) > 0:
+                msg = (
+                    'At subsampling size %d, samples %s are too small and will not be rarefied. '
+                    'Smallest sample size is %d'
+                    % (subsample_size, str(unrarefied), raremax)
+                )
+                warnings.append(msg)
+                logging.info(msg)
+        logging.info('Using subsample size %d' % subsample_size)
 
         vegan = rpackages.importr('vegan')
         numpy2ri.activate()
@@ -1971,7 +1988,7 @@ class MatrixUtil:
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
         with localconverter(ro.default_converter + pandas2ri.converter):
-            random_rare = vegan.rrarefy(df, raremax)
+            random_rare = vegan.rrarefy(df, subsample_size)
         random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
 
         if dimension == 'col':
@@ -1987,12 +2004,12 @@ class MatrixUtil:
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
         with localconverter(ro.default_converter + pandas2ri.converter):
-            vegan.rarecurve(df, sample=raremax, step=20, col="blue", cex=0.6)
+            vegan.rarecurve(df, sample=subsample_size, step=20, col="blue", cex=0.6)
         ro.r('dev.off()')
 
         logging.info('Start generating expected species richness vs raw abundance plot')
         with localconverter(ro.default_converter + pandas2ri.converter):
-            Srare = vegan.rarefy(df, raremax)
+            Srare = vegan.rarefy(df, subsample_size)
         specnumber = ro.r['specnumber']
         with localconverter(ro.default_converter + pandas2ri.converter):
             S = specnumber(df)
@@ -2023,7 +2040,8 @@ class MatrixUtil:
 
         report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
                                                      random_rare_df,
-                                                     rarecurve_image, obs_vs_rare_image)
+                                                     rarecurve_image, obs_vs_rare_image,
+                                                     warnings)
 
         returnVal.update(report_output)
 

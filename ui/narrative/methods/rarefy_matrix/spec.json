@@ -54,6 +54,18 @@
       }
     },
     {
+      "id": "subsample_size",
+      "optional": true,
+      "advanced": true,
+      "allow_multiple": false,
+      "default_values": [null],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int",
+          "min_int": 0
+      }
+    },
+    {
       "id" : "new_matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -88,6 +100,10 @@
         {
           "input_parameter" : "seed_number",
           "target_property" : "seed_number"
+        },
+        {
+          "input_parameter" : "subsample_size",
+          "target_property" : "subsample_size"
         },
         {
           "input_parameter" : "new_matrix_name",
