@@ -86,6 +86,7 @@ parameter-groups:
 
 description : |
     <p> Generating randomly rarefied matrix from input matrix </p>
+    <p> Thanks to Pamela Weisenhorn for steering the specifications of this app. </p>
 
 publications:
     -
