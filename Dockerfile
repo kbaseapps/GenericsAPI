@@ -57,6 +57,8 @@ RUN cd /kb/module && \
 
 # -----------------------------------------
 
+ENV PYTHONUNBUFFERED=1
+
 COPY ./ /kb/module
 WORKDIR /kb/module
 

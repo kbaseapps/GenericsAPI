@@ -56,9 +56,33 @@ parameters :
         ui-name: |
             Subsample Size
         short-hint: |
-            Subsample size for rarefying each sample. Default behavior (leaving field blank) is to use smallest sample size
+            Number of times to subsample each vector without replacement. Default behavior (leaving field blank) is to use smallest vector sum. If any vector sum is less than the subsample size, that vector will not be rarefied and will be returned as is.
         long-hint : |
-            Subsample size for rarefying each sample. Default behavior (leaving field blank) is to use smallest sample size
+            Number of times to subsample each vector without replacement. Default behavior (leaving field blank) is to use smallest vector sum. If any vector sum is less than the subsample size, that vector will not be rarefied and will be returned as is.
+
+    num_rare_reps:
+        ui-name: |
+            Number of Times<br>To Randomly Rarefy
+        short-hint: |
+            Number of times to randomly rarefy input matrix with the subsampling size
+        long-hint: |
+            Number of times to randomly rarefy input matrix with the subsampling size
+
+    central_tendency:
+        ui-name: |
+            Measure of<br>Central Tendency
+        short-hint: |
+            The measure of central tendency to apply to the randomly rarefied matrices by matrix position
+        long-hint: |
+            The measure of central tendency to apply to the randomly rarefied matrices by matrix position
+
+
+parameter-groups:
+    bootstrap:
+        ui-name: |
+            Bootstrap Options
+        short-hint: |
+            Rarefy with bootstrapping by randomly rarefying the input matrix multiple times with the same subsampling size, then taking the median or mean by matrix entry. Enable/disable to toggle feature
 
 description : |
     <p> Generating randomly rarefied matrix from input matrix </p>

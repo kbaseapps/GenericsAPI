@@ -8,6 +8,19 @@
     "input": "kbaseNarrativeMethodInput",
     "output" : "no-display"
   },
+  "parameter-groups": [
+    {
+      "id": "bootstrap",
+      "parameters": [
+        "num_rare_reps",
+        "central_tendency"
+      ],
+      "optional": true,
+      "advanced": true,
+      "allow_multiple": false,
+      "with_border": true
+    }        
+  ],
   "parameters" : [
     {
       "id" : "input_matrix_ref",
@@ -66,6 +79,40 @@
       }
     },
     {
+      "id": "num_rare_reps",
+      "optional": false,
+      "advanced": false,
+      "allow_multiple": false,
+      "default_values": [],
+      "field_type": "text",
+      "text_options": {
+        "validate_as": "int",
+        "min_int": 1
+      }
+    },
+    {
+      "id" : "central_tendency",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["median"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Median",
+              "value": "median"
+          },
+          {
+              "display": "Mean",
+              "value": "mean"
+          }
+        ]
+      }
+    },
+    {
       "id" : "new_matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -104,6 +151,10 @@
         {
           "input_parameter" : "subsample_size",
           "target_property" : "subsample_size"
+        },
+        {
+          "input_parameter" : "bootstrap",
+          "target_property" : "bootstrap"
         },
         {
           "input_parameter" : "new_matrix_name",

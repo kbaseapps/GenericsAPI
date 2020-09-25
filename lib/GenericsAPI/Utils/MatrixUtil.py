@@ -1946,6 +1946,11 @@ class MatrixUtil:
         subsample_size = params.get('subsample_size')
         dimension = params.get('dimension', 'col')
 
+        bootstrap = params.get('bootstrap')
+        if bootstrap is not None:
+            num_rare_reps = bootstrap['num_rare_reps']
+            central_tendency = bootstrap['central_tendency']
+
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
         input_matrix_name = input_matrix_info[1]
@@ -1966,6 +1971,7 @@ class MatrixUtil:
 
         run_seed = (not seed_number == 'do_not_seed')
 
+        # determining subsample size
         raremax = int(min(df.sum(axis=1)))  # least sample size
         if subsample_size is None:  # default behavior: use least sample size 
             subsample_size = raremax
@@ -1984,11 +1990,26 @@ class MatrixUtil:
         vegan = rpackages.importr('vegan')
         numpy2ri.activate()
 
-        logging.info('Start executing rrarefy')
+        # generating rarefied matrix
+        logging.info('Start executing rrarefy(s)')
         if run_seed:
             ro.r('set.seed({})'.format(seed_number))
-        with localconverter(ro.default_converter + pandas2ri.converter):
-            random_rare = vegan.rrarefy(df, subsample_size)
+        if bootstrap is None:
+            with localconverter(ro.default_converter + pandas2ri.converter):
+                random_rare = vegan.rrarefy(df, subsample_size)
+        else:
+            random_rare_l = []
+            for rep in range(num_rare_reps):
+                with localconverter(ro.default_converter + pandas2ri.converter):
+                    random_rare = vegan.rrarefy(df, subsample_size)  # returns np.ndarray
+                random_rare_l.append(random_rare)
+            if central_tendency == 'mean':
+                random_rare = sum(random_rare_l) / num_rare_reps
+            elif central_tendency == 'median':
+                random_rare = np.median(random_rare_l, axis=0)
+            else:
+                raise NotImplementedError('Unknown value for `central_tendency`')
+   
         random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
 
         if dimension == 'col':
