@@ -24,7 +24,7 @@ from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
 
-dec = '###' * 10
+dec = '###' * 5
 skipped_tests = []
 
 def tag_kb_env(e):
@@ -48,11 +48,12 @@ def skip_cond(select_run=None, kb_env=None):
                 skipped_tests.append(f.__name__)
                 print(dec, 'Skipping test %s because not in select_run' % f.__name__, dec)
                 self.skipTest("Test is not in list of select_run")
+            print(dec, 'Running test %s' % f.__name__, dec)
             f(self, *a, **kw)
         return f_new
     return decorator
 
-select_run = None #['test_rarefy_medLargeSubsample_bootstrap9Reps']
+select_run = None #['test_rarefy_defaultSubsample']
 
 
 
@@ -90,14 +91,14 @@ class MatrixUtilTest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
-        cls.gfu = GenomeFileUtil(cls.callback_url)
+        #cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
-        cls.loadAmpliconMatrix()
+
         cls.prepare_data()
 
     @classmethod
@@ -172,7 +173,12 @@ class MatrixUtilTest(unittest.TestCase):
      
     @classmethod
     def prepare_data(cls):
-        cls.matrix = [  # the toy matrix loaded with patched self.loadAmpliconMatrix
+        cls.loadAmpliconMatrix()
+        
+        # the toy matrix loaded with patched self.loadAmpliconMatrix
+        # sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
+        # sample sizes are [7, 3, 4, 6, 5, 2]
+        cls.matrix = [  
             [0,0,1,0,0,0],
             [5,1,0,2,3,1],
             [0,0,1,4,2,0],
@@ -188,14 +194,22 @@ class MatrixUtilTest(unittest.TestCase):
             [0,1,1,0,0,0]
         ]
 
-        cls.matrix_bootstrap9Reps_median = [
+        cls.matrix_subsample2 = [ # rarefying with seed 7, subsample 2
+            [0,0,0,0,0,0],        # confirm with `set.seed(7); t(rrarefy(t(m), 2))
+            [2,0,0,1,2,1],
+            [0,0,1,1,0,0],
+            [0,1,1,0,0,1],
+            [0,1,0,0,0,0]
+        ]
+
+        cls.matrix_bootstrap9Reps_median = [ # rarefying with seed 7, subsample 5
             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
             [4.0, 1.0, 0.0, 2.0, 3.0, 1.0], 
             [0.0, 0.0, 1.0, 3.0, 2.0, 0.0], 
             [1.0, 1.0, 1.0, 0.0, 0.0, 1.0], 
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]
 
-        cls.matrix_bootstrap9Reps_mean = np.array([
+        cls.matrix_bootstrap9Reps_mean = np.array([ # rarefying with seed 7, subsample 5
             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
             [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0], 
             [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0], 
@@ -205,6 +219,23 @@ class MatrixUtilTest(unittest.TestCase):
 
         ## In logging, look for 'Start generating html report in xxx' to find html report ##
         ## Count "In setUpClass" and "Executing loadAmpliconMatrix" -> once each
+        
+
+    def get_out_data(self, ret, matrix_out=True):
+        report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
+        warnings = report_obj['warnings']
+        matrix_out = self.dfu.get_objects({
+            'object_refs': [report_obj['objects_created'][0]['ref']]
+        })['data'][0]['data']['data']['values']
+
+        return warnings, matrix_out
+
+    def assert_matrices_equal(self, m1, m2):
+        self.assertTrue(
+            m1 == m2, 
+            'm1 is\n`%s`\nm2 is\n`%s`' % (m1, m2)
+        )
+
 
     ##########
     ##########
@@ -212,6 +243,8 @@ class MatrixUtilTest(unittest.TestCase):
     def test_rarefy_defaultSubsample(self):
         '''
         All samples should be rarefied to least sample size, 2
+        No warnings about anything too big to rarefy
+        Check output matrix against test data matrix
         '''
 
         ret = self.getImpl().perform_rarefy(
@@ -224,22 +257,20 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
+        warnings, matrix_out = self.get_out_data(ret)
 
-        warnings = report_obj['warnings']
         self.assertTrue(len(warnings) == 0, 'length is %d' % len(warnings))
-
+        self.assert_matrices_equal(matrix_out, self.matrix_subsample2)
+        
 
     ##########
     ##########
     @skip_cond(select_run=select_run)
-    def test_rarefy_medLargeSubsample_noBootstrap(self):
+    def test_rarefy_medSubsample(self):
         '''
         Some samples should and should not be rarefied
-
-        Sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
-        Sample sizes are [7, 3, 4, 6, 5, 2]
+        That means warnings for the ones too big to rarefy
+        Check output matrix against test data matrix
         '''
 
         ret = self.getImpl().perform_rarefy(
@@ -252,31 +283,24 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
+        warnings, matrix_out = self.get_out_data(ret)
 
-        warnings = report_obj['warnings']
         self.assertTrue(len(warnings) == 1, 'length is %d' % len(warnings))
         msg = (
             "At subsampling size 5, samples ['Sample2', 'Sample3', 'Sample6'] are too small "
             "and will not be rarefied. Smallest sample size is 2")
         self.assertTrue(warnings[0] == msg, 'warnings[0] is\n`%s`, msg is\n`%s`' % (warnings[0], msg))
 
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_new = ampmat_obj['data']['values']
-
-        self.assertTrue(
-            matrix_new == self.matrix_subsample5, 
-            'matrix_new is\n`%s`\nmatrix_subsample5 is\n`%s`' % (matrix_new, self.matrix_subsample5)
-        )
+        self.assert_matrices_equal(matrix_out, self.matrix_subsample5)
 
 
     ##########
     ##########
     @skip_cond(select_run=select_run)
-    def test_rarefy_medLargeSubsample_bootstrap9Reps(self):
+    def test_rarefy_medSubsample_bootstrap9Reps(self):
         '''
+        At subsample 5 and 9 bootstrap reps
+        Check output matrices against test data matrices
         '''
         ret = self.getImpl().perform_rarefy(
             self.ctx, {
@@ -292,12 +316,7 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
-
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_median = ampmat_obj['data']['values']
+        _, matrix_out_median = self.get_out_data(ret)
 
         ret = self.getImpl().perform_rarefy(
             self.ctx, {
@@ -313,25 +332,18 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
+        _, matrix_out_mean = self.get_out_data(ret)
 
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_mean = np.array(ampmat_obj['data']['values'])
-
+        self.assert_matrices_equal(matrix_out_median, self.matrix_bootstrap9Reps_median)
         self.assertTrue(
-            matrix_median == self.matrix_bootstrap9Reps_median
-        )
-        self.assertTrue(
-            np.all(np.abs(matrix_mean - self.matrix_bootstrap9Reps_mean) < 1e-10)
+            np.all(np.abs(np.array(matrix_out_mean) - self.matrix_bootstrap9Reps_mean) < 1e-10) # allow some error for mean
         )
 
 
     ##########
     ##########
     @skip_cond(select_run=select_run)
-    def test_rarefy_veryLargeSubsample_noBootstrap_bootstrap1Rep(self):
+    def test_rarefy_largeSubsample(self):
         '''
         All samples, bootstrapped or not, should not be rarefied and should be returned as is
         All resulting matrices in this test should be same
@@ -348,20 +360,14 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
+        warnings, matrix_out_noBootstrap = self.get_out_data(ret)
 
-        warnings = report_obj['warnings']
         self.assertTrue(len(warnings) == 1, 'length is %d' % len(warnings))
         msg = (
             "At subsampling size 1000, samples ['Sample1', 'Sample2', 'Sample3', 'Sample4', "
             "'Sample5', 'Sample6'] are too small "
             "and will not be rarefied. Smallest sample size is 2")
         self.assertTrue(warnings[0] == msg, 'warnings[0] is\n`%s`, msg is\n`%s`' % (warnings[0], msg))
-
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_noBootstrap = ampmat_obj['data']['values']
 
         # run perform_rarefy with bootstrap with rep=1 and central_tendency=median
         ret = self.getImpl().perform_rarefy(
@@ -378,12 +384,7 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
-
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_bootstrapMedian = ampmat_obj['data']['values']
+        _, matrix_out_median = self.get_out_data(ret)
 
         # run perform_rarefy with bootstrap with rep=1 and central_tendency=mean
         ret = self.getImpl().perform_rarefy(
@@ -400,24 +401,14 @@ class MatrixUtilTest(unittest.TestCase):
                 'new_matrix_name': 'new_matrix_name',
             })
 
-        report_ref = ret[0]['report_ref']
-        report_obj = self.dfu.get_objects({'object_refs': [report_ref]})['data'][0]['data']
+        _, matrix_out_mean = self.get_out_data(ret)
 
-        ampmat_ref_new = report_obj['objects_created'][0]['ref']
-        ampmat_obj = self.dfu.get_objects({'object_refs': [ampmat_ref_new]})['data'][0]['data']
-        matrix_bootstrapMean = ampmat_obj['data']['values']
 
         # these resulting 3 matrices should match
         # since seeded same
         # and ran just 1nce
-        self.assertTrue(
-            matrix_noBootstrap == matrix_bootstrapMedian, 
-            'matrix_noBootstrap is\n`%s`\nmatrix_bootstrapMedian is\n`%s`' % (matrix_noBootstrap, matrix_bootstrapMedian)
-        )
-        self.assertTrue(
-            matrix_bootstrapMedian == matrix_bootstrapMean, 
-            'matrix_bootstrapMedian is\n`%s`\nmatrix_bootstrapMean is\n`%s`' % (matrix_bootstrapMedian, matrix_bootstrapMean)
-        )
+        self.assertTrue(matrix_out_noBootstrap, matrix_out_median)
+        self.assertTrue(matrix_out_median, matrix_out_mean) 
 
 
 
