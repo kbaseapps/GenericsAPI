@@ -280,12 +280,18 @@ module GenericsAPI {
   funcdef transform_matrix (TransformMatrixParams params) returns (TransformMatrixOutput returnVal) authentication required;
 
   typedef structure {
+    int num_rare_reps;
+    string central_tendency;
+  } RarefyBootstrapParams;
+
+  typedef structure {
       obj_ref input_matrix_ref;
       int workspace_id;
       string new_matrix_name;
       int seed_number;
       string dimension;
       int subsample_size;
+      RarefyBootstrapParams bootstrap;
   } RarefyMatrixParams;
 
   typedef structure {
