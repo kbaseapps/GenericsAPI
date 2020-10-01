@@ -2062,10 +2062,6 @@ class MatrixUtil:
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
-        new_matrix_obj = self.dfu.get_objects({'object_refs': [new_matrix_obj_ref]})['data'][0]
-        new_matrix_data = new_matrix_obj['data']
-        logging.info("New object data: {}".format(new_matrix_data))
-
         report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
                                                      random_rare_df,
                                                      rarecurve_image, obs_vs_rare_image,
