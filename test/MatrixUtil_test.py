@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+import inspect
+import json
 import os
 import time
 import unittest
+from unittest import TestCase
 from unittest.mock import patch
 from configparser import ConfigParser
 from os import environ
+from mock import patch
+import shutil
+import sys
 import functools
 import numpy as np
 
@@ -12,23 +18,25 @@ from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
+from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+
+
+
 
 dec = '###' * 5
 skipped_tests = []
 
-
 def tag_kb_env(e):
-    @functools.wraps(f)  # preserve wrapped's function name
+    @functools.wraps(f) # preserve wrapped's function name
     def decorator(f):
         f.kb_env = e
         return f
     return decorator
 
-
 def skip_cond(select_run=None, kb_env=None):
     def decorator(f):
-        @functools.wraps(f)  # preserve wrapped's function name
+        @functools.wraps(f) # preserve wrapped's function name
         def f_new(self, *a, **kw):
             if kb_env is not None and not hasattr(f, "kb_env"):
                 raise Exception("Tag function (e.g., @tag_kb_env('ci')) with kb_env first to skip with this feature")
@@ -45,8 +53,9 @@ def skip_cond(select_run=None, kb_env=None):
         return f_new
     return decorator
 
+select_run = None #['test_rarefy_defaultSubsample']
 
-select_run = None  # ['test_rarefy_defaultSubsample']
+
 
 
 class MatrixUtilTest(unittest.TestCase):
@@ -82,6 +91,7 @@ class MatrixUtilTest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
+        #cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
 
         suffix = int(time.time() * 1000)
@@ -131,8 +141,7 @@ class MatrixUtilTest(unittest.TestCase):
     @classmethod
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def loadAmpliconMatrix(cls, download_staging_file):
-        if hasattr(cls, 'amplicon_matrix_ref'):
-            return
+        if hasattr(cls, 'amplicon_matrix_ref'): return
 
         print('Executing loadAmpliconMatrix')
 
@@ -161,21 +170,22 @@ class MatrixUtilTest(unittest.TestCase):
 
         print('Loaded AmpliconMatrix: ' + cls.amplicon_matrix_ref)
 
+     
     @classmethod
     def prepare_data(cls):
         cls.loadAmpliconMatrix()
-
+        
         # the toy matrix loaded with patched self.loadAmpliconMatrix
         # sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
         # sample sizes are [7, 3, 4, 6, 5, 2]
-        cls.matrix = [
+        cls.matrix = [  
             [0,0,1,0,0,0],
             [5,1,0,2,3,1],
             [0,0,1,4,2,0],
             [2,1,1,0,0,1],
             [0,1,1,0,0,0]
         ]
-
+        
         cls.matrix_subsample5 = [ # rarefying with seed 7, subsample 5
             [0,0,1,0,0,0],        # confirm with `set.seed(7); t(rrarefy(t(m), 5))
             [4,1,0,2,3,1],
@@ -193,22 +203,23 @@ class MatrixUtilTest(unittest.TestCase):
         ]
 
         cls.matrix_bootstrap9Reps_median = [ # rarefying with seed 7, subsample 5
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-            [4.0, 1.0, 0.0, 2.0, 3.0, 1.0],
-            [0.0, 0.0, 1.0, 3.0, 2.0, 0.0],
-            [1.0, 1.0, 1.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
+            [4.0, 1.0, 0.0, 2.0, 3.0, 1.0], 
+            [0.0, 0.0, 1.0, 3.0, 2.0, 0.0], 
+            [1.0, 1.0, 1.0, 0.0, 0.0, 1.0], 
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]
 
         cls.matrix_bootstrap9Reps_mean = np.array([ # rarefying with seed 7, subsample 5
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-            [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0],
-            [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0],
-            [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
+            [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0], 
+            [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0], 
+            [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0], 
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
         ])
 
         ## In logging, look for 'Start generating html report in xxx' to find html report ##
         ## Count "In setUpClass" and "Executing loadAmpliconMatrix" -> once each
+        
 
     def get_out_data(self, ret, matrix_out=True):
         report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
@@ -221,9 +232,10 @@ class MatrixUtilTest(unittest.TestCase):
 
     def assert_matrices_equal(self, m1, m2):
         self.assertTrue(
-            m1 == m2,
+            m1 == m2, 
             'm1 is\n`%s`\nm2 is\n`%s`' % (m1, m2)
         )
+
 
     ##########
     ##########
@@ -249,6 +261,7 @@ class MatrixUtilTest(unittest.TestCase):
 
         self.assertTrue(len(warnings) == 0, 'length is %d' % len(warnings))
         self.assert_matrices_equal(matrix_out, self.matrix_subsample2)
+        
 
     ##########
     ##########
@@ -279,6 +292,7 @@ class MatrixUtilTest(unittest.TestCase):
         self.assertTrue(warnings[0] == msg, 'warnings[0] is\n`%s`, msg is\n`%s`' % (warnings[0], msg))
 
         self.assert_matrices_equal(matrix_out, self.matrix_subsample5)
+
 
     ##########
     ##########
@@ -322,8 +336,9 @@ class MatrixUtilTest(unittest.TestCase):
 
         self.assert_matrices_equal(matrix_out_median, self.matrix_bootstrap9Reps_median)
         self.assertTrue(
-            np.all(np.abs(np.array(matrix_out_mean) - self.matrix_bootstrap9Reps_mean) < 1e-10)  # allow some error for mean
+            np.all(np.abs(np.array(matrix_out_mean) - self.matrix_bootstrap9Reps_mean) < 1e-10) # allow some error for mean
         )
+
 
     ##########
     ##########
@@ -388,11 +403,14 @@ class MatrixUtilTest(unittest.TestCase):
 
         _, matrix_out_mean = self.get_out_data(ret)
 
+
         # these resulting 3 matrices should match
         # since seeded same
         # and ran just 1nce
         self.assertTrue(matrix_out_noBootstrap, matrix_out_median)
-        self.assertTrue(matrix_out_median, matrix_out_mean)
+        self.assertTrue(matrix_out_median, matrix_out_mean) 
+
 
 
 all_tests = [k for k, v in MatrixUtilTest.__dict__.items() if k.startswith('test') and callable(v)]
+
