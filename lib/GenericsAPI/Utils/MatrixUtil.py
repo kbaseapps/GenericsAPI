@@ -1960,7 +1960,6 @@ class MatrixUtil:
             if key.endswith('_ref'):
                 subobj_ref = input_matrix_data[key]
                 input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
-                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
 
         if not new_matrix_name:
             current_time = time.localtime()
@@ -2215,7 +2214,6 @@ class MatrixUtil:
             if key.endswith('_ref'):
                 subobj_ref = input_matrix_data[key]
                 input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
-                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
 
         if not new_matrix_name:
             current_time = time.localtime()
