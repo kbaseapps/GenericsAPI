@@ -13,12 +13,16 @@ import shutil
 import sys
 import functools
 import numpy as np
+import pandas as pd
+import re
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
+from GenericsAPI.Utils.MatrixUtil import MatrixUtil
+from GenericsAPI.Utils.MatrixValidation import MatrixValidationException
+from GenericsAPI.Utils import MatrixValidation as vd
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
-from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
@@ -34,26 +38,32 @@ def tag_kb_env(e):
         return f
     return decorator
 
-def skip_cond(select_run=None, kb_env=None):
+def skip_cond(select_run=None, regex=None, exclude_regex=None, kb_env=None):
     def decorator(f):
         @functools.wraps(f) # preserve wrapped's function name
         def f_new(self, *a, **kw):
             if kb_env is not None and not hasattr(f, "kb_env"):
                 raise Exception("Tag function (e.g., @tag_kb_env('ci')) with kb_env first to skip with this feature")
 
-            if kb_env is not None and kb_env != f.kb_env:
+            if kb_env is not None and f.kb_env is not None and kb_env != f.kb_env:
                 skipped_tests.append(f.__name__)
                 self.skipTest("Test does not operate in this KBase environment")
             if select_run is not None and f.__name__ not in select_run:
                 skipped_tests.append(f.__name__)
                 print(dec, 'Skipping test %s because not in select_run' % f.__name__, dec)
                 self.skipTest("Test is not in list of select_run")
+            if regex is not None and re.search(regex, f.__name__) is None:
+                skipped_tests.append(f.__name__)
+                print(dec, 'Skipping test %s because regex has no hit' % f.__name__, dec)
+                self.skipTest("Test name does not have hit from regex %s" % regex)
+
             print(dec, 'Running test %s' % f.__name__, dec)
             f(self, *a, **kw)
         return f_new
     return decorator
 
-select_run = None #['test_rarefy_defaultSubsample']
+select_run = None #['test_transform_pipeline']
+regex = None #'transform'
 
 
 
@@ -106,6 +116,7 @@ class MatrixUtilTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        all_tests = [k for k, v in cls.__dict__.items() if k.startswith('test') and callable(v)]
         ran_tests = list(set(all_tests) - set(skipped_tests))
         print('All %d tests: %s' % (len(all_tests), all_tests))
         print('Skipped %d tests: %s' % (len(skipped_tests), skipped_tests))
@@ -173,7 +184,7 @@ class MatrixUtilTest(unittest.TestCase):
      
     @classmethod
     def prepare_data(cls):
-        cls.loadAmpliconMatrix()
+        cls.loadAmpliconMatrix() # TODO replace with mocking in tests
         
         # the toy matrix loaded with patched self.loadAmpliconMatrix
         # sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
@@ -209,17 +220,14 @@ class MatrixUtilTest(unittest.TestCase):
             [1.0, 1.0, 1.0, 0.0, 0.0, 1.0], 
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]
 
-        cls.matrix_bootstrap9Reps_mean = np.array([ # rarefying with seed 7, subsample 5
+        cls.matrix_bootstrap9Reps_mean = [ # rarefying with seed 7, subsample 5
             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
             [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0], 
             [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0], 
             [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0], 
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
-        ])
+        ]
 
-        ## In logging, look for 'Start generating html report in xxx' to find html report ##
-        ## Count "In setUpClass" and "Executing loadAmpliconMatrix" -> once each
-        
 
     def get_out_data(self, ret, matrix_out=True):
         report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
@@ -231,15 +239,491 @@ class MatrixUtilTest(unittest.TestCase):
         return warnings, matrix_out
 
     def assert_matrices_equal(self, m1, m2):
+        if not isinstance(m1, np.ndarray): m1 = np.array(m1)
+        if not isinstance(m2, np.ndarray): m2 = np.array(m2)
+
         self.assertTrue(
-            m1 == m2, 
+            np.allclose(m1, m2) and np.allclose(m2, m1),
             'm1 is\n`%s`\nm2 is\n`%s`' % (m1, m2)
         )
 
+    '''
+    {
+        "input_matrix_ref": "test_amplicon_matrix",
+        "options": [
+            "abundance_filtering",
+            "relative_abundance",
+            "standardization",
+            "ratio_transformation",
+            "logit",
+            "sqrt",
+            "log"
+        ],
+        "abundance_filtering_params": {
+            "abundance_filtering_row_threshold": 19,
+            "abundance_filtering_columns_threshold": 0,
+            "abundance_filtering_row_sum_threshold": 125,
+            "abundance_filtering_columns_sum_threshold": 3500
+        },
+        "perform_relative_abundance": 1,
+        "standardization_params": {
+            "standardization_with_mean": 0,
+            "standardization_with_std": 1,
+            "standardization_dimension": "col"
+        },
+        "ratio_transformation_params": {
+            "ratio_transformation_method": "clr",
+            "ratio_transformation_dimension": "col"
+        },
+        "log_params": {
+            "base": "e",
+            "offset": 1e-10
+        }
+        "new_matrix_name": "test_amplicon_transformed_matrix"
+    }
+    '''
 
     ##########
     ##########
-    @skip_cond(select_run=select_run)
+    @skip_cond(select_run=select_run, regex=regex)
+    def test_transform_pipeline(self):
+        
+        with self.subTest(): # TODO subTest not catching?
+            '''
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "log",
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 3
+                    },
+                    "log_params": {
+                        "base": 2.718281828459045,
+                        "offset": 1e-10
+                    }
+                })
+
+            out1 = [
+                [-2.30258509e+01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01],
+                [ 1.60943791e+00, -2.30258509e+01,  6.93147181e-01,  1.09861229e+00],
+                [-2.30258509e+01,  1.00000008e-10,  1.38629436e+00,  6.93147181e-01],
+                [ 6.93147181e-01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01],
+                [-2.30258509e+01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01]
+            ]
+
+            _, out2 = self.get_out_data(ret)
+            
+            self.assert_matrices_equal(out1, out2)
+
+        with self.subTest():
+            '''
+            Sqrt
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "relative_abundance", # fixed axis='col' currently
+                        "sqrt",
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 2,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                })
+
+            out1 = [
+                [ 0.845154,  0.707107,         0,   0.57735,  0.774597,  0.707107],
+                [        0,         0,  0.707107,  0.816497,  0.632456,         0],
+                [ 0.534522,  0.707107,  0.707107,         0,         0,  0.707107]
+            ]
+
+            _, out2 = self.get_out_data(ret)
+
+            self.assert_matrices_equal(out1, out2)
+
+
+        with self.subTest():
+            '''
+            Ratio transform
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "relative_abundance",
+                        'ratio_transformation',
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                    "ratio_transformation_params": {
+                        "ratio_transformation_method": "clr",
+                        "ratio_transformation_dimension": "col"
+                    }
+                })
+
+            # nan/inf
+
+
+        with self.subTest():
+            '''
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "relative_abundance",
+                        'log',
+                        'standardization',
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                    "log_params": {
+                        "base": 2,
+                        "offset": 1
+                    },
+                    "standardization_params": {
+                        "standardization_with_mean": 1,
+                        "standardization_with_std": 1,
+                        "standardization_dimension": "col"
+                    },
+                })
+
+            out1 = [
+                [-0.73896682, -1.22474487,  0.5       , -0.76804287, -0.79845904, -0.81649658],
+                [ 1.78093082,  0.81649658, -2.        ,  0.61548897,  1.52819859,  1.22474487],
+                [-0.73896682, -1.22474487,  0.5       ,  1.68863963,  0.86717852, -0.81649658],
+                [ 0.43596963,  0.81649658,  0.5       , -0.76804287, -0.79845904,  1.22474487],
+                [-0.73896682,  0.81649658,  0.5       , -0.76804287, -0.79845904, -0.81649658]
+            ]
+
+            _, out2 = self.get_out_data(ret)
+
+            self.assert_matrices_equal(out1, out2)
+
+
+        with self.subTest():
+            '''
+            Logit
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'log', # make positive
+                        "relative_abundance", # scale
+                        'logit', # requires domain (0,1)
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                    "log_params": {
+                        "base": 2,
+                        "offset": 3 
+                    },
+                    "standardization_params": {
+                        "standardization_with_mean": 1,
+                        "standardization_with_std": 1,
+                        "standardization_dimension": "col"
+                    },
+                    "ratio_transformation_params": {
+                        "ratio_transformation_method": "clr",
+                        "ratio_transformation_dimension": "col"
+                    },
+                })
+
+            out1 = [
+                [-1.6785465 , -1.56560692, -1.33302049, -1.65559934, -1.62843694, -1.50933445],
+                [-0.85821174, -1.27674801, -1.61888079, -1.18076985, -1.00711303, -1.21711914],
+                [-1.6785465 , -1.56560692, -1.33302049, -0.9245813 , -1.15092049, -1.50933445],
+                [-1.20592537, -1.27674801, -1.33302049, -1.65559934, -1.62843694, -1.21711914],
+                [-1.6785465 , -1.27674801, -1.33302049, -1.65559934, -1.62843694, -1.50933445]
+            ]
+            
+            _, out2 = self.get_out_data(ret)
+
+            self.assert_matrices_equal(out1, out2)
+
+
+        with self.subTest():
+            '''
+            Random
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        'relative_abundance',
+                        'ratio_transformation',
+                        'standardization',
+                    ],
+                    'abundance_filtering_params': {
+                        'abundance_filtering_row_threshold': -1,
+                        'abundance_filtering_columns_threshold': -1,
+                        'abundance_filtering_row_sum_threshold': -1,
+                        'abundance_filtering_columns_sum_threshold': -1,
+                    }
+                })
+
+            # numericized inf
+
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
+    def test_transform_pipeline_throws(self):
+
+        with self.assertRaises(MatrixValidationException) as cm:
+            '''
+            Logit, out of domain
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "relative_abundance",
+                        'logit', # throws, requires domain (0,1)
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                })
+        print(cm.exception)
+
+        with self.assertRaises(AssertionError) as cm:
+            '''
+            Unknown op
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'abundance_filtering',
+                        "relative_abundance",
+                        'fake_op' #
+                    ],
+                    "abundance_filtering_params": {
+                        "abundance_filtering_row_threshold": 0,
+                        "abundance_filtering_columns_threshold": 0,
+                        "abundance_filtering_row_sum_threshold": 0,
+                        "abundance_filtering_columns_sum_threshold": 0
+                    },
+                })
+        print(cm.exception)
+
+        with self.assertRaises(Exception):
+            '''
+            Try to save matrix with inf
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'log' # 
+                    ],
+                    "log_params": {
+                        "base": 10,
+                        "offset": 0
+                    },
+                })
+
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
+    def test_transform_unit_op(self):
+        '''
+        '''
+        mu = MatrixUtil
+        m = np.array(self.matrix)
+        df = pd.DataFrame(m)
+
+
+        ## Logit ##
+
+        out1 = [
+            [-2.19722458, -2.19722458, -1.38629436, -2.19722458, -2.19722458, -2.19722458],
+            [ 0.40546511, -1.38629436, -2.19722458, -0.84729786, -0.40546511, -1.38629436],
+            [-2.19722458, -2.19722458, -1.38629436,  0.        , -0.84729786, -2.19722458],
+            [-0.84729786, -1.38629436, -1.38629436, -2.19722458, -2.19722458, -1.38629436],
+            [-2.19722458, -1.38629436, -1.38629436, -2.19722458, -2.19722458, -2.19722458]
+        ]
+        out2 = mu._logit((df+1) / 10)
+
+        self.assert_matrices_equal(out1, out2)
+
+
+        ## Sqrt ##
+
+        out1 = [
+            [0.        , 0.        , 1.        , 0.        , 0.        , 0.        ],
+            [2.23606798, 1.        , 0.        , 1.41421356, 1.73205081, 1.        ],
+            [0.        , 0.        , 1.        , 2.        , 1.41421356, 0.        ],
+            [1.41421356, 1.        , 1.        , 0.        , 0.        , 1.        ],
+            [0.        , 1.        , 1.        , 0.        , 0.        , 0.        ]
+        ]
+        out2 = mu._sqrt(df)
+
+        self.assert_matrices_equal(out1, out2)
+
+        ## Log ##
+       
+        out1 = [
+            [0.        , 0.        , 0.30103   , 0.        , 0.        , 0.        ],
+            [0.77815125, 0.30103   , 0.        , 0.47712125, 0.60205999, 0.30103   ],
+            [0.        , 0.        , 0.30103   , 0.69897   , 0.47712125, 0.        ],
+            [0.47712125, 0.30103   , 0.30103   , 0.        , 0.        , 0.30103   ],
+            [0.        , 0.30103   , 0.30103   , 0.        , 0.        , 0.        ]
+        ]
+        out2 = mu._log(df, base=10, a=1)
+
+        self.assert_matrices_equal(out1, out2)
+ 
+        out1 = [
+            [-2.30258509e+01, -2.30258509e+01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01, -2.30258509e+01],
+            [ 1.60943791e+00,  1.00000008e-10, -2.30258509e+01,  6.93147181e-01,  1.09861229e+00,  1.00000008e-10],
+            [-2.30258509e+01, -2.30258509e+01,  1.00000008e-10,  1.38629436e+00,  6.93147181e-01, -2.30258509e+01],
+            [ 6.93147181e-01,  1.00000008e-10,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01,  1.00000008e-10],
+            [-2.30258509e+01,  1.00000008e-10,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01, -2.30258509e+01]
+        ]
+        out2 = mu._log(df, base=2.718281828459045, a=1e-10)
+
+        self.assert_matrices_equal(out1, out2)
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
+    def test_transform_op_validation(self):
+        mu = MatrixUtil
+        m = np.array(self.matrix)
+        m0 = np.zeros((0,0)) # ?
+        m1 = np.zeros(m.shape); m1[0,0] = 1
+
+        DF = pd.DataFrame
+
+        ## Logit ##
+        ## In range (0,1) ##
+        with self.subTest():
+            valid = [(m+1)/10, m1/2+.1]
+            invalid = [m, m*0, m*0+1, m-2*m, m1, -m1]
+
+            for m_v in valid:
+                mu._logit(DF(m_v))
+            for m_inv in invalid:
+                with self.assertRaises(MatrixValidationException) as cm:
+                    mu._logit(DF(m_inv))
+                print(cm.exception)
+
+        ## Log ##
+        ## Nonnegative after offset ##
+        with self.subTest():
+            valid = [m, m-1, m1, m1-1, m1*0, m1-1e-6]
+            invalid = [m-2, m*-2, m1-2, m1*-2]
+
+            for m_v in valid:
+                mu._log(DF(m_v), base=10, a=1)
+            for m_inv in invalid:
+                with self.assertRaises(MatrixValidationException) as cm:
+                    mu._log(DF(m_inv), base=10, a=1)
+                    mu._log(DF(m_inv), base=2.718281828459045, a=1e-10)
+                print(cm.exception)
+
+        ## Sqrt ##
+        ## Nonnegative ##
+        with self.subTest():
+            valid = [m, m1, m1*0]
+            invalid = [m-1, m-1e-6, m*-1]
+
+            for m_v in valid:
+                mu._sqrt(DF(m_v))
+            for m_inv in invalid:
+                with self.assertRaises(MatrixValidationException) as cm:
+                    mu._sqrt(DF(m_inv))
+                print(cm.exception)
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
+    def test_transform_identity(self):
+        '''
+        Test identity operations
+        '''
+        ret = self.getImpl().transform_matrix(
+            self.ctx, {
+                'workspace_id': self.getWsId(),
+                'input_matrix_ref': self.amplicon_matrix_ref,
+                'operations': [
+                    'abundance_filtering',
+                    'standardization',
+                    'abundance_filtering',
+                    'standardization',
+                    'abundance_filtering',
+                    'standardization',
+                ],
+                'abundance_filtering_params': {
+                    'abundance_filtering_row_threshold': -1,
+                    'abundance_filtering_columns_threshold': -1,
+                    'abundance_filtering_row_sum_threshold': -1,
+                    'abundance_filtering_columns_sum_threshold': -1,
+                },
+                'standardization_params': {
+                    'standardization_with_mean': 0,
+                    'standardization_with_std': 0,
+                },
+            })
+
+        _, matrix_out = self.get_out_data(ret)
+
+        self.assert_matrices_equal(matrix_out, self.matrix)
+
+
+
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_defaultSubsample(self):
         '''
         All samples should be rarefied to least sample size, 2
@@ -265,7 +749,7 @@ class MatrixUtilTest(unittest.TestCase):
 
     ##########
     ##########
-    @skip_cond(select_run=select_run)
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_medSubsample(self):
         '''
         Some samples should and should not be rarefied
@@ -296,7 +780,7 @@ class MatrixUtilTest(unittest.TestCase):
 
     ##########
     ##########
-    @skip_cond(select_run=select_run)
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_medSubsample_bootstrap9Reps(self):
         '''
         At subsample 5 and 9 bootstrap reps
@@ -335,14 +819,12 @@ class MatrixUtilTest(unittest.TestCase):
         _, matrix_out_mean = self.get_out_data(ret)
 
         self.assert_matrices_equal(matrix_out_median, self.matrix_bootstrap9Reps_median)
-        self.assertTrue(
-            np.all(np.abs(np.array(matrix_out_mean) - self.matrix_bootstrap9Reps_mean) < 1e-10) # allow some error for mean
-        )
+        self.assert_matrices_equal(matrix_out_mean, self.matrix_bootstrap9Reps_mean)
 
 
     ##########
     ##########
-    @skip_cond(select_run=select_run)
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_largeSubsample(self):
         '''
         All samples, bootstrapped or not, should not be rarefied and should be returned as is
@@ -412,5 +894,4 @@ class MatrixUtilTest(unittest.TestCase):
 
 
 
-all_tests = [k for k, v in MatrixUtilTest.__dict__.items() if k.startswith('test') and callable(v)]
 

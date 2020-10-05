@@ -10,6 +10,46 @@
   },
   "parameters" : [
     {
+        "id": "operations",
+        "optional": false,
+        "advanced": false,
+        "allow_multiple": true,
+        "default_values": [""],
+        "field_type": "dropdown",
+        "dropdown_options": {
+            "options": [
+                {
+                    "display": "Perform Abundance Filtering",
+                    "value": "abundance_filtering"
+                },
+                {
+                    "display": "Transform Matrix To Relative Abundance Matrix",
+                    "value": "relative_abundance"
+                },
+                {
+                    "display": "Perform Standardization",
+                    "value": "standardization"
+                },
+                {
+                    "display": "Perform Ratio Transform",
+                    "value": "ratio_transformation"
+                },
+                {
+                    "display": "Take Log",
+                    "value": "log"
+                },
+                {
+                    "display": "Take Square Root",
+                    "value": "sqrt"
+                },
+                {
+                    "display": "Take Logit",
+                    "value": "logit"
+                }
+            ]
+        }
+    },
+    {
       "id" : "input_matrix_ref",
       "optional" : false,
       "advanced" : false,
@@ -63,18 +103,6 @@
       "text_options": {
           "validate_as": "float"
       }
-    },
-    {
-      "id": "perform_relative_abundance",
-      "optional":false,
-      "advanced":false,
-      "allow_multiple":false,
-      "default_values":[0],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-        }
     },
     {
       "id": "standardization_with_mean",
@@ -167,6 +195,29 @@
       }
     },
     {
+      "id": "log_base",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["10"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float",
+          "min_float": 0
+      }
+    },
+    {
+      "id": "log_offset",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["1"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
       "id" : "new_matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -188,10 +239,10 @@
         "abundance_filtering_row_sum_threshold",
         "abundance_filtering_columns_sum_threshold"
       ],
-      "optional": true,
+      "optional": false,
       "allow_multiple": false,
       "with_border": false,
-      "advanced" : false
+      "advanced" : true
     },
     {
       "id": "standardization_params",
@@ -200,10 +251,10 @@
         "standardization_with_std",
         "standardization_dimension"
       ],
-      "optional": true,
+      "optional": false,
       "allow_multiple": false,
       "with_border": false,
-      "advanced" : false
+      "advanced" : true
     },
     {
       "id": "ratio_transformation_params",
@@ -211,10 +262,21 @@
         "ratio_transformation_method",
         "ratio_transformation_dimension"
       ],
-      "optional": true,
+      "optional": false,
       "allow_multiple": false,
       "with_border": false,
-      "advanced" : false
+      "advanced" : true
+    },
+    {
+      "id": "log_params",
+      "parameters": [
+        "log_base",
+        "log_offset"
+      ],
+      "optional": false,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : true
     }
   ],
   "behavior" : {
@@ -237,6 +299,10 @@
           "target_type_transform": "resolved-ref"
         },
         {
+          "input_parameter" : "operations",
+          "target_property" : "operations"
+        },
+        {
           "input_parameter" : "abundance_filtering_params",
           "target_property" : "abundance_filtering_params"
         },
@@ -249,8 +315,8 @@
           "target_property" : "ratio_transformation_params"
         },
         {
-          "input_parameter" : "perform_relative_abundance",
-          "target_property" : "perform_relative_abundance"
+          "input_parameter" : "log_params",
+          "target_property" : "log_params"
         },
         {
           "input_parameter" : "new_matrix_name",
