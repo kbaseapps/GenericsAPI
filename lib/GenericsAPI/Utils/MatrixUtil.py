@@ -1918,6 +1918,12 @@ class MatrixUtil:
         input_matrix_name = input_matrix_info[1]
         input_matrix_data = input_matrix_obj['data']
 
+        for key, obj_data in input_matrix_data.items():
+            if key.endswith('_ref'):
+                subobj_ref = input_matrix_data[key]
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
         if not new_matrix_name:
             current_time = time.localtime()
             new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
@@ -1935,7 +1941,7 @@ class MatrixUtil:
 
         # determining subsample size
         raremax = int(min(df.sum(axis=1)))  # least sample size
-        if subsample_size is None:  # default behavior: use least sample size 
+        if subsample_size is None:  # default behavior: use least sample size
             subsample_size = raremax
         else:  # user-specified behavior, find any samples too small
             unrarefied = df.index[df.sum(axis=1) < subsample_size].tolist()
@@ -1971,7 +1977,7 @@ class MatrixUtil:
                 random_rare = np.median(random_rare_l, axis=0)
             else:
                 raise NotImplementedError('Unknown value for `central_tendency`')
-   
+
         random_rare_df = pd.DataFrame(random_rare, index=df.index, columns=df.columns)
 
         if dimension == 'col':
@@ -2009,16 +2015,13 @@ class MatrixUtil:
         input_matrix_data['data'] = new_matrix_data
 
         logging.info("Saving new rarefy matrix object")
-        info = self.dfu.save_objects({
-            "id": workspace_id,
-            "objects": [{
-                "type": input_matrix_info[2],
-                "data": input_matrix_data,
-                "name": new_matrix_name
-            }]
-        })[0]
 
-        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+        new_matrix_obj_ref = self.data_util.save_object({
+                                                'obj_type': input_matrix_info[2],
+                                                'obj_name': new_matrix_name,
+                                                'data': input_matrix_data,
+                                                'workspace_name': workspace_id})['obj_ref']
+
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_rarefy_report(new_matrix_obj_ref, workspace_id,
@@ -2181,6 +2184,12 @@ class MatrixUtil:
         input_matrix_name = input_matrix_info[1]
         input_matrix_data = input_matrix_obj['data']
 
+        for key, obj_data in input_matrix_data.items():
+            if key.endswith('_ref'):
+                subobj_ref = input_matrix_data[key]
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
         if not new_matrix_name:
             current_time = time.localtime()
             new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
@@ -2251,16 +2260,12 @@ class MatrixUtil:
         input_matrix_data['data'] = new_matrix_data
 
         logging.info("Saving new transformed matrix object")
-        info = self.dfu.save_objects({
-            "id": workspace_id,
-            "objects": [{
-                "type": input_matrix_info[2],
-                "data": input_matrix_data,
-                "name": new_matrix_name
-            }]
-        })[0]
+        new_matrix_obj_ref = self.data_util.save_object({
+                                                'obj_type': input_matrix_info[2],
+                                                'obj_name': new_matrix_name,
+                                                'data': input_matrix_data,
+                                                'workspace_name': workspace_id})['obj_ref']
 
-        new_matrix_obj_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_id,
