@@ -686,8 +686,18 @@ class PCAUtil:
 
         if dimension == 'row':
             attribute_mapping = obj_data.get('row_mapping')
+            attributemapping_ref = obj_data.get('row_attributemapping_ref')
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                obj_data['row_mapping'] = attribute_mapping
         elif dimension == 'col':
             attribute_mapping = obj_data.get('col_mapping')
+            attributemapping_ref = obj_data.get('col_attributemapping_ref')
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                obj_data['col_mapping'] = attribute_mapping
         else:
             raise ValueError('Unexpected dimension')
 
@@ -695,6 +705,8 @@ class PCAUtil:
             if (color_marker_by and color_marker_by.get('attribute_color')[0]) or \
                (scale_size_by and scale_size_by.get('attribute_size')[0]):
                 raise ValueError('Matrix object is not associated with any {} attribute mapping'.format(dimension))
+
+        return obj_data
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -735,10 +747,11 @@ class PCAUtil:
         obj_data = res['data']
         obj_type = res['info'][2]
 
-        self._validate_pca_matrix(obj_data, dimension,
-                                  params.get('color_marker_by'), params.get('scale_size_by'))
+        obj_data = self._validate_pca_matrix(obj_data, dimension,
+                                             params.get('color_marker_by'),
+                                             params.get('scale_size_by'))
 
-        if "KBaseMatrices" in obj_type:
+        if "KBaseMatrices" in obj_type or 'KBaseProfile' in obj_type:
 
             (rotation_matrix_df, components_df, explained_variance,
              explained_variance_ratio, singular_values) = self._pca_for_matrix(input_obj_ref,
@@ -746,8 +759,8 @@ class PCAUtil:
                                                                                dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
-            err_msg += 'Please supply KBaseMatrices object'
-            raise ValueError("err_msg")
+            err_msg += 'Please supply KBaseMatrices or KBaseProfile object'
+            raise ValueError(err_msg)
 
         pca_ref = self._save_pca_matrix(workspace_name, input_obj_ref, pca_matrix_name,
                                         rotation_matrix_df, components_df, explained_variance,
