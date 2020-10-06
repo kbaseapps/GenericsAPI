@@ -98,6 +98,43 @@ class CorrelationUtil:
 
         return taxons, taxons_level
 
+    def _build_heatmap_content(self, matrix_2D, output_directory):
+        row_ids = matrix_2D.get('row_ids')
+        col_ids = matrix_2D.get('col_ids')
+        values = matrix_2D.get('values')
+
+        data_df = pd.DataFrame(values, index=row_ids, columns=col_ids)
+        data_df.fillna(0, inplace=True)
+
+        tsv_file_path = os.path.join(output_directory, 'heatmap_data_{}.tsv'.format(
+                                                                    str(uuid.uuid4())))
+
+        data_df.to_csv(tsv_file_path)
+        heatmap_dir = self.report_util.build_heatmap_html({
+                                            'tsv_file_path': tsv_file_path,
+                                            'cluster_data': True})['html_dir']
+
+        heatmap_report_files = os.listdir(heatmap_dir)
+
+        heatmap_index_page = None
+        for heatmap_report_file in heatmap_report_files:
+            if heatmap_report_file.endswith('.html'):
+                heatmap_index_page = heatmap_report_file
+
+            shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
+                         output_directory)
+        tab_content = ''
+
+        if heatmap_index_page:
+            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += 'src="{}" '.format(heatmap_index_page)
+            tab_content += 'style="border:none;"></iframe>'
+        else:
+            tab_content += '''\n<p style="color:red;" >'''
+            tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+
+        return tab_content
+
     def _build_table_content(self, matrix_2D, output_directory, original_matrix_ref=[],
                              type='corr'):
         """
@@ -230,9 +267,10 @@ class CorrelationUtil:
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
         """
 
-        corr_table_content = self._build_table_content(coefficient_data, output_directory,
-                                                       original_matrix_ref=original_matrix_ref,
-                                                       type='corr')
+        # corr_table_content = self._build_table_content(coefficient_data, output_directory,
+        #                                                original_matrix_ref=original_matrix_ref,
+        #                                                type='corr')
+        corr_table_content = self._build_heatmap_content(coefficient_data, output_directory)
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
 
@@ -240,9 +278,10 @@ class CorrelationUtil:
             tab_def_content += """
             <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
             """
-            sig_table_content = self._build_table_content(significance_data, output_directory,
-                                                          original_matrix_ref=original_matrix_ref,
-                                                          type='sig')
+            # sig_table_content = self._build_table_content(significance_data, output_directory,
+            #                                               original_matrix_ref=original_matrix_ref,
+            #                                               type='sig')
+            sig_table_content = self._build_heatmap_content(significance_data, output_directory)
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
 
@@ -560,7 +599,7 @@ class CorrelationUtil:
         res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
         obj_type = res['info'][2]
 
-        if "KBaseMatrices" in obj_type:
+        if "KBaseMatrices" in obj_type or 'KBaseProfile' in obj_type:
             data_matrix = self.data_util.fetch_data({'obj_ref': matrix_ref}).get('data_matrix')
             data_df = pd.read_json(data_matrix)
             data_df = data_df.reindex(index=natsorted(data_df.index))
@@ -569,8 +608,8 @@ class CorrelationUtil:
             return data_df
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
-            err_msg += 'Please supply KBaseMatrices object'
-            raise ValueError("err_msg")
+            err_msg += 'Please supply KBaseMatrices or KBaseProfile object'
+            raise ValueError(err_msg)
 
     def _compute_metrices_corr(self, df1, df2, method, compute_significance):
 
@@ -853,15 +892,15 @@ class CorrelationUtil:
         res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
         obj_type = res['info'][2]
 
-        if "KBaseMatrices" in obj_type:
+        if "KBaseMatrices" in obj_type or 'KBaseProfile' in obj_type:
             corr_df, data_df = self._corr_for_matrix(input_obj_ref, method, dimension)
             sig_df = None
             if compute_significance:
                 sig_df = self._compute_significance(data_df, dimension)
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
-            err_msg += 'Please supply KBaseMatrices object'
-            raise ValueError("err_msg")
+            err_msg += 'Please supply KBaseMatrices or KBaseProfile object'
+            raise ValueError(err_msg)
 
         if plot_corr_matrix:
             corr_matrix_plot_path = self.plotly_corr_matrix(corr_df)
