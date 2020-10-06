@@ -15,6 +15,7 @@ from natsort import natsorted
 from sklearn import metrics
 
 from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.kb_GenericsReportClient import kb_GenericsReport
 from GenericsAPI.Utils.DataUtil import DataUtil
 from installed_clients.KBaseReportClient import KBaseReport
 
@@ -680,6 +681,7 @@ class CorrelationUtil:
 
         self.data_util = DataUtil(config)
         self.dfu = DataFileUtil(self.callback_url)
+        self.report_util = kb_GenericsReport(self.callback_url)
 
         plt.switch_backend('agg')
 
