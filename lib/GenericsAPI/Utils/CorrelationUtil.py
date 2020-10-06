@@ -608,8 +608,8 @@ class CorrelationUtil:
             return data_df
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
-            err_msg += 'Please supply KBaseMatrices object'
-            raise ValueError("err_msg")
+            err_msg += 'Please supply KBaseMatrices or KBaseProfile object'
+            raise ValueError(err_msg)
 
     def _compute_metrices_corr(self, df1, df2, method, compute_significance):
 
@@ -900,7 +900,7 @@ class CorrelationUtil:
         else:
             err_msg = 'Ooops! [{}] is not supported.\n'.format(obj_type)
             err_msg += 'Please supply KBaseMatrices or KBaseProfile object'
-            raise ValueError("err_msg")
+            raise ValueError(err_msg)
 
         if plot_corr_matrix:
             corr_matrix_plot_path = self.plotly_corr_matrix(corr_df)
