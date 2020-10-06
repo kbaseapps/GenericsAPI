@@ -1881,18 +1881,33 @@ class MatrixUtil:
         dimension = params.get('dimension', 'col')
         permutations = int(params.get('permutations', 0))
 
-        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
-        input_matrix_data = input_matrix_obj['data']
-        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
-        df = pd.read_json(data_matrix)
-
         if dimension not in ['col', 'row']:
             raise ValueError('Please use "col" or "row" for input dimension')
 
-        am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_data = input_matrix_obj['data']
 
-        if not am_ref:
-            raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+        matrix_type = input_matrix_info[2]
+
+        if 'KBaseMatrices' in matrix_type:
+            am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+            if not am_ref:
+                raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+        elif 'KBaseProfile' in matrix_type:
+            profile_category = input_matrix_data.get('profile_category')
+            if profile_category == 'community' and dimension == 'row':
+                raise ValueError('Please choose column dimension for community profile')
+            if profile_category == 'organism' and dimension == 'col':
+                raise ValueError('Please choose row dimension for organism profile')
+            am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+            if not am_ref:
+                raise ValueError('Missing {} attribute mapping from functional profile'.format(dimension))
+        else:
+            raise ValueError('Unsupported data type: {}'.format(matrix_type))
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
 
         am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
         attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
@@ -2129,21 +2144,33 @@ class MatrixUtil:
         if not bool(perform_anosim or perform_permanova or perform_permdisp):
             raise ValueError('Please select at least one algorithm to perform')
 
-        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
-        input_matrix_data = input_matrix_obj['data']
-
-        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
-        df = pd.read_json(data_matrix)
-
-        dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
-
         if dimension not in ['col', 'row']:
             raise ValueError('Please use "col" or "row" for input dimension')
 
-        am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_data = input_matrix_obj['data']
 
-        if not am_ref:
-            raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+        matrix_type = input_matrix_info[2]
+        if 'KBaseMatrices' in matrix_type:
+            am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+            if not am_ref:
+                raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+        elif 'KBaseProfile' in matrix_type:
+            profile_category = input_matrix_data.get('profile_category')
+            if profile_category == 'community' and dimension == 'row':
+                raise ValueError('Please choose column dimension for community profile')
+            if profile_category == 'organism' and dimension == 'col':
+                raise ValueError('Please choose row dimension for organism profile')
+            am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
+            if not am_ref:
+                raise ValueError('Missing {} attribute mapping from functional profile'.format(dimension))
+        else:
+            raise ValueError('Unsupported data type: {}'.format(matrix_type))
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
 
         am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
         attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
