@@ -451,7 +451,7 @@ class MatrixUtil:
 
         tab_def_content = ''
         tab_content = ''
-        
+
         op_2_name = {
             'abundance_filtering': 'Filtered',
             'standardization': 'Standardized',
@@ -480,7 +480,7 @@ class MatrixUtil:
 
                 shutil.copy2(os.path.join(heatmap_html_dir, flnm), output_directory)
             tab_content += self._generate_tab_content(heatmap_html_flnm, viewer_name)
-        
+
         ## Transformed matrix statistics tab ##
         viewer_name = 'data_summary'
         tab_def_content += '''\n<button class="tablinks" '''
@@ -973,7 +973,7 @@ class MatrixUtil:
 
         return report_output
 
-    def _generate_transform_report(self, new_matrix_obj_ref, workspace_id, 
+    def _generate_transform_report(self, new_matrix_obj_ref, workspace_id,
                                    operations, df_results):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
@@ -1605,10 +1605,8 @@ class MatrixUtil:
 
         f = np.vectorize(lambda p: np.log(p/(1-p)))
         df = pd.DataFrame(f(df.values), index=df.index, columns=df.columns)
-        
+
         return df
-
-
 
     @staticmethod
     def _sqrt(df):
@@ -1616,8 +1614,6 @@ class MatrixUtil:
         vd.assert_is_nonnegative(df, opname='sqrt')
 
         return pd.DataFrame(np.sqrt(df.values), index=df.index, columns=df.columns)
-
-        
 
     @staticmethod
     def _log(df, base, a):
@@ -1629,11 +1625,10 @@ class MatrixUtil:
         # entries are nonnegative
         # TODO allow 0? gives -np.inf
         vd.assert_is_nonnegative(m, opname='log')
-        
-        m = np.log(m) / np.log(base)
-    
-        return pd.DataFrame(m, index=df.index, columns=df.columns)
 
+        m = np.log(m) / np.log(base)
+
+        return pd.DataFrame(m, index=df.index, columns=df.columns)
 
     def _create_distance_matrix(self, df, dist_metric='euclidean', dimension='col'):
         '''
@@ -2197,7 +2192,7 @@ class MatrixUtil:
 
         operations = params.get('operations')
         abundance_filtering_params = params.get('abundance_filtering_params', {})
-        perform_relative_abundance = params.get('perform_relative_abundance', False)
+        relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
         ratio_transformation_params = params.get('ratio_transformation_params', {})
         log_params = params.get('log_params', {})
@@ -2248,7 +2243,8 @@ class MatrixUtil:
                                                         10000))
 
             elif op == 'relative_abundance':
-                df = self._relative_abundance(df, dimension='col')
+                df = self._relative_abundance(df, dimension=relative_abundance_params.get(
+                                                            'relative_abundance_dimension', 'col'))
 
             elif op == 'standardization':
                 df = self._standardize_df(df,
@@ -2278,11 +2274,7 @@ class MatrixUtil:
             else:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
-
             df_results.append(df.copy(deep=True))
-
-
-
 
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),

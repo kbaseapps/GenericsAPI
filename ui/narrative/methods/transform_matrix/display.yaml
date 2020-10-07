@@ -68,6 +68,14 @@ parameters :
         long-hint  : |
             Remove all columns with sum below or equal the threshold
 
+    relative_abundance_dimension:
+        ui-name: |
+            Perform Transform Relative Abundance Algorithm On
+        short-hint : |
+            Standardize row or column
+        long-hint  : |
+            Standardize row or column
+
     standardization_with_mean:
         ui-name: |
             Center The Data Before Scaling
@@ -107,7 +115,7 @@ parameters :
             Standardize row or column
         long-hint  : |
             Standardize row or column
-            
+
     log_base:
         ui-name: |
             Base
@@ -115,17 +123,17 @@ parameters :
             Logarithmic base in <code>log(a+x)</code>
         long-hint: |
             Logarithmic base in <code>log(a+x)</code>
-            
-    log_offset: 
+
+    log_offset:
         ui-name: |
             Offset
         short-hint: |
             Offset <code>a</code> in <code>log(a+x)</code>
         long-hint: |
             Offset <code>a</code> in <code>log(a+x)</code>
-        
+
     operations:
-        ui-name: 
+        ui-name:
             Operations
         short-hint: |
             Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
@@ -136,6 +144,9 @@ parameter-groups :
     abundance_filtering_params:
         ui-name : Perform Abundance Filtering
         short-hint :  Perform Abundance Filtering
+    relative_abundance_params:
+        ui-name : Perform Transform Relative Abundance
+        short-hint :  Perform Transform Relative Abundance
     standardization_params:
         ui-name : Perform Standardization
         short-hint :  Perform Standardization
