@@ -250,7 +250,7 @@ class MatrixUtilTest(unittest.TestCase):
     '''
     {
         "input_matrix_ref": "test_amplicon_matrix",
-        "options": [
+        "operations": [
             "abundance_filtering",
             "relative_abundance",
             "standardization",
@@ -276,7 +276,7 @@ class MatrixUtilTest(unittest.TestCase):
             "ratio_transformation_dimension": "col"
         },
         "log_params": {
-            "base": "e",
+            "base": 10,
             "offset": 1e-10
         }
         "new_matrix_name": "test_amplicon_transformed_matrix"

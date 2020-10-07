@@ -2176,8 +2176,12 @@ class MatrixUtil:
         log_params = params.get('log_params', {})
 
         # validate operations
+        MAX_OPS = 15
+        if len(operations) > MAX_OPS:
+            raise Exception('Maximum allowed number of operations is %d' % MAX_OPS)
         for op in operations:
-            assert op in OPS, op
+            if op not in OPS:
+                raise Exception('Operation %s not in allowed %s' % (str(op), OPS))
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']

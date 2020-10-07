@@ -262,12 +262,13 @@ module GenericsAPI {
 
   typedef structure {
       obj_ref input_matrix_ref;
-      workspace_name workspace_name;
       int workspace_id;
       string new_matrix_name;
+      list<string> operations;
       mapping<string, string> abundance_filtering_params;
       mapping<string, string> standardization_params;
       mapping<string, string> ratio_transformation_params;
+      mapping<string, int> log_params;
       boolean perform_relative_abundance;
   } TransformMatrixParams;
 
