@@ -105,6 +105,28 @@
       }
     },
     {
+      "id" : "relative_abundance_dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
       "id": "standardization_with_mean",
       "optional":false,
       "advanced":false,
@@ -245,6 +267,16 @@
       "advanced" : true
     },
     {
+      "id": "relative_abundance_params",
+      "parameters": [
+        "relative_abundance_dimension"
+      ],
+      "optional": false,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : true
+    },
+    {
       "id": "standardization_params",
       "parameters": [
         "standardization_with_mean",
@@ -286,10 +318,6 @@
       "method" : "transform_matrix",
       "input_mapping" : [
         {
-          "narrative_system_variable": "workspace",
-          "target_property": "workspace_name"
-        },
-        {
           "narrative_system_variable": "workspace_id",
           "target_property": "workspace_id"
         },
@@ -305,6 +333,10 @@
         {
           "input_parameter" : "abundance_filtering_params",
           "target_property" : "abundance_filtering_params"
+        },
+        {
+          "input_parameter" : "relative_abundance_params",
+          "target_property" : "relative_abundance_params"
         },
         {
           "input_parameter" : "standardization_params",

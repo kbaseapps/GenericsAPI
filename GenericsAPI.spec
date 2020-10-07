@@ -266,10 +266,10 @@ module GenericsAPI {
       string new_matrix_name;
       list<string> operations;
       mapping<string, string> abundance_filtering_params;
+      mapping<string, string> relative_abundance_params;
       mapping<string, string> standardization_params;
       mapping<string, string> ratio_transformation_params;
       mapping<string, int> log_params;
-      boolean perform_relative_abundance;
   } TransformMatrixParams;
 
   typedef structure {

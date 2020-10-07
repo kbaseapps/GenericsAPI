@@ -32,8 +32,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "1.0.11"
-    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "ebe28bb2e1b0f8d6e1256cffdca29871390aa482"
+    GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "5a9f08d7d632142f5b0fb8fc7ce3ce4f6f69e76d"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -363,14 +363,14 @@ class GenericsAPI:
         """
         :param params: instance of type "TransformMatrixParams" -> structure:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "workspace_name" of type "workspace_name"
-           (workspace name of the object), parameter "workspace_id" of Long,
-           parameter "new_matrix_name" of String, parameter
-           "abundance_filtering_params" of mapping from String to String,
-           parameter "standardization_params" of mapping from String to
-           String, parameter "ratio_transformation_params" of mapping from
-           String to String, parameter "perform_relative_abundance" of type
-           "boolean" (A boolean - 0 for false, 1 for true.)
+           reference), parameter "workspace_id" of Long, parameter
+           "new_matrix_name" of String, parameter "operations" of list of
+           String, parameter "abundance_filtering_params" of mapping from
+           String to String, parameter "relative_abundance_params" of mapping
+           from String to String, parameter "standardization_params" of
+           mapping from String to String, parameter
+           "ratio_transformation_params" of mapping from String to String,
+           parameter "log_params" of mapping from String to Long
         :returns: instance of type "TransformMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -395,7 +395,10 @@ class GenericsAPI:
            parameter "input_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "workspace_id" of Long, parameter
            "new_matrix_name" of String, parameter "seed_number" of Long,
-           parameter "dimension" of String
+           parameter "dimension" of String, parameter "subsample_size" of
+           Long, parameter "bootstrap" of type "RarefyBootstrapParams" ->
+           structure: parameter "num_rare_reps" of Long, parameter
+           "central_tendency" of String
         :returns: instance of type "RarefyMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
