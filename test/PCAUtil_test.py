@@ -173,7 +173,8 @@ class PCAUtilTest(unittest.TestCase):
                   'color_marker_by': {
                         "attribute_color": ["test_attribute_2"]
                     },
-                  'n_components': 3}
+                  'n_components': 3,
+                  'dimension': 'row'}
 
         ret = self.getImpl().run_pca(self.ctx, params)[0]
 

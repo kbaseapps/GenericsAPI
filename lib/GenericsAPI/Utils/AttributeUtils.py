@@ -448,6 +448,7 @@ class AttributesUtil:
         if closest:
             params['match_filter'] = {"full_text_in_all": term}
         try:
+            raise ValueError('skip search ontology term"')
             res = self.kbse.search_objects(params)
         except Exception:
             return None

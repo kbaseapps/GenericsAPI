@@ -183,7 +183,7 @@ class AttributeUtilsTest(unittest.TestCase):
 
         return {'copy_file_path': os.path.join("data", filename)}
 
-    # @unittest.skip("Only passes on CI")
+    @unittest.skip("Only passes on CI")
     def test_add_ontology_info(self):
         factor = {'attribute': 'stalk development', "attribute_ont_id": "GO:0031150",
                   "unit": "Hour", "unit_ont_id": "UO_0000032"}
