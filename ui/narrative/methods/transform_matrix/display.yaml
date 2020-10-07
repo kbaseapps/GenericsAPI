@@ -68,14 +68,6 @@ parameters :
         long-hint  : |
             Remove all columns with sum below or equal the threshold
 
-    perform_relative_abundance:
-        ui-name: |
-            Transform Matrix To Relative Abundance Matrix
-        short-hint : |
-            Transform Matrix To Relative Abundance Matrix
-        long-hint  : |
-            Transform Matrix To Relative Abundance Matrix
-
     standardization_with_mean:
         ui-name: |
             Center The Data Before Scaling
@@ -115,6 +107,30 @@ parameters :
             Standardize row or column
         long-hint  : |
             Standardize row or column
+            
+    log_base:
+        ui-name: |
+            Base
+        short-hint: |
+            Logarithmic base in <code>log(a+x)</code>
+        long-hint: |
+            Logarithmic base in <code>log(a+x)</code>
+            
+    log_offset: 
+        ui-name: |
+            Offset
+        short-hint: |
+            Offset <code>a</code> in <code>log(a+x)</code>
+        long-hint: |
+            Offset <code>a</code> in <code>log(a+x)</code>
+        
+    operations:
+        ui-name: 
+            Operations
+        short-hint: |
+            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
+        long-hint: |
+            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
 
 parameter-groups :
     abundance_filtering_params:
@@ -126,6 +142,17 @@ parameter-groups :
     ratio_transformation_params:
         ui-name : Perform Ratio Transformation
         short-hint :  Perform Ratio Transformation
+    log_params:
+        ui-name: Take Log
+        short-hint: Apply <code>log(a+x)</code> to entries
 
 description : |
-    <p> Create a new transformed matrix from input matrix </p>
+    <p> Apply a series of operations to input matrix. </p>
+
+    <p> Currently only supports one specification of parameters per operation. </p>
+
+    <p>
+    Currently, if any of the input, output, or intermediate matrices contains NaN, infinity,
+    complex numbers, etc., or are empty, the behavior of this app will be unspecified.
+    Also, saved KBase objects at the moment can capture only integers, floats, and null numbers.
+    </p>
