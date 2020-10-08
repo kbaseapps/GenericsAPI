@@ -3,7 +3,6 @@ import inspect
 import os
 import unittest
 import time
-import shutil
 import uuid
 from mock import patch
 
@@ -101,19 +100,23 @@ class CorrUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'expr_matrix_ref'):
             return self.__class__.expr_matrix_ref
 
-        matrix_file_name = 'test_import.xlsx'
-        matrix_file_path = os.path.join(self.scratch, matrix_file_name)
-        shutil.copy(os.path.join('data', matrix_file_name), matrix_file_path)
+        data = {'data': {'col_ids': ['instance_1', 'instance_2', 'instance_3', 'instance_4'],
+                         'row_ids': ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1'],
+                         'values': [[0.1, 0.2, 0.3, 0.4],
+                                    [0.5, 0.6, 0.7, 0.8],
+                                    [None, None, 1.1, 1.2]]},
+                'scale': 'log2'}
 
-        obj_type = 'ExpressionMatrix'
-        params = {'obj_type': obj_type,
-                  'matrix_name': 'test_ExpressionMatrix',
-                  'workspace_name': self.wsName,
-                  'input_file_path': matrix_file_path,
-                  'scale': "log2",
-                  }
-        expr_matrix_ref = self.serviceImpl.import_matrix_from_excel(
-            self.ctx, params)[0].get('matrix_obj_ref')
+        info = self.dfu.save_objects({
+            'id': self.wsId,
+            'objects': [{
+                'type': 'KBaseMatrices.ExpressionMatrix',
+                'data': data,
+                'name': 'test_ExpressionMatrix'
+            }]
+        })[0]
+
+        expr_matrix_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
         self.__class__.expr_matrix_ref = expr_matrix_ref
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
@@ -123,19 +126,21 @@ class CorrUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'expr_matrix_ref_2'):
             return self.__class__.expr_matrix_ref_2
 
-        matrix_file_name = 'test_import_2.xlsx'
-        matrix_file_path = os.path.join(self.scratch, matrix_file_name)
-        shutil.copy(os.path.join('data', matrix_file_name), matrix_file_path)
+        data = {'data': {'col_ids': ['instance_1', 'instance_4', 'instance_3'],
+                         'row_ids': ['gene_1', 'gene_2', 'gene_3'],
+                         'values': [[0.1, 0.4, 0.3], [0.5, None, 0.7], [None, 1.2, 1.1]]},
+                'scale': 'log2'}
 
-        obj_type = 'ExpressionMatrix'
-        params = {'obj_type': obj_type,
-                  'matrix_name': 'test_ExpressionMatrix_2',
-                  'workspace_name': self.wsName,
-                  'input_file_path': matrix_file_path,
-                  'scale': "log2",
-                  }
-        expr_matrix_ref_2 = self.serviceImpl.import_matrix_from_excel(
-            self.ctx, params)[0].get('matrix_obj_ref')
+        info = self.dfu.save_objects({
+            'id': self.wsId,
+            'objects': [{
+                'type': 'KBaseMatrices.ExpressionMatrix',
+                'data': data,
+                'name': 'test_ExpressionMatrix_2'
+            }]
+        })[0]
+
+        expr_matrix_ref_2 = "%s/%s/%s" % (info[6], info[0], info[4])
 
         self.__class__.expr_matrix_ref_2 = expr_matrix_ref_2
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref_2)
@@ -329,6 +334,7 @@ class CorrUtilTest(unittest.TestCase):
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_compute_correlation_across_matrices(invalidate_params, error_msg)
 
+    @unittest.skip("redundant and takes long time to run")
     def test_compute_correlation_across_matrices_amplicon_matrix_ok(self):
         self.start_test()
         expr_matrix_ref = self.loadAmpliconMatrix()

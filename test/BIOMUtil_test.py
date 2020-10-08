@@ -134,6 +134,7 @@ class BioMultiTest(unittest.TestCase):
         print('Loaded SampleSet: ' + sample_set_ref)
         return sample_set_ref
 
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file):
         self.start_test()
@@ -172,6 +173,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_biom_fasta(self, download_staging_file):
         self.start_test()
@@ -210,6 +212,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file):
         self.start_test()
@@ -322,6 +325,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file):
         self.start_test()
@@ -357,36 +361,6 @@ class BioMultiTest(unittest.TestCase):
         self.assertEqual(obj['description'], 'OTU data')
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
-
-    # @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    # def test_import_matrix_from_biom_2_1(self, download_staging_file):
-    #     self.start_test()
-
-    #     params = {'obj_type': 'AmpliconMatrix',
-    #               'matrix_name': 'test_AmpliconMatrix',
-    #               'workspace_name': self.wsName,
-    #               "biom_fasta": {
-    #                     "biom_file_biom_fasta": os.path.join('data', 'v2.1example.biom'),
-    #                     "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-    #                     },
-    #               'scale': 'raw',
-    #               'description': "OTU data",
-    #               'amplicon_set_name': 'test_AmpliconSet'
-    #               }
-    #     returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
-    #     self.assertIn('matrix_obj_ref', returnVal)
-    #     self.assertIn('report_name', returnVal)
-    #     self.assertIn('report_ref', returnVal)
-    #     obj = self.dfu.get_objects(
-    #         {'object_refs': [returnVal['matrix_obj_ref']]}
-    #     )['data'][0]['data']
-    #     self.assertIn('description', obj)
-    #     self.assertEqual(obj['description'], 'OTU data')
-    #     self.assertIn('attributes', obj)
-    #     self.assertEqual(obj['attributes'], {'generated_by': 'QIIME 1.9.1',
-    #                                          'create_date': '2017-05-22T11:07:28.478444',
-    #                                          })
-    #     self.assertIn('row_attributemapping_ref', obj)
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_with_external_am(self, download_staging_file):
