@@ -269,7 +269,7 @@ module GenericsAPI {
       mapping<string, string> relative_abundance_params;
       mapping<string, string> standardization_params;
       mapping<string, string> ratio_transformation_params;
-      mapping<string, int> log_params;
+      mapping<string, float> log_params;
   } TransformMatrixParams;
 
   typedef structure {
