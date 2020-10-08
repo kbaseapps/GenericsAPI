@@ -741,7 +741,7 @@ class PCAUtil:
         pca_matrix_name = params.get('pca_matrix_name')
 
         n_components = int(params.get('n_components', 2))
-        dimension = params.get('dimension', 'row')
+        dimension = params.get('dimension', 'col')
 
         res = self.dfu.get_objects({'object_refs': [input_obj_ref]})['data'][0]
         obj_data = res['data']

@@ -269,27 +269,27 @@ class BiomUtil:
                 if val:
                     taxonomy[key] = val
 
-        if lineage:
-            for taxon_str in lineage[::-1]:
-                taxon_items = taxon_str.split('__')
-                if len(taxon_items) == 1:
-                    scientific_name = taxon_items[-1]
-                    taxon_level_char = 'None'
-                else:
-                    scientific_name = taxon_items[-1]
-                    taxon_level_char = taxon_items[0]
+        # if lineage:
+        #     for taxon_str in lineage[::-1]:
+        #         taxon_items = taxon_str.split('__')
+        #         if len(taxon_items) == 1:
+        #             scientific_name = taxon_items[-1]
+        #             taxon_level_char = 'None'
+        #         else:
+        #             scientific_name = taxon_items[-1]
+        #             taxon_level_char = taxon_items[0]
 
-                if scientific_name:
-                    taxon_id = self._search_taxon(scientific_name)
-                    if taxon_id:
-                        taxon_ref = f"{self.taxon_wsname}/{taxon_id}"
-                        taxon_level = self._fetch_taxon_level(taxon_level_char)
+        #         if scientific_name:
+        #             taxon_id = self._search_taxon(scientific_name)
+        #             if taxon_id:
+        #                 taxon_ref = f"{self.taxon_wsname}/{taxon_id}"
+        #                 taxon_level = self._fetch_taxon_level(taxon_level_char)
 
-                        taxonomy.update({'taxon_ref': taxon_ref,
-                                         'taxon_id': taxon_id,
-                                         'scientific_name': scientific_name,
-                                         'taxon_level': taxon_level})
-                        break
+        #                 taxonomy.update({'taxon_ref': taxon_ref,
+        #                                  'taxon_id': taxon_id,
+        #                                  'scientific_name': scientific_name,
+        #                                  'taxon_level': taxon_level})
+        #                 break
 
         return taxonomy
 

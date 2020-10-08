@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import inspect
 import os
-import shutil
 import time
 import unittest
 from configparser import ConfigParser  # py2
@@ -65,16 +64,16 @@ class ImportMatrixTest(unittest.TestCase):
     def prepare_data(cls):
 
         # upload genome object
-        genbank_file_name = 'minimal.gbff'
-        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
-        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
+        # genbank_file_name = 'minimal.gbff'
+        # genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
+        # shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
 
-        genome_object_name = 'test_Genome'
-        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
-                                                    'workspace_name': cls.wsName,
-                                                    'genome_name': genome_object_name,
-                                                    'generate_ids_if_needed': 1
-                                                    })['genome_ref']
+        # genome_object_name = 'test_Genome'
+        # cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
+        #                                             'workspace_name': cls.wsName,
+        #                                             'genome_name': genome_object_name,
+        #                                             'generate_ids_if_needed': 1
+        #                                             })['genome_ref']
 
         # upload AttributeMapping object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
@@ -128,7 +127,7 @@ class ImportMatrixTest(unittest.TestCase):
                   'matrix_name': 'test_ExpressionMatrix',
                   'workspace_name': self.wsName,
                   'input_file_path': os.path.join('data', 'test_import.xlsx'),
-                  'genome_ref': self.genome_ref,
+                  # 'genome_ref': self.genome_ref,
                   'scale': 'log2',
                   }
         returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]

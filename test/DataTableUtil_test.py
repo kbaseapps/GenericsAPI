@@ -88,28 +88,92 @@ class DataTableTest(unittest.TestCase):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
 
-        params = {'obj_type': 'AmpliconMatrix',
-                  'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
-                  "biom_fasta": {
-                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                        },
-                  'scale': 'raw',
-                  'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
-                  'amplicon_type': '16S',
-                  'target_gene_region': 'V1',
-                  'forward_primer_sequence': 'forward_primer_sequence',
-                  'reverse_primer_sequence': 'reverse_primer_sequence',
-                  'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-                  'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method'
-                  }
-        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        col_attribute = {'attributes': [{'attribute': 'BODY_SITE', 'source': 'upload'},
+                                        {'attribute': 'BarcodeSequence', 'source': 'upload'},
+                                        {'attribute': 'Description', 'source': 'upload'},
+                                        {'attribute': 'LinkerPrimerSequence', 'source': 'upload'}],
+                         'instances': {'Sample1': ['gut', 'CGCTTATCGAGA', 'human gut', 'CATGCTGCCTCCCGTAGGAGT'],
+                                       'Sample2': ['gut', 'CATACCAGTAGC', 'human gut', 'CATGCTGCCTCCCGTAGGAGT'],
+                                       'Sample3': ['gut', 'CTCTCTACCTGT', 'human gut', 'CATGCTGCCTCCCGTAGGAGT'],
+                                       'Sample4': ['skin', 'CTCTCGGCCTGT', 'human skin', 'CATGCTGCCTCCCGTAGGAGT'],
+                                       'Sample5': ['skin', 'CTCTCTACCAAT', 'human skin', 'CATGCTGCCTCCCGTAGGAGT'],
+                                       'Sample6': ['skin', 'CTAACTACCAAT', 'human skin', 'CATGCTGCCTCCCGTAGGAGT']},
+                         'ontology_mapping_method': 'BIOM file'}
 
-        amplicon_matrix_ref = returnVal['matrix_obj_ref']
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseExperiments.AttributeMapping',
+                                'data': col_attribute,
+                                'name': 'test_AmpliconMatrix_col_attributes'
+                            }]
+                        })[0]
+
+        col_attributemapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        row_attribute = {'attributes': [{'attribute': 'taxonomy', 'source': 'upload'}],
+                         'instances': {'GG_OTU_1': ["['k__Bacteria', 'p__Proteobacteria', 'c__Gammaproteobacteria', 'o__Enterobacteriales', 'f__Enterobacteriaceae', 'g__Escherichia', 's__']"],
+                                       'GG_OTU_2': ["['k__Bacteria', 'p__Cyanobacteria', 'c__Nostocophycideae', 'o__Nostocales', 'f__Nostocaceae', 'g__Dolichospermum', 's__']"],
+                                       'GG_OTU_3': ["['k__Archaea', 'p__Euryarchaeota', 'c__Methanomicrobia', 'o__Methanosarcinales', 'f__Methanosarcinaceae', 'g__Methanosarcina', 's__']"],
+                                       'GG_OTU_4': ["['k__Bacteria', 'p__Firmicutes', 'c__Clostridia', 'o__Halanaerobiales', 'f__Halanaerobiaceae', 'g__Halanaerobium', 's__Halanaerobiumsaccharolyticum']"],
+                                       'GG_OTU_5': ["['k__Bacteria', 'p__Proteobacteria', 'c__Gammaproteobacteria', 'o__Enterobacteriales', 'f__Enterobacteriaceae', 'g__Escherichia', 's__']"]},
+                         'ontology_mapping_method': 'BIOM file'}
+
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseExperiments.AttributeMapping',
+                                'data': row_attribute,
+                                'name': 'test_AmpliconMatrix_row_attributes'
+                            }]
+                        })[0]
+
+        row_attributemapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        matrix_data = {'amplicon_type': '16S',
+                       # 'amplicon_set_ref': '54867/4/1',
+                       'attributes': {'generated_by': 'QIIME revision XYZ'},
+                       'clustering_cutoff': 0.3,
+                       'clustering_method': 'clustering_method',
+                       'col_attributemapping_ref': col_attributemapping_ref,
+                       'col_mapping': {'Sample1': 'Sample1',
+                                       'Sample2': 'Sample2',
+                                       'Sample3': 'Sample3',
+                                       'Sample4': 'Sample4',
+                                       'Sample5': 'Sample5',
+                                       'Sample6': 'Sample6'},
+                       'data': {'col_ids': ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6'],
+                                'row_ids': ['GG_OTU_1', 'GG_OTU_2', 'GG_OTU_3', 'GG_OTU_4', 'GG_OTU_5'],
+                                'values': [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+                                           [5.0, 1.0, 0.0, 2.0, 3.0, 1.0],
+                                           [0.0, 0.0, 1.0, 4.0, 2.0, 0.0],
+                                           [2.0, 1.0, 1.0, 0.0, 0.0, 1.0],
+                                           [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]},
+                       'description': 'OTU data',
+                       'forward_primer_sequence': 'forward_primer_sequence',
+                       'reverse_primer_sequence': 'reverse_primer_sequence',
+                       'row_attributemapping_ref': row_attributemapping_ref,
+                       'row_mapping': {'GG_OTU_1': 'GG_OTU_1',
+                                       'GG_OTU_2': 'GG_OTU_2',
+                                       'GG_OTU_3': 'GG_OTU_3',
+                                       'GG_OTU_4': 'GG_OTU_4',
+                                       'GG_OTU_5': 'GG_OTU_5'},
+                       'scale': 'raw',
+                       'search_attributes': ['generated_by|QIIME revision XYZ'],
+                       'sequencing_platform': 'Illumina',
+                       'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
+                       'target_gene_region': 'V1'}
+
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseMatrices.AmpliconMatrix',
+                                'data': matrix_data,
+                                'name': 'test_AmpliconMatrix'
+                            }]
+                        })[0]
+
+        amplicon_matrix_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
         self.__class__.amplicon_matrix_ref = amplicon_matrix_ref
         print('Loaded AmpliconMatrix: ' + amplicon_matrix_ref)

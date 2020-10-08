@@ -3,7 +3,6 @@ import inspect
 import os  # noqa: F401
 import unittest
 import time
-import shutil
 from configparser import ConfigParser
 import uuid
 import pandas as pd
@@ -80,19 +79,103 @@ class PCAUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'expr_matrix_ref'):
             return self.__class__.expr_matrix_ref
 
-        matrix_file_name = 'test_import.xlsx'
-        matrix_file_path = os.path.join(self.scratch, matrix_file_name)
-        shutil.copy(os.path.join('data', matrix_file_name), matrix_file_path)
+        # matrix_file_name = 'test_import.xlsx'
+        col_attribute = {'attributes': [{'attribute': 'test_attribute_1',
+                                         'attribute_ont_id': 'OBI_0500020',
+                                         'source': 'upload',
+                                         'unit': 'Hour',
+                                         'unit_ont_id': 'UO_0000032'},
+                                        {'attribute': 'test_attribute_2',
+                                         'attribute_ont_id': 'CHEBI:9168',
+                                         'source': 'upload',
+                                         'unit': 'nanogram per milliliter',
+                                         'unit_ont_id': 'UO_0000275'},
+                                        {'attribute': 'test_attribute_3',
+                                         'attribute_ont_id': 'CHEBI:9168',
+                                         'source': 'upload',
+                                         'unit': 'nanogram per milliliter',
+                                         'unit_ont_id': 'UO_0000275'}],
+                         'instances': {'test_col_instance_1': ['1', '5', '9'],
+                                       'test_col_instance_2': ['2', '6', '10'],
+                                       'test_col_instance_3': ['3', '7', '11'],
+                                       'test_col_instance_4': ['4', '8', '12']},
+                         'ontology_mapping_method': 'User Curation'}
 
-        obj_type = 'ExpressionMatrix'
-        params = {'obj_type': obj_type,
-                  'matrix_name': 'test_ExpressionMatrix',
-                  'workspace_name': self.wsName,
-                  'input_file_path': matrix_file_path,
-                  'scale': "log2",
-                  }
-        expr_matrix_ref = self.serviceImpl.import_matrix_from_excel(
-            self.ctx, params)[0].get('matrix_obj_ref')
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseExperiments.AttributeMapping',
+                                'data': col_attribute,
+                                'name': 'test_ExpressionMatrix_col_attribute_mapping'
+                            }]
+                        })[0]
+
+        col_attributemapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        row_attribute = {'attributes': [{'attribute': 'test_attribute_1',
+                                         'attribute_ont_id': 'OBI_0500020',
+                                         'source': 'upload',
+                                         'unit': 'Hour',
+                                         'unit_ont_id': 'UO_0000032'},
+                                        {'attribute': 'test_attribute_2',
+                                         'attribute_ont_id': 'CHEBI:9168',
+                                         'source': 'upload',
+                                         'unit': 'nanogram per milliliter',
+                                         'unit_ont_id': 'UO_0000275'},
+                                        {'attribute': 'test_attribute_3',
+                                         'attribute_ont_id': 'CHEBI:9168',
+                                         'source': 'upload',
+                                         'unit': 'nanogram per milliliter',
+                                         'unit_ont_id': 'UO_0000275'}],
+                         'instances': {'test_row_instance_1': ['1', '4', '7'],
+                                       'test_row_instance_2': ['3', '4', '8'],
+                                       'test_row_instance_3': ['3', '6', '7']},
+                         'ontology_mapping_method': 'User Curation'}
+
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseExperiments.AttributeMapping',
+                                'data': row_attribute,
+                                'name': 'test_ExpressionMatrix_row_attribute_mapping'
+                            }]
+                        })[0]
+
+        row_attributemapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        matrix_data = {'attributes': {'Instrument': 'Old Faithful',
+                                      'Scientist': 'Marie Currie'},
+                       'col_attributemapping_ref': col_attributemapping_ref,
+                       'col_mapping': {'instance_1': 'test_col_instance_1',
+                                       'instance_2': 'test_col_instance_2',
+                                       'instance_3': 'test_col_instance_3',
+                                       'instance_4': 'test_col_instance_4'},
+                       'col_normalization': 'test_col_normalization',
+                       'data': {'col_ids': ['instance_1', 'instance_2', 'instance_3', 'instance_4'],
+                                'row_ids': ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1'],
+                                'values': [[0.1, 0.2, 0.3, 0.4],
+                                           [0.5, 0.6, 0.7, 0.8],
+                                           [None, None, 1.1, 1.2]]},
+                       'description': 'test_desc',
+                       'row_attributemapping_ref': row_attributemapping_ref,
+                       'row_mapping': {'WRI_RS00010_CDS_1': 'test_row_instance_1',
+                                       'WRI_RS00015_CDS_1': 'test_row_instance_2',
+                                       'WRI_RS00025_CDS_1': 'test_row_instance_3'},
+                       'row_normalization': 'test_row_normalization',
+                       'scale': 'log2',
+                       'search_attributes': ['Scientist | Marie Currie',
+                                             'Instrument | Old Faithful']}
+
+        info = self.dfu.save_objects({
+                            'id': self.wsId,
+                            'objects': [{
+                                'type': 'KBaseMatrices.ExpressionMatrix',
+                                'data': matrix_data,
+                                'name': 'test_ExpressionMatrix'
+                            }]
+                        })[0]
+
+        expr_matrix_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
         self.__class__.expr_matrix_ref = expr_matrix_ref
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
@@ -103,13 +186,10 @@ class PCAUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'pca_matrix_ref'):
             return self.__class__.pca_matrix_ref
 
-        original_matrix_ref = self.loadExpressionMatrix()
-
         object_type = 'KBaseExperiments.PCAMatrix'
         pca_matrix_object_name = 'test_PCA_matrix'
         pca_matrix_data = {'explained_variance_ratio': [0.628769688409428, 0.371230311590572],
                            'explained_variance': [0.628769688409428, 0.371230311590572],
-                           # 'original_matrix_ref': original_matrix_ref,
                            'pca_parameters': {'dimension': 'row', 'n_components': '2'},
                            'rotation_matrix': {'col_ids': ['principal_component_1',
                                                            'principal_component_2'],
@@ -173,7 +253,8 @@ class PCAUtilTest(unittest.TestCase):
                   'color_marker_by': {
                         "attribute_color": ["test_attribute_2"]
                     },
-                  'n_components': 3}
+                  'n_components': 3,
+                  'dimension': 'row'}
 
         ret = self.getImpl().run_pca(self.ctx, params)[0]
 
