@@ -346,7 +346,7 @@ module KBaseExperiments {
     } Amplicon;
 
     /*
-      @optional description reads_set_ref amplicon_matrix_ref
+      @optional description reads_set_ref
     */
     typedef structure {
       string description;
