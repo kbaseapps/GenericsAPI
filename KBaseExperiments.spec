@@ -346,12 +346,11 @@ module KBaseExperiments {
     } Amplicon;
 
     /*
-      @optional description reads_set_ref
+      @optional description reads_set_ref amplicon_matrix_ref
     */
     typedef structure {
       string description;
       WSRef reads_set_ref;
-      AmpliconMatrixRef amplicon_matrix_ref;
       mapping<otu_id, Amplicon> amplicons;
     } AmpliconSet;
 };
