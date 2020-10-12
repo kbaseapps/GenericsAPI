@@ -31,6 +31,12 @@ module KBaseExperiments {
      typedef string WSRef;
 
     /*
+     * Reference to a handle ID
+     * @id handle
+     */
+    typedef string handle_ref;
+
+    /*
         Internally this is used to store factor information (without the value term) and also a
         format for returning data in a useful form from get_conditions
         @optional unit unit_ont_id unit_ont_ref value
@@ -346,11 +352,12 @@ module KBaseExperiments {
     } Amplicon;
 
     /*
-      @optional description reads_set_ref
+      @optional description reads_set_ref sequencing_file_handle
     */
     typedef structure {
       string description;
       WSRef reads_set_ref;
       mapping<otu_id, Amplicon> amplicons;
+      handle_ref sequencing_file_handle;
     } AmpliconSet;
 };
