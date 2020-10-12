@@ -421,8 +421,7 @@ class BiomUtil:
         logging.info('finished processing files')
         return amplicons
 
-    def _file_to_amplicon_set_data(self, biom_file, tsv_file, fasta_file, mode, refs, description,
-                                   matrix_obj_ref):
+    def _file_to_amplicon_set_data(self, biom_file, tsv_file, fasta_file, mode, refs, description):
 
         logging.info('start parsing amplicon_set_data')
 
@@ -452,10 +451,6 @@ class BiomUtil:
 
         if description:
             amplicon_set_data['description'] = description
-
-        matrix_obj_ref_array = matrix_obj_ref.split('/')
-        amplicon_set_data['amplicon_matrix_ref'] = '{}/{}'.format(matrix_obj_ref_array[0],
-                                                                  matrix_obj_ref_array[1])
 
         return amplicon_set_data
 
@@ -1022,15 +1017,8 @@ class BiomUtil:
         if not params.get('col_attributemapping_ref'):
             new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
-        logging.info('start saving Matrix object: {}'.format(matrix_name))
-        matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': 'KBaseMatrices.{}'.format(obj_type),
-                                                'obj_name': matrix_name,
-                                                'data': amplicon_data,
-                                                'workspace_name': workspace_id})['obj_ref']
-
         amplicon_set_data = self._file_to_amplicon_set_data(biom_file, tsv_file, fasta_file, mode,
-                                                            refs, description, matrix_obj_ref)
+                                                            refs, description)
 
         if fasta_file:
             handle_id = self.dfu.file_to_shock({'file_path': fasta_file,
@@ -1045,8 +1033,8 @@ class BiomUtil:
                                                 'data': amplicon_set_data,
                                                 'workspace_name': workspace_id})['obj_ref']
 
-        logging.info('start resaving Matrix object with amplicon set: {}'.format(matrix_name))
-        amplicon_data['amplicon_set_ref'] = '{}/{}'.format(workspace_id, amplicon_set_name)
+        amplicon_data['amplicon_set_ref'] = amplicon_set_obj_ref
+        logging.info('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
