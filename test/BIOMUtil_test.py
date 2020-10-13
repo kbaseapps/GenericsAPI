@@ -304,11 +304,17 @@ class BioMultiTest(unittest.TestCase):
     def test_import_matrix_from_tsv_fasta(self):
         self.start_test()
 
+        taxonomic_abundance_tsv = os.path.join(self.scratch, 'amplicon_test.tsv')
+        shutil.copy(os.path.join('data', 'amplicon_test.tsv'), taxonomic_abundance_tsv)
+
+        taxonomic_fasta = os.path.join(self.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), taxonomic_fasta)
+
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_id': self.wsId,
-                  'taxonomic_abundance_tsv': os.path.join('data', 'amplicon_test.tsv'),
-                  'taxonomic_fasta': os.path.join('data', 'phyloseq_test.fa'),
+                  'taxonomic_abundance_tsv': taxonomic_abundance_tsv,
+                  'taxonomic_fasta': taxonomic_fasta,
                   'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
                   'scale': 'raw',
                   'description': "OTU data",
@@ -413,12 +419,18 @@ class BioMultiTest(unittest.TestCase):
     def test_import_with_external_am(self, download_staging_file):
         self.start_test()
 
+        biom_file_biom_fasta = os.path.join(self.scratch, 'phyloseq_test.biom')
+        shutil.copy(os.path.join('data', 'phyloseq_test.biom'), biom_file_biom_fasta)
+
+        fasta_file_biom_fasta = os.path.join(self.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), fasta_file_biom_fasta)
+
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_id': self.wsId,
                   "biom_fasta": {
-                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                        "biom_file_biom_fasta": biom_file_biom_fasta,
+                        "fasta_file_biom_fasta": fasta_file_biom_fasta
                         },
                   'scale': 'raw',
                   'description': "OTU data",
@@ -518,7 +530,7 @@ class BioMultiTest(unittest.TestCase):
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                            },d
+                            },
                       'scale': 'raw',
                       'description': "OTU data",
                       'row_attributemapping_ref': self.attribute_mapping_ref,
