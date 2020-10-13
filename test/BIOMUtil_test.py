@@ -270,7 +270,6 @@ class BioMultiTest(unittest.TestCase):
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
-        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -309,7 +308,6 @@ class BioMultiTest(unittest.TestCase):
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
-        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
