@@ -8,6 +8,7 @@ from configparser import ConfigParser
 from os import environ
 from mock import patch
 import shutil
+from Bio import SeqIO
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -16,6 +17,7 @@ from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 from installed_clients.sample_uploaderClient import sample_uploader
+from installed_clients.FakeObjectsForTestsClient import FakeObjectsForTests
 
 
 class BioMultiTest(unittest.TestCase):
@@ -65,6 +67,20 @@ class BioMultiTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+
+    def createAnObject(self):
+        if hasattr(self.__class__, 'fake_object_ref'):
+            return self.__class__.fake_object_ref
+
+        obj_name = 'test_obj.1'
+        foft = FakeObjectsForTests(self.callback_url)
+        info = foft.create_any_objects({'ws_name': self.wsName, 'obj_names': [obj_name]})[0]
+
+        fake_object_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        self.__class__.fake_object_ref = fake_object_ref
+        print('Loaded Fake Object: ' + fake_object_ref)
+        return fake_object_ref
 
     @classmethod
     def prepare_data(cls):
@@ -133,6 +149,44 @@ class BioMultiTest(unittest.TestCase):
         self.__class__.sample_set_ref = sample_set_ref
         print('Loaded SampleSet: ' + sample_set_ref)
         return sample_set_ref
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def loadAmpliconMatrix(self, download_staging_file):
+        if hasattr(self.__class__, 'amplicon_matrix_ref'):
+            return self.__class__.amplicon_matrix_ref
+
+        taxonomic_abundance_tsv = os.path.join(self.scratch, 'amplicon_test.tsv')
+        shutil.copy(os.path.join('data', 'amplicon_test.tsv'), taxonomic_abundance_tsv)
+
+        taxonomic_fasta = os.path.join(self.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), taxonomic_fasta)
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_id': self.wsId,
+                  'taxonomic_abundance_tsv': taxonomic_abundance_tsv,
+                  'taxonomic_fasta': taxonomic_fasta,
+                  'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method',
+                  'input_local_file': True
+                  }
+
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
+        amplicon_matrix_ref = returnVal['matrix_obj_ref']
+
+        self.__class__.amplicon_matrix_ref = amplicon_matrix_ref
+        print('Loaded AmpliconMatrix: ' + amplicon_matrix_ref)
+        return amplicon_matrix_ref
 
     @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
@@ -280,6 +334,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
 
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def test_import_matrix_from_biom_1_0_tsv_fasta_with_sample_set(self, download_staging_file):
         self.start_test()
@@ -414,7 +469,7 @@ class BioMultiTest(unittest.TestCase):
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
-            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "Unknown matrix object type"):
             params = {'obj_type': 'foo',
@@ -434,7 +489,7 @@ class BioMultiTest(unittest.TestCase):
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
-            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "Unknown scale type"):
             params = {'obj_type': 'AmpliconMatrix',
@@ -454,7 +509,7 @@ class BioMultiTest(unittest.TestCase):
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
-            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "IDs from the uploaded matrix do not match"):
             params = {'obj_type': 'AmpliconMatrix',
@@ -463,7 +518,7 @@ class BioMultiTest(unittest.TestCase):
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                            },
+                            },d
                       'scale': 'raw',
                       'description': "OTU data",
                       'row_attributemapping_ref': self.attribute_mapping_ref,
@@ -476,4 +531,23 @@ class BioMultiTest(unittest.TestCase):
                       'clustering_cutoff': 0.3,
                       'clustering_method': 'clustering_method'
                       }
-            returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
+    def test_fetch_sequence(self):
+        self.start_test()
+
+        fake_object_ref = self.createAnObject()
+        amplicon_matrix_ref = self.loadAmpliconMatrix()
+
+        with self.assertRaisesRegex(ValueError, "Unexpected data type"):
+            self.getImpl().fetch_sequence(self.ctx, fake_object_ref)[0]
+
+        fasta_file_path = self.getImpl().fetch_sequence(self.ctx, amplicon_matrix_ref)[0]
+        fastq_dict = SeqIO.index(fasta_file_path, "fasta")
+
+        expected_seq_ids = ['GG_OTU_1', 'GG_OTU_2', 'GG_OTU_3', 'GG_OTU_4', 'GG_OTU_5', 'GG_OTU_6']
+        self.assertCountEqual(expected_seq_ids, list(fastq_dict.keys()))
+
+        expected_seq = 'ATCGATCGATCGTACGATCG'
+        for seq_id in expected_seq_ids:
+            self.assertEqual(expected_seq, str(fastq_dict.get(seq_id).seq))
