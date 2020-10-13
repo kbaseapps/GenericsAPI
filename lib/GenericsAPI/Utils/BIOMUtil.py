@@ -455,8 +455,8 @@ class BiomUtil:
         return amplicon_set_data
 
     def _validate_fasta_file(self, df, fasta_file):
+        logging.info('start validating FASTA file')
         try:
-            logging.info('start parsing FASTA file')
             fastq_dict = SeqIO.index(fasta_file, "fasta")
         except Exception:
             raise ValueError('Cannot parse file. Please provide valide FASTA file')
