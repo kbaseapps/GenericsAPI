@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.12"
     GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "4ccb2292738a7204b9d8cb3748ed6727a3801efd"
+    GIT_COMMIT_HASH = "5ffb0441f60503aed4f7fa25a589e82be951ac14"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -203,20 +203,20 @@ class GenericsAPI:
            parameter "obj_type" of String, parameter
            "taxonomic_abundance_tsv" of String, parameter "taxonomic_fasta"
            of String, parameter "input_local_file" of String, parameter
-           "matrix_name" of String, parameter "amplicon_set_name" of String,
-           parameter "scale" of String, parameter "description" of String,
-           parameter "workspace_id" of Long, parameter "genome_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
-           "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "row_attributemapping_ref" of type "obj_ref"
-           (An X/Y/Z style reference), parameter "diff_expr_matrix_ref" of
-           type "obj_ref" (An X/Y/Z style reference), parameter
-           "biochemistry_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "reads_set_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "sample_set_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "metadata_keys" of list of String,
-           parameter "extraction_kit" of String, parameter "amplicon_type" of
-           String, parameter "target_gene_region" of String, parameter
+           "matrix_name" of String, parameter "scale" of String, parameter
+           "description" of String, parameter "workspace_id" of Long,
+           parameter "genome_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "col_attributemapping_ref" of type "obj_ref"
+           (An X/Y/Z style reference), parameter "row_attributemapping_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "biochemistry_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "reads_set_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "sample_set_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
+           "metadata_keys" of list of String, parameter "extraction_kit" of
+           String, parameter "amplicon_type" of String, parameter
+           "target_gene_region" of String, parameter
            "forward_primer_sequence" of String, parameter
            "reverse_primer_sequence" of String, parameter
            "sequencing_platform" of String, parameter "sequencing_run" of

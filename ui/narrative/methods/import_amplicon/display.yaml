@@ -165,14 +165,6 @@ parameters :
         long-hint : |
             Provide a name for the Matrix that will be created by this importer
 
-    amplicon_set_name :
-        ui-name : |
-            Amplicon Set Object Name
-        short-hint : |
-            Provide a name for the AmpliconSet that will be created by this importer
-        long-hint : |
-            Provide a name for the AmpliconSet that will be created by this importer
-
     reads_set_ref:
         ui-name : |
             Reads Set Reference

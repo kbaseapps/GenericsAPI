@@ -49,7 +49,7 @@ class BiomUtil:
         logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale', 'amplicon_set_name',
+        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale',
                   'amplicon_type', 'target_gene_region', 'forward_primer_sequence',
                   'reverse_primer_sequence', 'sequencing_platform',
                   'sequencing_quality_filter_cutoff', 'clustering_cutoff', 'clustering_method']:
@@ -987,7 +987,6 @@ class BiomUtil:
 
         workspace_id = params.get('workspace_id')
         matrix_name = params.get('matrix_name')
-        amplicon_set_name = params.get('amplicon_set_name')
         obj_type = params.get('obj_type')
         scale = params.get('scale')
         description = params.get('description')

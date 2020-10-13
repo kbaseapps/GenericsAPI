@@ -168,7 +168,6 @@ class CorrUtilTest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',

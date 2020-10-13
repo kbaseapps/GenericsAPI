@@ -144,7 +144,6 @@ module GenericsAPI {
       string taxonomic_fasta;
       string input_local_file;
       string matrix_name;
-      string amplicon_set_name;
       string scale;
       string description;
       int workspace_id;

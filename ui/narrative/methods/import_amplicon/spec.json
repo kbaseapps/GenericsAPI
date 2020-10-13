@@ -258,18 +258,6 @@
       }
     },
     {
-      "id" : "amplicon_set_name",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseExperiments.AmpliconSet"],
-        "is_output_name" : true
-      }
-    },
-    {
       "id" : "reads_set_ref",
       "optional" : true,
       "advanced" : true,
@@ -362,10 +350,6 @@
         {
           "input_parameter": "matrix_name",
           "target_property": "matrix_name"
-        },
-        {
-          "input_parameter": "amplicon_set_name",
-          "target_property": "amplicon_set_name"
         },
         {
           "input_parameter" : "sample_set_ref",
