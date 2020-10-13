@@ -399,7 +399,7 @@ module KBaseMatrices{
 
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref sample_set_ref
-      @optional attributes search_attributes sequence_mapping reads_set_ref amplicon_set_ref
+      @optional attributes search_attributes sequence_mapping reads_set_ref
       @optional extraction_kit amplicon_type target_gene_region forward_primer_sequence
       @optional reverse_primer_sequence sequencing_platform sequencing_run sequencing_kit
       @optional sequencing_quality_filter_cutoff clustering_cutoff clustering_method
@@ -439,7 +439,6 @@ module KBaseMatrices{
       ws_ref reads_set_ref;
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
-      ws_ref amplicon_set_ref;
       ws_ref sample_set_ref;
       string extraction_kit;
       string amplicon_type;
@@ -452,6 +451,7 @@ module KBaseMatrices{
       string sequencing_quality_filter_cutoff;
       float clustering_cutoff;
       string clustering_method;
+      handle_ref sequencing_file_handle;
     } AmpliconMatrix;
     /*
       A wrapper around a FloatMatrix2D designed for matrices of trait data for use in population
