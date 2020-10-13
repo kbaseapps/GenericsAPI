@@ -141,7 +141,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_tsv": {
                         "biom_file_biom_tsv": os.path.join('data', 'phyloseq_test.biom'),
                         "tsv_file_biom_tsv": os.path.join('data', 'amplicon_test.tsv')
@@ -180,7 +180,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_fasta": {
                         "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                         "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -219,7 +219,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv_fasta": {
                         "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
                         "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
@@ -255,7 +255,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   'taxonomic_abundance_tsv': os.path.join('data', 'amplicon_test.tsv'),
                   'taxonomic_fasta': os.path.join('data', 'phyloseq_test.fa'),
                   'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
@@ -293,7 +293,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv_fasta": {
                         "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
                         "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
@@ -332,7 +332,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv": {
                         "tsv_file_tsv": os.path.join('data', 'amplicon_test.tsv'),
                         'metadata_keys_tsv': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence'
@@ -368,7 +368,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_fasta": {
                         "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                         "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -409,7 +409,7 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "parameter is required, but missing"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -429,7 +429,7 @@ class BioMultiTest(unittest.TestCase):
             params = {'obj_type': 'foo',
                       'matrix_name': 'test_AmpliconMatrix',
                       'amplicon_set_name': 'test_AmpliconSet',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -450,7 +450,7 @@ class BioMultiTest(unittest.TestCase):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
                       'amplicon_set_name': 'test_AmpliconSet',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -470,7 +470,7 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "IDs from the uploaded matrix do not match"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')

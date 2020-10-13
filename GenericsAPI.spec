@@ -147,7 +147,7 @@ module GenericsAPI {
       string amplicon_set_name;
       string scale;
       string description;
-      workspace_name workspace_name;
+      int workspace_id;
 
       obj_ref genome_ref;
       obj_ref col_attributemapping_ref;

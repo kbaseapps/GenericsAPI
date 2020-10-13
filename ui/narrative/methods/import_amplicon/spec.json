@@ -288,8 +288,8 @@
       "method" : "import_matrix_from_biom",
       "input_mapping" : [
         {
-          "narrative_system_variable": "workspace",
-          "target_property": "workspace_name"
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
         },
         {
           "constant_value": "AmpliconMatrix",
