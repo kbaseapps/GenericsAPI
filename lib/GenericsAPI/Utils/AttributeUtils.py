@@ -158,7 +158,7 @@ class AttributesUtil:
         report_params = {'message': '',
                          'objects_created': objects_created,
                          'workspace_name': workspace_name,
-                         'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
+                         'report_object_name': 'update_matrix_attribute_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
         output = kbase_report_client.create_extended_report(report_params)

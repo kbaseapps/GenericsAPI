@@ -258,18 +258,6 @@
       }
     },
     {
-      "id" : "amplicon_set_name",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options" : {
-        "valid_ws_types" : ["KBaseExperiments.AmpliconSet"],
-        "is_output_name" : true
-      }
-    },
-    {
       "id" : "reads_set_ref",
       "optional" : true,
       "advanced" : true,
@@ -288,8 +276,8 @@
       "method" : "import_matrix_from_biom",
       "input_mapping" : [
         {
-          "narrative_system_variable": "workspace",
-          "target_property": "workspace_name"
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
         },
         {
           "constant_value": "AmpliconMatrix",
@@ -362,10 +350,6 @@
         {
           "input_parameter": "matrix_name",
           "target_property": "matrix_name"
-        },
-        {
-          "input_parameter": "amplicon_set_name",
-          "target_property": "amplicon_set_name"
         },
         {
           "input_parameter" : "sample_set_ref",

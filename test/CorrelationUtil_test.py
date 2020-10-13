@@ -161,14 +161,13 @@ class CorrUtilTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_fasta": {
                         "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                         "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',

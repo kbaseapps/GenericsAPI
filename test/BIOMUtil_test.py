@@ -141,14 +141,13 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_tsv": {
                         "biom_file_biom_tsv": os.path.join('data', 'phyloseq_test.biom'),
                         "tsv_file_biom_tsv": os.path.join('data', 'amplicon_test.tsv')
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -180,14 +179,13 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_fasta": {
                         "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                         "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -219,7 +217,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv_fasta": {
                         "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
                         "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
@@ -227,7 +225,6 @@ class BioMultiTest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -255,13 +252,12 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   'taxonomic_abundance_tsv': os.path.join('data', 'amplicon_test.tsv'),
                   'taxonomic_fasta': os.path.join('data', 'phyloseq_test.fa'),
                   'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -274,7 +270,6 @@ class BioMultiTest(unittest.TestCase):
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
-        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -293,7 +288,7 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv_fasta": {
                         "tsv_file_tsv_fasta": os.path.join('data', 'amplicon_test.tsv'),
                         "fasta_file_tsv_fasta": os.path.join('data', 'phyloseq_test.fa'),
@@ -301,7 +296,6 @@ class BioMultiTest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'sample_set_ref': sample_set_ref,
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
@@ -314,7 +308,6 @@ class BioMultiTest(unittest.TestCase):
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
-        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
@@ -332,14 +325,13 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "tsv": {
                         "tsv_file_tsv": os.path.join('data', 'amplicon_test.tsv'),
                         'metadata_keys_tsv': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence'
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -368,14 +360,13 @@ class BioMultiTest(unittest.TestCase):
 
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': self.wsName,
+                  'workspace_id': self.wsId,
                   "biom_fasta": {
                         "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                         "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'col_attributemapping_ref': self.attribute_mapping_ref,
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
@@ -409,7 +400,7 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "parameter is required, but missing"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -428,8 +419,7 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown matrix object type"):
             params = {'obj_type': 'foo',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'amplicon_set_name': 'test_AmpliconSet',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -449,8 +439,7 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown scale type"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'amplicon_set_name': 'test_AmpliconSet',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
@@ -470,14 +459,13 @@ class BioMultiTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "IDs from the uploaded matrix do not match"):
             params = {'obj_type': 'AmpliconMatrix',
                       'matrix_name': 'test_AmpliconMatrix',
-                      'workspace_name': self.wsName,
+                      'workspace_id': self.wsId,
                       "biom_fasta": {
                             "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
                             "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
                             },
                       'scale': 'raw',
                       'description': "OTU data",
-                      'amplicon_set_name': 'test_AmpliconSet',
                       'row_attributemapping_ref': self.attribute_mapping_ref,
                       'amplicon_type': '16S',
                       'target_gene_region': 'V1',

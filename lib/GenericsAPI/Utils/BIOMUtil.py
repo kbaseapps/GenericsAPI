@@ -49,7 +49,7 @@ class BiomUtil:
         logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_name', 'scale', 'amplicon_set_name',
+        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale',
                   'amplicon_type', 'target_gene_region', 'forward_primer_sequence',
                   'reverse_primer_sequence', 'sequencing_platform',
                   'sequencing_quality_filter_cutoff', 'clustering_cutoff', 'clustering_method']:
@@ -849,14 +849,13 @@ class BiomUtil:
                             })
         return html_report
 
-    def _generate_report(self, matrix_obj_ref, amplicon_set_obj_ref, new_row_attr_ref,
-                         new_col_attr_ref, workspace_name, data=None):
+    def _generate_report(self, matrix_obj_ref, new_row_attr_ref,
+                         new_col_attr_ref, workspace_id, data=None):
         """
         _generate_report: generate summary report
         """
 
-        objects_created = [{'ref': matrix_obj_ref, 'description': 'Imported Amplicon Matrix'},
-                           {'ref': amplicon_set_obj_ref, 'description': 'Imported Amplicon Set'}]
+        objects_created = [{'ref': matrix_obj_ref, 'description': 'Imported Amplicon Matrix'}]
 
         if new_row_attr_ref:
             objects_created.append({'ref': new_row_attr_ref,
@@ -871,7 +870,7 @@ class BiomUtil:
 
             report_params = {'message': '',
                              'objects_created': objects_created,
-                             'workspace_name': workspace_name,
+                             'workspace_id': workspace_id,
                              'html_links': output_html_files,
                              'direct_html_link_index': 0,
                              'html_window_height': 660,
@@ -880,7 +879,7 @@ class BiomUtil:
         else:
             report_params = {'message': '',
                              'objects_created': objects_created,
-                             'workspace_name': workspace_name,
+                             'workspace_id': workspace_id,
                              'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
@@ -970,7 +969,7 @@ class BiomUtil:
         arguments:
         obj_type: one of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
         matrix_name: matrix object name
-        workspace_name: workspace name matrix object to be saved to
+        workspace_id: workspace id matrix object to be saved to
         input_shock_id: file shock id
         or
         input_file_path: absolute file path
@@ -986,18 +985,12 @@ class BiomUtil:
 
         (biom_file, tsv_file, fasta_file, mode, metadata_keys) = self._process_params(params)
 
-        workspace_name = params.get('workspace_name')
+        workspace_id = params.get('workspace_id')
         matrix_name = params.get('matrix_name')
-        amplicon_set_name = params.get('amplicon_set_name')
         obj_type = params.get('obj_type')
         scale = params.get('scale')
         description = params.get('description')
         refs = {k: v for k, v in params.items() if "_ref" in k}
-
-        if not isinstance(workspace_name, int):
-            workspace_id = self.dfu.ws_name_to_id(workspace_name)
-        else:
-            workspace_id = workspace_name
 
         amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
@@ -1017,23 +1010,12 @@ class BiomUtil:
         if not params.get('col_attributemapping_ref'):
             new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
-        amplicon_set_data = self._file_to_amplicon_set_data(biom_file, tsv_file, fasta_file, mode,
-                                                            refs, description)
-
         if fasta_file:
             handle_id = self.dfu.file_to_shock({'file_path': fasta_file,
                                                 'make_handle': True,
                                                 'pack': 'zip'})['handle']['hid']
-            amplicon_set_data['sequencing_file_handle'] = handle_id
+            amplicon_data['sequencing_file_handle'] = handle_id
 
-        logging.info('start saving AmpliconSet object: {}'.format(amplicon_set_name))
-        amplicon_set_obj_ref = self.data_util.save_object({
-                                                'obj_type': 'KBaseExperiments.AmpliconSet',
-                                                'obj_name': amplicon_set_name,
-                                                'data': amplicon_set_data,
-                                                'workspace_name': workspace_id})['obj_ref']
-
-        amplicon_data['amplicon_set_ref'] = amplicon_set_obj_ref
         logging.info('start saving Matrix object: {}'.format(matrix_name))
         matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
@@ -1041,11 +1023,10 @@ class BiomUtil:
                                                 'data': amplicon_data,
                                                 'workspace_name': workspace_id})['obj_ref']
 
-        returnVal = {'matrix_obj_ref': matrix_obj_ref,
-                     'amplicon_set_obj_ref': amplicon_set_obj_ref}
+        returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
-        report_output = self._generate_report(matrix_obj_ref, amplicon_set_obj_ref,
-                                              new_row_attr_ref, new_col_attr_ref, workspace_name,
+        report_output = self._generate_report(matrix_obj_ref,
+                                              new_row_attr_ref, new_col_attr_ref, workspace_id,
                                               data=amplicon_data['data'])
 
         returnVal.update(report_output)
