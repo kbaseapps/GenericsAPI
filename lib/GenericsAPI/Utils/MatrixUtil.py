@@ -990,7 +990,6 @@ class MatrixUtil:
             })['html_dir']
             heatmap_html_dir_l.append(heatmap_html_dir)
 
-
         output_html_files = self._generate_transform_html_report(operations, heatmap_html_dir_l,
                                                                  df_results[-1])
 
@@ -1570,7 +1569,7 @@ class MatrixUtil:
         logging.info("Removed columns: {}".format(additional_removed_col_ids))
         df = df.loc[:, col_check]
 
-        return df, removed_row_ids, removed_col_ids
+        return df
 
     def _relative_abundance(self, df, dimension='col'):
 
@@ -1754,6 +1753,38 @@ class MatrixUtil:
             species_stats[target_col] = average_abun
 
         return species_stats
+
+    def _sync_attribute_mapping(self, matrix_data, removed_ids, new_attri_mapping_name, dimension,
+                                workspace_id):
+
+        attri_mapping_ref = matrix_data.get('{}_attributemapping_ref'.format(dimension))
+
+        if attri_mapping_ref:
+            logging.info('Start removing {} from {} attribute mapping object'.format(removed_ids,
+                                                                                     dimension))
+            am_data = self.dfu.get_objects({"object_refs": [attri_mapping_ref]})['data'][0]['data']
+            instances = am_data.get('instances', {})
+            for removed_id in removed_ids:
+                instances.pop(removed_id, None)
+
+            # save new attribute mapping
+            info = self.dfu.save_objects({"id": workspace_id,
+                                          "objects": [{
+                                                "type": 'KBaseExperiments.AttributeMapping',
+                                                "data": am_data,
+                                                "name": new_attri_mapping_name
+                                            }]})[0]
+
+            new_attri_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+            matrix_data['{}_attributemapping_ref'.format(dimension)] = new_attri_mapping_ref
+
+            mapping = matrix_data.get('{}_mapping'.format(dimension))
+            if mapping:
+                for remove_id in removed_ids:
+                    mapping.pop(remove_id, None)
+
+        return matrix_data
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -2222,15 +2253,15 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        # original_matrix_df = df.copy(deep=True)
+        original_row_ids = df.index
+        original_col_ids = df.columns
 
         # iterate over operations
         df_results = []
         for op in operations:
 
             if op == 'abundance_filtering':
-                (df, removed_row_ids, removed_col_ids) = self._filtering_matrix(
-                                            df,
+                df = self._filtering_matrix(df,
                                             row_threshold=abundance_filtering_params.get(
                                                             'abundance_filtering_row_threshold', 0),
                                             columns_threshold=abundance_filtering_params.get(
@@ -2282,6 +2313,19 @@ class MatrixUtil:
 
         input_matrix_data['data'] = new_matrix_data
 
+        removed_row_ids = set(original_row_ids) - set(df.index)
+        removed_col_ids = set(original_col_ids) - set(df.columns)
+
+        if removed_row_ids and input_matrix_data.get('row_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_row_ids,
+                                                             new_matrix_name + '_row_attribute_mapping',
+                                                             'row', workspace_id)
+
+        if removed_col_ids and input_matrix_data.get('col_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_col_ids,
+                                                             new_matrix_name + '_col_attribute_mapping',
+                                                             'col', workspace_id)
+
         logging.info("Saving new transformed matrix object")
         new_matrix_obj_ref = self.data_util.save_object({
                                                 'obj_type': input_matrix_info[2],
@@ -2297,6 +2341,9 @@ class MatrixUtil:
         returnVal.update(report_output)
 
         return returnVal
+
+
+
 
     def filter_matrix(self, params):
         """
