@@ -62,13 +62,9 @@ def skip_cond(select_run=None, regex=None, exclude_regex=None, kb_env=None):
         return f_new
     return decorator
 
+
 select_run = None #['test_transform_pipeline']
 regex = None #'transform'
-
-
-select_run = ['test_transform_pipeline']
-
-
 
 
 class MatrixUtilTest(unittest.TestCase):
