@@ -1760,7 +1760,7 @@ class MatrixUtil:
         attri_mapping_ref = matrix_data.get('{}_attributemapping_ref'.format(dimension))
 
         if attri_mapping_ref:
-            self.logging('Start removing {} from {} attribute mapping object'.format(removed_ids,
+            logging.info('Start removing {} from {} attribute mapping object'.format(removed_ids,
                                                                                      dimension))
             am_data = self.dfu.get_objects({"object_refs": [attri_mapping_ref]})['data'][0]['data']
             instances = am_data.get('instances', {})
@@ -1779,7 +1779,7 @@ class MatrixUtil:
 
             matrix_data['{}_attributemapping_ref'.format(dimension)] = new_attri_mapping_ref
 
-            mapping = matrix_data.get('{}_mapping'.foramt(dimension))
+            mapping = matrix_data.get('{}_mapping'.format(dimension))
             if mapping:
                 for remove_id in removed_ids:
                     mapping.pop(remove_id, None)

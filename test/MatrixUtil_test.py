@@ -66,6 +66,9 @@ select_run = None #['test_transform_pipeline']
 regex = None #'transform'
 
 
+select_run = ['test_transform_pipeline']
+
+
 
 
 class MatrixUtilTest(unittest.TestCase):
@@ -235,14 +238,38 @@ class MatrixUtilTest(unittest.TestCase):
         ]
 
 
-    def get_out_data(self, ret, matrix_out=True):
+    def get_out_data(self, ret, matrix_out=True, attri_out=False):
         report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
         warnings = report_obj['warnings']
-        matrix_out = self.dfu.get_objects({
-            'object_refs': [report_obj['objects_created'][0]['ref']]
-        })['data'][0]['data']['data']['values']
 
-        return warnings, matrix_out
+        if matrix_out or attri_out:
+            obj_data = self.dfu.get_objects({
+                'object_refs': [report_obj['objects_created'][0]['ref']]
+            })['data'][0]['data']
+
+            if attri_out:
+                row_attri = obj_data.get('row_attributemapping_ref')
+                col_attri = obj_data.get('col_attributemapping_ref')
+
+                row_attri_size = 0
+                if row_attri:
+                    row_attri_obj = self.dfu.get_objects({'object_refs': [row_attri]})['data'][0]['data']
+                    row_attri_size = len(row_attri_obj['instances'])
+
+                col_attri_size = 0
+                if col_attri:
+                    col_attri_obj = self.dfu.get_objects({'object_refs': [col_attri]})['data'][0]['data']
+                    col_attri_size = len(col_attri_obj['instances'])
+
+            if matrix_out:
+                matrix_out = obj_data['data']['values']
+
+                if attri_out:
+                    return warnings, matrix_out, row_attri_size, col_attri_size
+                else:
+                    return warnings, matrix_out
+
+        return warnings
 
     def assert_matrices_equal(self, m1, m2):
         if not isinstance(m1, np.ndarray): m1 = np.array(m1)
@@ -325,9 +352,11 @@ class MatrixUtilTest(unittest.TestCase):
                 [-2.30258509e+01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01]
             ]
 
-            _, out2 = self.get_out_data(ret)
+            _, out2, row_attri_size, col_attri_size = self.get_out_data(ret, matrix_out=True, attri_out=True)
 
             self.assert_matrices_equal(out1, out2)
+            self.assertEqual(row_attri_size, 5)
+            self.assertEqual(col_attri_size, 4)
 
         with self.subTest():
             '''
@@ -356,9 +385,11 @@ class MatrixUtilTest(unittest.TestCase):
                 [ 0.534522,  0.707107,  0.707107,         0,         0,  0.707107]
             ]
 
-            _, out2 = self.get_out_data(ret)
+            _, out2, row_attri_size, col_attri_size = self.get_out_data(ret, matrix_out=True, attri_out=True)
 
             self.assert_matrices_equal(out1, out2)
+            self.assertEqual(row_attri_size, 3)
+            self.assertEqual(col_attri_size, 6)
 
 
         with self.subTest():
