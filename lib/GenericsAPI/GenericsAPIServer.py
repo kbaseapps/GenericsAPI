@@ -462,6 +462,10 @@ class Application(object):
                              name='GenericsAPI.build_chemical_abundance_template',
                              types=[dict])
         self.method_authentication['GenericsAPI.build_chemical_abundance_template'] = 'required'  # noqa
+        self.rpc_service.add(impl_GenericsAPI.fetch_sequence,
+                             name='GenericsAPI.fetch_sequence',
+                             types=[str])
+        self.method_authentication['GenericsAPI.fetch_sequence'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.status,
                              name='GenericsAPI.status',
                              types=[dict])

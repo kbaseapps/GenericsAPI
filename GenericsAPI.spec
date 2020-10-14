@@ -593,4 +593,6 @@ module GenericsAPI {
   funcdef build_chemical_abundance_template(ChemAbunTempParams params) returns (ViewMatrixOutput returnVal) authentication required;
 
 
+  funcdef fetch_sequence(obj_ref matrix_ref) returns (string fasta_file_path) authentication required;
+
 };

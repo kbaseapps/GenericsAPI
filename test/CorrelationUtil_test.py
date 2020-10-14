@@ -5,6 +5,7 @@ import unittest
 import time
 import uuid
 from mock import patch
+import shutil
 
 import pandas as pd
 import numpy as np
@@ -159,13 +160,18 @@ class CorrUtilTest(unittest.TestCase):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
 
+        taxonomic_abundance_tsv = os.path.join(self.scratch, 'amplicon_test.tsv')
+        shutil.copy(os.path.join('data', 'amplicon_test.tsv'), taxonomic_abundance_tsv)
+
+        taxonomic_fasta = os.path.join(self.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), taxonomic_fasta)
+
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
                   'workspace_id': self.wsId,
-                  "biom_fasta": {
-                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                        },
+                  'taxonomic_abundance_tsv': taxonomic_abundance_tsv,
+                  'taxonomic_fasta': taxonomic_fasta,
+                  'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_type': '16S',
@@ -175,7 +181,8 @@ class CorrUtilTest(unittest.TestCase):
                   'sequencing_platform': 'Illumina',
                   'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method'
+                  'clustering_method': 'clustering_method',
+                  'input_local_file': True
                   }
 
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]

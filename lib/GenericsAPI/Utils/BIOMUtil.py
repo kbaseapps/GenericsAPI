@@ -454,8 +454,23 @@ class BiomUtil:
 
         return amplicon_set_data
 
-    def _file_to_amplicon_data(self, biom_file, tsv_file, mode, refs, matrix_name, workspace_id,
-                               scale, description, metadata_keys=None):
+    def _validate_fasta_file(self, df, fasta_file):
+        logging.info('start validating FASTA file')
+        try:
+            fastq_dict = SeqIO.index(fasta_file, "fasta")
+        except Exception:
+            raise ValueError('Cannot parse file. Please provide valide FASTA file')
+
+        matrix_ids = df.index
+        file_ids = fastq_dict.keys()
+
+        unmatched_ids = set(matrix_ids) - set(file_ids)
+
+        if unmatched_ids:
+            raise ValueError('FASTA file does not have [{}] OTU id'.format(unmatched_ids))
+
+    def _file_to_amplicon_data(self, biom_file, tsv_file, fasta_file, mode, refs, matrix_name,
+                               workspace_id, scale, description, metadata_keys=None):
 
         amplicon_data = refs
 
@@ -497,6 +512,7 @@ class BiomUtil:
             except Exception:
                 raise ValueError('Cannot parse file. Please provide valide tsv file')
             else:
+                self._validate_fasta_file(df, fasta_file)
                 metadata_df = None
                 if metadata_keys:
                     shared_metadata_keys = list(set(metadata_keys) & set(df.columns))
@@ -964,6 +980,47 @@ class BiomUtil:
         self.kbse = KBaseSearchEngine(config['search-url'])
         self.taxon_cache = dict()
 
+    def fetch_sequence(self, matrix_ref):
+        logging.info('start to fetch consensus sequence')
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        matrix_name = input_matrix_info[1]
+        matrix_type = input_matrix_info[2]
+        matrix_data = input_matrix_obj['data']
+
+        if 'KBaseMatrices.AmpliconMatrix' not in matrix_type:
+            raise ValueError('Unexpected data type: {}'.format(matrix_type))
+
+        handle = matrix_data.get('sequencing_file_handle')
+        if not handle:
+            raise ValueError('Missing sequencing_file_handle from the matrix object')
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating consensus sequence file in {}'.format(output_directory))
+        self._mkdir_p(output_directory)
+
+        matrix_fasta_file = self.dfu.shock_to_file({'handle_id': handle,
+                                                    'file_path': self.scratch}).get('file_path')
+
+        try:
+            logging.info('start parsing FASTA file')
+            fastq_dict = SeqIO.index(matrix_fasta_file, "fasta")
+        except Exception:
+            raise ValueError('Cannot parse file. Please provide valide FASTA file')
+
+        row_ids = matrix_data['data']['row_ids']
+
+        fasta_file_path = os.path.join(output_directory, matrix_name + 'consensus_sequence.fasta')
+
+        with open(fasta_file_path, 'w') as f:
+            for row_id in row_ids:
+                consensus_sequence = str(fastq_dict.get(row_id).seq)
+                f.write('>' + str(row_id) + '\n')
+                f.write(consensus_sequence + '\n')
+
+        return fasta_file_path
+
     def import_matrix_from_biom(self, params):
         """
         arguments:
@@ -992,7 +1049,8 @@ class BiomUtil:
         description = params.get('description')
         refs = {k: v for k, v in params.items() if "_ref" in k}
 
-        amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, mode, refs, matrix_name,
+        amplicon_data = self._file_to_amplicon_data(biom_file, tsv_file, fasta_file, mode,
+                                                    refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
         for key in ['extraction_kit', 'amplicon_type', 'target_gene_region',
@@ -1011,9 +1069,9 @@ class BiomUtil:
             new_col_attr_ref = amplicon_data.get('col_attributemapping_ref')
 
         if fasta_file:
+            logging.info('start saving consensus sequence file to shock: {}'.format(fasta_file))
             handle_id = self.dfu.file_to_shock({'file_path': fasta_file,
-                                                'make_handle': True,
-                                                'pack': 'zip'})['handle']['hid']
+                                                'make_handle': True})['handle']['hid']
             amplicon_data['sequencing_file_handle'] = handle_id
 
         logging.info('start saving Matrix object: {}'.format(matrix_name))

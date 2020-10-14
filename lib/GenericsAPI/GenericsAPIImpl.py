@@ -22,7 +22,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.12"
     GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5ffb0441f60503aed4f7fa25a589e82be951ac14"
+    GIT_COMMIT_HASH = "b0487d1757b817abf0d3d67c33873b527e1ad39e"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -972,6 +972,25 @@ class GenericsAPI:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
+    def fetch_sequence(self, ctx, matrix_ref):
+        """
+        :param matrix_ref: instance of type "obj_ref" (An X/Y/Z style
+           reference)
+        :returns: instance of String
+        """
+        # ctx is the context object
+        # return variables are: fasta_file_path
+        #BEGIN fetch_sequence
+        fasta_file_path = self.biom_util.fetch_sequence(matrix_ref)
+        #END fetch_sequence
+
+        # At some point might do deeper type checking...
+        if not isinstance(fasta_file_path, str):
+            raise ValueError('Method fetch_sequence return value ' +
+                             'fasta_file_path is not type str as required.')
+        # return the results
+        return [fasta_file_path]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",
