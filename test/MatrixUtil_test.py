@@ -156,12 +156,18 @@ class MatrixUtilTest(unittest.TestCase):
 
         print('Executing loadAmpliconMatrix')
 
+        biom_file_biom_fasta = os.path.join(cls.scratch, 'phyloseq_test.biom')
+        shutil.copy(os.path.join('data', 'phyloseq_test.biom'), biom_file_biom_fasta)
+
+        fasta_file_biom_fasta = os.path.join(cls.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), fasta_file_biom_fasta)
+
         params = {'obj_type': 'AmpliconMatrix',
                   'matrix_name': 'test_AmpliconMatrix',
-                  'workspace_name': cls.wsName,
+                  'workspace_id': cls.wsId,
                   "biom_fasta": {
-                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                        "biom_file_biom_fasta": biom_file_biom_fasta,
+                        "fasta_file_biom_fasta": fasta_file_biom_fasta
                         },
                   'scale': 'raw',
                   'description': "OTU data",
@@ -181,22 +187,22 @@ class MatrixUtilTest(unittest.TestCase):
 
         print('Loaded AmpliconMatrix: ' + cls.amplicon_matrix_ref)
 
-     
+
     @classmethod
     def prepare_data(cls):
         cls.loadAmpliconMatrix() # TODO replace with mocking in tests
-        
+
         # the toy matrix loaded with patched self.loadAmpliconMatrix
         # sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
         # sample sizes are [7, 3, 4, 6, 5, 2]
-        cls.matrix = [  
+        cls.matrix = [
             [0,0,1,0,0,0],
             [5,1,0,2,3,1],
             [0,0,1,4,2,0],
             [2,1,1,0,0,1],
             [0,1,1,0,0,0]
         ]
-        
+
         cls.matrix_subsample5 = [ # rarefying with seed 7, subsample 5
             [0,0,1,0,0,0],        # confirm with `set.seed(7); t(rrarefy(t(m), 5))
             [4,1,0,2,3,1],
@@ -214,17 +220,17 @@ class MatrixUtilTest(unittest.TestCase):
         ]
 
         cls.matrix_bootstrap9Reps_median = [ # rarefying with seed 7, subsample 5
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
-            [4.0, 1.0, 0.0, 2.0, 3.0, 1.0], 
-            [0.0, 0.0, 1.0, 3.0, 2.0, 0.0], 
-            [1.0, 1.0, 1.0, 0.0, 0.0, 1.0], 
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+            [4.0, 1.0, 0.0, 2.0, 3.0, 1.0],
+            [0.0, 0.0, 1.0, 3.0, 2.0, 0.0],
+            [1.0, 1.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]
 
         cls.matrix_bootstrap9Reps_mean = [ # rarefying with seed 7, subsample 5
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], 
-            [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0], 
-            [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0], 
-            [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0], 
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+            [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0],
+            [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0],
+            [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
         ]
 
@@ -287,7 +293,7 @@ class MatrixUtilTest(unittest.TestCase):
     ##########
     @skip_cond(select_run=select_run, regex=regex)
     def test_transform_pipeline(self):
-        
+
         with self.subTest(): # TODO subTest not catching?
             '''
             '''
@@ -320,7 +326,7 @@ class MatrixUtilTest(unittest.TestCase):
             ]
 
             _, out2 = self.get_out_data(ret)
-            
+
             self.assert_matrices_equal(out1, out2)
 
         with self.subTest():
@@ -447,7 +453,7 @@ class MatrixUtilTest(unittest.TestCase):
                     },
                     "log_params": {
                         "base": 2,
-                        "offset": 3 
+                        "offset": 3
                     },
                     "standardization_params": {
                         "standardization_with_mean": 1,
@@ -467,7 +473,7 @@ class MatrixUtilTest(unittest.TestCase):
                 [-1.20592537, -1.27674801, -1.33302049, -1.65559934, -1.62843694, -1.21711914],
                 [-1.6785465 , -1.27674801, -1.33302049, -1.65559934, -1.62843694, -1.50933445]
             ]
-            
+
             _, out2 = self.get_out_data(ret)
 
             self.assert_matrices_equal(out1, out2)
@@ -526,7 +532,7 @@ class MatrixUtilTest(unittest.TestCase):
                 })
         print(cm.exception)
 
-        with self.assertRaises(AssertionError) as cm:
+        with self.assertRaises(Exception) as cm:
             '''
             Unknown op
             '''
@@ -557,7 +563,7 @@ class MatrixUtilTest(unittest.TestCase):
                     'workspace_id': self.getWsId(),
                     'input_matrix_ref': self.amplicon_matrix_ref,
                     'operations': [
-                        'log' # 
+                        'log' #
                     ],
                     "log_params": {
                         "base": 10,
@@ -606,7 +612,7 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(out1, out2)
 
         ## Log ##
-       
+
         out1 = [
             [0.        , 0.        , 0.30103   , 0.        , 0.        , 0.        ],
             [0.77815125, 0.30103   , 0.        , 0.47712125, 0.60205999, 0.30103   ],
@@ -617,7 +623,7 @@ class MatrixUtilTest(unittest.TestCase):
         out2 = mu._log(df, base=10, a=1)
 
         self.assert_matrices_equal(out1, out2)
- 
+
         out1 = [
             [-2.30258509e+01, -2.30258509e+01,  1.00000008e-10, -2.30258509e+01, -2.30258509e+01, -2.30258509e+01],
             [ 1.60943791e+00,  1.00000008e-10, -2.30258509e+01,  6.93147181e-01,  1.09861229e+00,  1.00000008e-10],
@@ -745,7 +751,7 @@ class MatrixUtilTest(unittest.TestCase):
 
         self.assertTrue(len(warnings) == 0, 'length is %d' % len(warnings))
         self.assert_matrices_equal(matrix_out, self.matrix_subsample2)
-        
+
 
     ##########
     ##########
@@ -890,7 +896,7 @@ class MatrixUtilTest(unittest.TestCase):
         # since seeded same
         # and ran just 1nce
         self.assertTrue(matrix_out_noBootstrap, matrix_out_median)
-        self.assertTrue(matrix_out_median, matrix_out_mean) 
+        self.assertTrue(matrix_out_median, matrix_out_mean)
 
 
 
