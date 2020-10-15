@@ -31,9 +31,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.13"
+    VERSION = "1.0.16"
     GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "b19c325c9bc51f42a5031566560bbe65fb8fe649"
+    GIT_COMMIT_HASH = "32d1d04b237b0a7bab288c6da77526fdb46d1924"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -248,11 +248,10 @@ class GenericsAPI:
         :param params: instance of type "SaveObjectParams" (Input of the
            import_matrix_from_excel function obj_type: saving object data
            type obj_name: saving object name data: data to be saved
-           workspace_name: workspace name matrix object to be saved to) ->
+           workspace_id: workspace id matrix object to be saved to) ->
            structure: parameter "obj_type" of String, parameter "obj_name" of
            String, parameter "data" of mapping from String to String,
-           parameter "workspace_name" of type "workspace_name" (workspace
-           name of the object)
+           parameter "workspace_id" of Long
         :returns: instance of type "SaveObjectOutput" -> structure: parameter
            "obj_ref" of type "obj_ref" (An X/Y/Z style reference)
         """

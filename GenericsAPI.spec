@@ -177,13 +177,13 @@ module GenericsAPI {
     obj_type: saving object data type
     obj_name: saving object name
     data: data to be saved
-    workspace_name: workspace name matrix object to be saved to
+    workspace_id: workspace id matrix object to be saved to
   */
   typedef structure {
       string obj_type;
       string obj_name;
       mapping<string, string> data;
-      workspace_name workspace_name;
+      int workspace_id;
   } SaveObjectParams;
 
   typedef structure {
