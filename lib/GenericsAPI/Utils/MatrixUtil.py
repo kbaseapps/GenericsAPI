@@ -1965,6 +1965,14 @@ class MatrixUtil:
                 input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
                 logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
 
+        for dim in ['row', 'col']:
+            attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
+            attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
+
         if not new_matrix_name:
             current_time = time.localtime()
             new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
@@ -2246,6 +2254,14 @@ class MatrixUtil:
                 subobj_ref = input_matrix_data[key]
                 input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
                 logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
+        for dim in ['row', 'col']:
+            attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
+            attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
 
         if not new_matrix_name:
             current_time = time.localtime()
