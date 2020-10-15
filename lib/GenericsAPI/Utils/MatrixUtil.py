@@ -375,19 +375,19 @@ class MatrixUtil:
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Rarefied Matrix Aggregating Statistic</button>\n'''
+        tab_def_content += '''>Rarefied Matrix Statistics</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
         tab_content += '''\n<h5>Rarefied Matrix Size: {} x {}</h5>'''.format(
                                                                     len(random_rare_df.index),
                                                                     len(random_rare_df.columns))
-        tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
+        tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '''\n<br>'''
         tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
         tab_content += '''\n<br>'''
-        tab_content += '''\n<h5>Column Aggregating Statistic</h5>'''
+        tab_content += '''\n<h5>Column Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '\n</div>\n'
@@ -504,7 +504,6 @@ class MatrixUtil:
         tab_content += html
         tab_content += '\n</div>\n'
 
-
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
@@ -545,19 +544,19 @@ class MatrixUtil:
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Matrix Aggregating Statistic</button>\n'''
+        tab_def_content += '''>Matrix Statistics</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
                                                                                     viewer_name)
         tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(data_df.index),
                                                                     len(data_df.columns))
-        tab_content += '''\n<h5>Row Aggregating Statistic</h5>'''
+        tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '''\n<br>'''
         tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
         tab_content += '''\n<br>'''
-        tab_content += '''\n<h5>Column Aggregating Statistic</h5>'''
+        tab_content += '''\n<h5>Column Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
         tab_content += '\n</div>\n'
