@@ -1079,7 +1079,7 @@ class BiomUtil:
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
                                                 'data': amplicon_data,
-                                                'workspace_name': workspace_id})['obj_ref']
+                                                'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 

@@ -2069,7 +2069,7 @@ class MatrixUtil:
                                                 'obj_type': input_matrix_info[2],
                                                 'obj_name': new_matrix_name,
                                                 'data': input_matrix_data,
-                                                'workspace_name': workspace_id})['obj_ref']
+                                                'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
@@ -2347,7 +2347,7 @@ class MatrixUtil:
                                                 'obj_type': input_matrix_info[2],
                                                 'obj_name': new_matrix_name,
                                                 'data': input_matrix_data,
-                                                'workspace_name': workspace_id})['obj_ref']
+                                                'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
@@ -2357,9 +2357,6 @@ class MatrixUtil:
         returnVal.update(report_output)
 
         return returnVal
-
-
-
 
     def filter_matrix(self, params):
         """
@@ -2413,7 +2410,7 @@ class MatrixUtil:
                                                 'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
                                                 'obj_name': filtered_matrix_name,
                                                 'data': matrix_data,
-                                                'workspace_name': workspace_id})['obj_ref']
+                                                'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_refs': [filtered_matrix_obj_ref]}
 
@@ -2508,7 +2505,7 @@ class MatrixUtil:
                                                 'obj_type': 'KBaseMatrices.{}'.format(obj_type),
                                                 'obj_name': matrix_name,
                                                 'data': data,
-                                                'workspace_name': workspace_id})['obj_ref']
+                                                'workspace_id': workspace_id})['obj_ref']
 
         try:
             logging.info('Start trying to look up ModelSeed ID')

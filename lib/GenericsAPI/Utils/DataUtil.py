@@ -291,11 +291,13 @@ class DataUtil:
         if not validate.get('validated'):
             self._raise_validation_error(params, validate)
 
+        ws_name_id = params.get('workspace_id')
         workspace_name = params.get('workspace_name')
-        if not isinstance(workspace_name, int):
-            ws_name_id = self.dfu.ws_name_to_id(workspace_name)
-        else:
-            ws_name_id = workspace_name
+        if not ws_name_id:
+            if not isinstance(workspace_name, int):
+                ws_name_id = self.dfu.ws_name_to_id(workspace_name)
+            else:
+                ws_name_id = workspace_name
 
         try:
             info = self.dfu.save_objects({
