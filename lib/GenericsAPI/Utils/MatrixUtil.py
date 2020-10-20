@@ -1896,6 +1896,7 @@ class MatrixUtil:
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
 
+        am_ref = '{};{}'.format(input_matrix_ref, am_ref)
         am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
         attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
 
@@ -1968,6 +1969,7 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
+                attributemapping_ref = '{};{}'.format(input_matrix_ref, attributemapping_ref)
                 am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
@@ -2167,6 +2169,7 @@ class MatrixUtil:
         df = pd.read_json(data_matrix)
         dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
 
+        am_ref = '{};{}'.format(input_matrix_ref, am_ref)
         am_data = self.dfu.get_objects({'object_refs': [am_ref]})['data'][0]['data']
         attribute_names = [am.get('attribute') for am in am_data.get('attributes')]
 
@@ -2258,6 +2261,7 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
+                attributemapping_ref = '{};{}'.format(input_matrix_ref, attributemapping_ref)
                 am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
