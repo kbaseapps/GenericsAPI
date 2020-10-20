@@ -1969,7 +1969,6 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
-                attributemapping_ref = '{};{}'.format(input_matrix_ref, attributemapping_ref)
                 am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
@@ -2261,7 +2260,6 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
-                attributemapping_ref = '{};{}'.format(input_matrix_ref, attributemapping_ref)
                 am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
