@@ -2209,6 +2209,124 @@ class MatrixUtil:
 
         return report_output
 
+    def transform_matrix_variable_specific(self, params):
+        """
+        Transform a list of variable from a matrix
+        """
+
+        OPS = [
+            'log',
+            'sqrt',
+            'logit',
+        ]
+
+        logging.info('Start performing transformation with {}'.format(params))
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        new_matrix_name = params.get('new_matrix_name')
+
+        operations = params.get('operations')
+        log_params = params.get('log_params', {})
+
+        dimension = params.get('dimension', 'row')
+        variables = params.get('variables', list())
+
+        # validate operations
+        MAX_OPS = 15
+        if len(operations) > MAX_OPS:
+            raise Exception('Maximum allowed number of operations is %d' % MAX_OPS)
+        for op in operations:
+            if op not in OPS:
+                raise Exception('Operation %s not in allowed %s' % (str(op), OPS))
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        unmatched_var = set(variables) - set(input_matrix_data['data']['{}_ids'.format(dimension)])
+        if unmatched_var:
+            raise ValueError('variable [{}] is not contained in {} ids from matrix'.format(
+                                                                                    unmatched_var,
+                                                                                    dimension))
+
+        for key, obj_data in input_matrix_data.items():
+            if key.endswith('_ref'):
+                subobj_ref = input_matrix_data[key]
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
+        for dim in ['row', 'col']:
+            attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
+            attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        original_row_ids = df.index
+        original_col_ids = df.columns
+
+        # iterate over operations
+        df_results = []
+        for op in operations:
+
+            if op == 'logit':
+                df = self._logit(df)
+
+            elif op == 'sqrt':
+                df = self._sqrt(df)
+
+            elif op == 'log':
+                df = self._log(df, base=log_params.get('base', 10), a=log_params.get('offset', 1))
+
+            else:
+                raise NotImplementedError('Unknown op `%s`' % op)
+
+            df_results.append(df.copy(deep=True))
+
+        new_matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        removed_row_ids = set(original_row_ids) - set(df.index)
+        removed_col_ids = set(original_col_ids) - set(df.columns)
+
+        if removed_row_ids and input_matrix_data.get('row_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_row_ids,
+                                                             new_matrix_name + '_row_attribute_mapping',
+                                                             'row', workspace_id)
+
+        if removed_col_ids and input_matrix_data.get('col_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_col_ids,
+                                                             new_matrix_name + '_col_attribute_mapping',
+                                                             'col', workspace_id)
+
+        logging.info("Saving new transformed matrix object")
+        new_matrix_obj_ref = self.data_util.save_object({
+                                                'obj_type': input_matrix_info[2],
+                                                'obj_name': new_matrix_name,
+                                                'data': input_matrix_data,
+                                                'workspace_id': workspace_id})['obj_ref']
+
+        returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
+
+        report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_id,
+                                                        operations, df_results)
+
+        returnVal.update(report_output)
+
+        return returnVal
+
     def transform_matrix(self, params):
         """
         Transform a matrix

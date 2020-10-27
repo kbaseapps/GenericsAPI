@@ -22,7 +22,7 @@ class GenericsAPI:
     GenericsAPI
 
     Module Description:
-    
+
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -408,6 +408,7 @@ class GenericsAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN transform_matrix_variable_specific
+        returnVal = self.matrix_util.transform_matrix_variable_specific(params)
         #END transform_matrix_variable_specific
 
         # At some point might do deeper type checking...
