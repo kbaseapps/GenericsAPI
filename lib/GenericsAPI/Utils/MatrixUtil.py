@@ -2215,6 +2215,9 @@ class MatrixUtil:
         """
 
         OPS = [
+            'relative_abundance',
+            'standardization',
+            'ratio_transformation',
             'log',
             'sqrt',
             'logit',
@@ -2227,6 +2230,9 @@ class MatrixUtil:
         new_matrix_name = params.get('new_matrix_name')
 
         operations = params.get('operations')
+        relative_abundance_params = params.get('perform_relative_abundance', {})
+        standardization_params = params.get('standardization_params', {})
+        ratio_transformation_params = params.get('ratio_transformation_params', {})
         log_params = params.get('log_params', {})
 
         dimension = params.get('dimension', 'row')
@@ -2287,7 +2293,31 @@ class MatrixUtil:
         df_results = []
         for op in operations:
 
-            if op == 'logit':
+            if op == 'relative_abundance':
+                selected_df = self._relative_abundance(
+                                    selected_df,
+                                    dimension=relative_abundance_params.get(
+                                                'relative_abundance_dimension', 'col'))
+
+            elif op == 'standardization':
+                selected_df = self._standardize_df(
+                                    selected_df,
+                                    dimension=standardization_params.get(
+                                                            'standardization_dimension', 'col'),
+                                    with_mean=standardization_params.get(
+                                                            'standardization_with_mean', True),
+                                    with_std=standardization_params.get(
+                                                            'standardization_with_std', True))
+
+            elif op == 'ratio_transformation':
+                selected_df = self._ratio_trans_df(
+                                    selected_df,
+                                    method=ratio_transformation_params.get(
+                                                            'ratio_transformation_method', 'clr'),
+                                    dimension=ratio_transformation_params.get(
+                                                            'ratio_transformation_dimension', 'col'))
+
+            elif op == 'logit':
                 selected_df = self._logit(selected_df)
 
             elif op == 'sqrt':
