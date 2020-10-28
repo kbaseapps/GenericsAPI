@@ -270,7 +270,7 @@ class DataUtil:
         return:
         obj_ref: object reference
         """
-        logging.info('Starting saving object')
+        logging.info('Starting validating and saving object data')
 
         obj_type = params.get('obj_type')
 
@@ -300,6 +300,7 @@ class DataUtil:
                 ws_name_id = workspace_name
 
         try:
+            logging.info('Starting saving object via DataFileUtil')
             info = self.dfu.save_objects({
                 "id": ws_name_id,
                 "objects": [{
@@ -309,6 +310,8 @@ class DataUtil:
                 }]
             })[0]
         except Exception:
+            logging.info('Saving object via DataFileUtil failed')
+            logging.info('Starting saving object via WsLargeDataIO')
             data_path = os.path.join(self.scratch,
                                      params.get('obj_name') + "_" + str(uuid.uuid4()) + ".json")
             json.dump(data, open(data_path, 'w'))
