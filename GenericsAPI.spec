@@ -284,7 +284,7 @@ module GenericsAPI {
       int workspace_id;
       string new_matrix_name;
       list<string> operations;
-      mapping<string, string> abundance_filtering_params;
+
       mapping<string, string> relative_abundance_params;
       mapping<string, string> standardization_params;
       mapping<string, string> ratio_transformation_params;
