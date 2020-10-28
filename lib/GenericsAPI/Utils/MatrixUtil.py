@@ -445,7 +445,8 @@ class MatrixUtil:
         return tab_def_content + tab_content
 
     def _generate_trans_visualization_content(self, output_directory,
-                                              operations, heatmap_html_dir_l, transformed_matrix_df):
+                                              operations, heatmap_html_dir_l,
+                                              transformed_matrix_df, variable_specific):
         row_data_summary = transformed_matrix_df.T.describe().to_string()
         col_data_summary = transformed_matrix_df.describe().to_string()
 
@@ -486,11 +487,18 @@ class MatrixUtil:
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Transformed Matrix Statistics</button>\n'''
-
+        if variable_specific:
+            tab_def_content += '''>Transformed Selected Variables Statistics</button>\n'''
+        else:
+            tab_def_content += '''>Transformed Matrix Statistics</button>\n'''
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
                                                                                     viewer_name)
-        tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
+        if variable_specific:
+            tab_content += '''\n<h5>Transformed Selected Variables Size: {} x {}</h5>'''.format(
+                                                                len(transformed_matrix_df.index),
+                                                                len(transformed_matrix_df.columns))
+        else:
+            tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
                                                                 len(transformed_matrix_df.index),
                                                                 len(transformed_matrix_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
@@ -844,7 +852,8 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_transform_html_report(self, operations, heatmap_html_dir_l, transformed_matrix_df):
+    def _generate_transform_html_report(self, operations, heatmap_html_dir_l,
+                                        transformed_matrix_df, variable_specific):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -857,7 +866,8 @@ class MatrixUtil:
                                                                     output_directory,
                                                                     operations,
                                                                     heatmap_html_dir_l,
-                                                                    transformed_matrix_df)
+                                                                    transformed_matrix_df,
+                                                                    variable_specific)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -973,7 +983,7 @@ class MatrixUtil:
         return report_output
 
     def _generate_transform_report(self, new_matrix_obj_ref, workspace_id,
-                                   operations, df_results):
+                                   operations, df_results, variable_specific=False):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -990,7 +1000,8 @@ class MatrixUtil:
             heatmap_html_dir_l.append(heatmap_html_dir)
 
         output_html_files = self._generate_transform_html_report(operations, heatmap_html_dir_l,
-                                                                 df_results[-1])
+                                                                 df_results[-1],
+                                                                 variable_specific)
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -2367,7 +2378,8 @@ class MatrixUtil:
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
         report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_id,
-                                                        operations, df_results)
+                                                        operations, df_results,
+                                                        variable_specific=True)
 
         returnVal.update(report_output)
 
