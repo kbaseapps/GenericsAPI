@@ -2232,6 +2232,9 @@ class MatrixUtil:
         dimension = params.get('dimension', 'row')
         variables = params.get('variables', list())
 
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
         # validate operations
         MAX_OPS = 15
         if len(operations) > MAX_OPS:
@@ -2271,26 +2274,39 @@ class MatrixUtil:
 
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_row_ids = df.index
-        original_col_ids = df.columns
+        original_df = df.copy(deep=True)
+        original_row_ids = original_df.index
+        original_col_ids = original_df.columns
+
+        if dimension == 'row':
+            selected_df = original_df.loc[list(set(variables))]
+        else:
+            selected_df = original_df.loc[:, list(set(variables))]
 
         # iterate over operations
         df_results = []
         for op in operations:
 
             if op == 'logit':
-                df = self._logit(df)
+                selected_df = self._logit(selected_df)
 
             elif op == 'sqrt':
-                df = self._sqrt(df)
+                selected_df = self._sqrt(selected_df)
 
             elif op == 'log':
-                df = self._log(df, base=log_params.get('base', 10), a=log_params.get('offset', 1))
+                selected_df = self._log(selected_df,
+                                        base=log_params.get('base', 10),
+                                        a=log_params.get('offset', 1))
 
             else:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
-            df_results.append(df.copy(deep=True))
+            df_results.append(selected_df.copy(deep=True))
+
+        if dimension == 'row':
+            df = selected_df.combine_first(original_df)
+        else:
+            df = selected_df.T.combine_first(original_df.T).T
 
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
