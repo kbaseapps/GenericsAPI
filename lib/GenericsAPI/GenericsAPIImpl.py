@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.16"
     GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "32d1d04b237b0a7bab288c6da77526fdb46d1924"
+    GIT_COMMIT_HASH = "925735c6e4be0554b2e7ea75533d875b2af6a410"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -383,6 +383,36 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method transform_matrix return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def transform_matrix_variable_specific(self, ctx, params):
+        """
+        :param params: instance of type "TransformMatrixVariableParams" ->
+           structure: parameter "input_matrix_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "workspace_id" of Long,
+           parameter "new_matrix_name" of String, parameter "operations" of
+           list of String, parameter "relative_abundance_params" of mapping
+           from String to String, parameter "standardization_params" of
+           mapping from String to String, parameter
+           "ratio_transformation_params" of mapping from String to String,
+           parameter "log_params" of mapping from String to Double, parameter
+           "dimension" of String, parameter "variables" of list of String
+        :returns: instance of type "TransformMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN transform_matrix_variable_specific
+        returnVal = self.matrix_util.transform_matrix_variable_specific(params)
+        #END transform_matrix_variable_specific
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method transform_matrix_variable_specific return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

@@ -445,7 +445,8 @@ class MatrixUtil:
         return tab_def_content + tab_content
 
     def _generate_trans_visualization_content(self, output_directory,
-                                              operations, heatmap_html_dir_l, transformed_matrix_df):
+                                              operations, heatmap_html_dir_l,
+                                              transformed_matrix_df, variable_specific):
         row_data_summary = transformed_matrix_df.T.describe().to_string()
         col_data_summary = transformed_matrix_df.describe().to_string()
 
@@ -486,11 +487,18 @@ class MatrixUtil:
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
         tab_def_content += ''' id="defaultOpen"'''
-        tab_def_content += '''>Transformed Matrix Statistics</button>\n'''
-
+        if variable_specific:
+            tab_def_content += '''>Transformed Selected Variables Statistics</button>\n'''
+        else:
+            tab_def_content += '''>Transformed Matrix Statistics</button>\n'''
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
                                                                                     viewer_name)
-        tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
+        if variable_specific:
+            tab_content += '''\n<h5>Transformed Selected Variables Size: {} x {}</h5>'''.format(
+                                                                len(transformed_matrix_df.index),
+                                                                len(transformed_matrix_df.columns))
+        else:
+            tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
                                                                 len(transformed_matrix_df.index),
                                                                 len(transformed_matrix_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
@@ -844,7 +852,8 @@ class MatrixUtil:
                             })
         return html_report
 
-    def _generate_transform_html_report(self, operations, heatmap_html_dir_l, transformed_matrix_df):
+    def _generate_transform_html_report(self, operations, heatmap_html_dir_l,
+                                        transformed_matrix_df, variable_specific):
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
 
@@ -857,7 +866,8 @@ class MatrixUtil:
                                                                     output_directory,
                                                                     operations,
                                                                     heatmap_html_dir_l,
-                                                                    transformed_matrix_df)
+                                                                    transformed_matrix_df,
+                                                                    variable_specific)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -973,7 +983,7 @@ class MatrixUtil:
         return report_output
 
     def _generate_transform_report(self, new_matrix_obj_ref, workspace_id,
-                                   operations, df_results):
+                                   operations, df_results, variable_specific=False):
         objects_created = [{'ref': new_matrix_obj_ref, 'description': 'Transformed Matrix'}]
 
         data_tsv_directory = os.path.join(self.scratch, str(uuid.uuid4()))
@@ -990,7 +1000,8 @@ class MatrixUtil:
             heatmap_html_dir_l.append(heatmap_html_dir)
 
         output_html_files = self._generate_transform_html_report(operations, heatmap_html_dir_l,
-                                                                 df_results[-1])
+                                                                 df_results[-1],
+                                                                 variable_specific)
 
         report_params = {'message': '',
                          'objects_created': objects_created,
@@ -2208,6 +2219,171 @@ class MatrixUtil:
                                                              permdisp_res)
 
         return report_output
+
+    def transform_matrix_variable_specific(self, params):
+        """
+        Transform a list of variable from a matrix
+        """
+
+        OPS = [
+            'relative_abundance',
+            'standardization',
+            'ratio_transformation',
+            'log',
+            'sqrt',
+            'logit',
+        ]
+
+        logging.info('Start performing transformation with {}'.format(params))
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        new_matrix_name = params.get('new_matrix_name')
+
+        operations = params.get('operations')
+        relative_abundance_params = params.get('perform_relative_abundance', {})
+        standardization_params = params.get('standardization_params', {})
+        ratio_transformation_params = params.get('ratio_transformation_params', {})
+        log_params = params.get('log_params', {})
+
+        dimension = params.get('dimension', 'row')
+        variables = params.get('variables', list())
+
+        if dimension not in ['col', 'row']:
+            raise ValueError('Please use "col" or "row" for input dimension')
+
+        # validate operations
+        MAX_OPS = 15
+        if len(operations) > MAX_OPS:
+            raise Exception('Maximum allowed number of operations is %d' % MAX_OPS)
+        for op in operations:
+            if op not in OPS:
+                raise Exception('Operation %s not in allowed %s' % (str(op), OPS))
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        unmatched_var = set(variables) - set(input_matrix_data['data']['{}_ids'.format(dimension)])
+        if unmatched_var:
+            raise ValueError('variable [{}] is not contained in {} ids from matrix'.format(
+                                                                                    unmatched_var,
+                                                                                    dimension))
+
+        for key, obj_data in input_matrix_data.items():
+            if key.endswith('_ref'):
+                subobj_ref = input_matrix_data[key]
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
+        for dim in ['row', 'col']:
+            attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
+            attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        original_df = df.copy(deep=True)
+        original_row_ids = original_df.index
+        original_col_ids = original_df.columns
+
+        if dimension == 'row':
+            selected_df = original_df.loc[list(set(variables))]
+        else:
+            selected_df = original_df.loc[:, list(set(variables))]
+
+        # iterate over operations
+        df_results = []
+        for op in operations:
+
+            if op == 'relative_abundance':
+                selected_df = self._relative_abundance(
+                                    selected_df,
+                                    dimension=relative_abundance_params.get(
+                                                'relative_abundance_dimension', 'col'))
+
+            elif op == 'standardization':
+                selected_df = self._standardize_df(
+                                    selected_df,
+                                    dimension=standardization_params.get(
+                                                            'standardization_dimension', 'col'),
+                                    with_mean=standardization_params.get(
+                                                            'standardization_with_mean', True),
+                                    with_std=standardization_params.get(
+                                                            'standardization_with_std', True))
+
+            elif op == 'ratio_transformation':
+                selected_df = self._ratio_trans_df(
+                                    selected_df,
+                                    method=ratio_transformation_params.get(
+                                                            'ratio_transformation_method', 'clr'),
+                                    dimension=ratio_transformation_params.get(
+                                                            'ratio_transformation_dimension', 'col'))
+
+            elif op == 'logit':
+                selected_df = self._logit(selected_df)
+
+            elif op == 'sqrt':
+                selected_df = self._sqrt(selected_df)
+
+            elif op == 'log':
+                selected_df = self._log(selected_df,
+                                        base=log_params.get('base', 10),
+                                        a=log_params.get('offset', 1))
+
+            else:
+                raise NotImplementedError('Unknown op `%s`' % op)
+
+            df_results.append(selected_df.copy(deep=True))
+
+        if dimension == 'row':
+            df = selected_df.combine_first(original_df)
+        else:
+            df = selected_df.T.combine_first(original_df.T).T
+
+        new_matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        removed_row_ids = set(original_row_ids) - set(df.index)
+        removed_col_ids = set(original_col_ids) - set(df.columns)
+
+        if removed_row_ids and input_matrix_data.get('row_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_row_ids,
+                                                             new_matrix_name + '_row_attribute_mapping',
+                                                             'row', workspace_id)
+
+        if removed_col_ids and input_matrix_data.get('col_attributemapping_ref'):
+            input_matrix_data = self._sync_attribute_mapping(input_matrix_data, removed_col_ids,
+                                                             new_matrix_name + '_col_attribute_mapping',
+                                                             'col', workspace_id)
+
+        logging.info("Saving new transformed matrix object")
+        new_matrix_obj_ref = self.data_util.save_object({
+                                                'obj_type': input_matrix_info[2],
+                                                'obj_name': new_matrix_name,
+                                                'data': input_matrix_data,
+                                                'workspace_id': workspace_id})['obj_ref']
+
+        returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
+
+        report_output = self._generate_transform_report(new_matrix_obj_ref, workspace_id,
+                                                        operations, df_results,
+                                                        variable_specific=True)
+
+        returnVal.update(report_output)
+
+        return returnVal
 
     def transform_matrix(self, params):
         """
