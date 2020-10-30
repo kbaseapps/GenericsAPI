@@ -3,7 +3,7 @@
   "authors" : ["tgu2", "swwang"],
   "contact" : "http://kbase.us/contact-us/",
   "visible" : true,
-  "categories" : ["inactive","util"],
+  "categories" : ["active","util"],
   "widgets": {
     "input": "kbaseNarrativeMethodInput",
     "output" : "no-display"
