@@ -1,0 +1,174 @@
+{
+  "ver" : "",
+  "authors" : ["tgu2", "swwang"],
+  "contact" : "http://kbase.us/contact-us/",
+  "visible" : true,
+  "categories" : ["inactive","util"],
+  "widgets": {
+    "input": "kbaseNarrativeMethodInput",
+    "output" : "no-display"
+  },
+  "parameters" : [
+    {
+      "id" : "input_matrix_ref",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+        "valid_ws_types" : ["KBaseMatrices"]
+      }
+    },
+    {
+        "id": "operations",
+        "optional": false,
+        "advanced": false,
+        "allow_multiple": true,
+        "default_values": [""],
+        "field_type": "dropdown",
+        "dropdown_options": {
+            "options": [
+                {
+                    "display": "Take Log",
+                    "value": "log"
+                },
+                {
+                    "display": "Take Square Root",
+                    "value": "sqrt"
+                },
+                {
+                    "display": "Take Logit",
+                    "value": "logit"
+                }
+            ]
+        }
+    },
+    {
+      "id" : "variables",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "textsubdata",
+      "textsubdata_options" : {
+        "subdata_selection": {
+          "parameter_id" : "input_matrix_ref",
+          "path_to_subdata": ["row_mapping"]
+          },
+        "multiselection":true,
+        "show_src_obj":false,
+        "allow_custom":false
+      }
+    },
+    {
+      "id": "log_base",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["10"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float",
+          "min_float": 0
+      }
+    },
+    {
+      "id": "log_offset",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["1"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id" : "new_matrix_name",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options" : {
+          "valid_ws_types" : ["KBaseMatrices"],
+          "is_output_name" : true
+        }
+    }
+  ],
+  "parameter-groups": [
+    {
+      "id": "log_params",
+      "parameters": [
+        "log_base",
+        "log_offset"
+      ],
+      "optional": false,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : true
+    }
+  ],
+  "behavior" : {
+    "service-mapping" : {
+      "url" : "",
+      "name" : "GenericsAPI",
+      "method" : "transform_matrix_variable_specific",
+      "input_mapping" : [
+        {
+          "narrative_system_variable": "workspace_id",
+          "target_property": "workspace_id"
+        },
+        {
+          "input_parameter" : "input_matrix_ref",
+          "target_property" : "input_matrix_ref",
+          "target_type_transform": "resolved-ref"
+        },
+        {
+          "input_parameter" : "operations",
+          "target_property" : "operations"
+        },
+        {
+          "input_parameter" : "variables",
+          "target_property" : "variables"
+        },
+        {
+          "constant_value": "row",
+          "target_property": "dimension"
+        },
+        {
+          "input_parameter" : "log_params",
+          "target_property" : "log_params"
+        },
+        {
+          "input_parameter" : "new_matrix_name",
+          "target_property" : "new_matrix_name"
+        }
+      ],
+      "output_mapping" : [
+        {
+          "narrative_system_variable": "workspace",
+          "target_property": "wsName"
+        },
+        {
+            "service_method_output_path": [0, "new_matrix_obj_ref"],
+            "target_property": "new_matrix_obj_ref"
+        },
+        {
+            "service_method_output_path": [0, "report_name"],
+            "target_property": "report_name"
+        },
+        {
+            "service_method_output_path": [0, "report_ref"],
+            "target_property": "report_ref"
+        },
+        {
+            "constant_value": "16",
+            "target_property": "report_window_line_height"
+        }
+      ]
+    }
+  },
+  "job_id_output_field": "docker"
+}

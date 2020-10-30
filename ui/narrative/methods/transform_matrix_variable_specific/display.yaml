@@ -1,0 +1,85 @@
+name     : Transform Selected Variables From Matrix
+subtitle : Performaing Standardization/Ratio Transformation Algorithm from input matrix on selected Variables
+tooltip  : Performaing Standardization/Ratio Transformation Algorithm from input matrix on selected Variables
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Input Matrix
+        short-hint : |
+            Input matrix whose data needs to be transformed
+        long-hint  : |
+            Input matrix whose data needs to be transformed
+
+    new_matrix_name:
+        ui-name: |
+            Transformed Matrix Name
+        short-hint : |
+            Output transformed matrix name
+        long-hint  : |
+            Output transformed matrix name
+
+    log_base:
+        ui-name: |
+            Base
+        short-hint: |
+            Logarithmic base in <code>log(a+x)</code>
+        long-hint: |
+            Logarithmic base in <code>log(a+x)</code>
+
+    log_offset:
+        ui-name: |
+            Offset
+        short-hint: |
+            Offset <code>a</code> in <code>log(a+x)</code>
+        long-hint: |
+            Offset <code>a</code> in <code>log(a+x)</code>
+
+    operations:
+        ui-name:
+            Operations
+        short-hint: |
+            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
+        long-hint: |
+            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
+
+    variables:
+        ui-name:
+            Variables
+        short-hint: |
+            Select variables from input matrix
+        long-hint: |
+            Select variables from input matrix
+
+parameter-groups :
+    log_params:
+        ui-name: Take Log
+        short-hint: Apply <code>log(a+x)</code> to entries
+
+description : |
+    <p> Apply a series of operations to input matrix. </p>
+
+    <p> Currently only supports one specification of parameters per operation. </p>
+
+    <p>
+    Currently, if any of the input, output, or intermediate matrices contains NaN, infinity,
+    complex numbers, etc., or are empty, the behavior of this app will be unspecified.
+    Also, saved KBase objects at the moment can capture only integers, floats, and null numbers.
+    </p>
