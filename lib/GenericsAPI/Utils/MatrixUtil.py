@@ -1184,9 +1184,39 @@ class MatrixUtil:
 
         return df
 
+    @staticmethod
+    def _check_df_col_inclusive(df, col_name, valid_values):
+        unmatched_type = set(df[col_name]) - valid_values
+        if unmatched_type:
+            err_msg = 'Found unsupported {}: {}\n'.format(' '.join(col_name.split('_')),
+                                                          unmatched_type)
+            err_msg += 'Please use one of {} as {}'.format(valid_values,
+                                                           ' '.join(col_name.split('_')))
+            raise ValueError(err_msg)
+
     def _check_chem_abun_metadata(self, metadata_df):
         logging.info('Start checking metadata fields for Chemical Abundance Matrix')
-        pass
+
+        str_cols = ['chemical_type', 'measurement_type', 'units']
+        for str_col in str_cols:
+            metadata_df[str_cols] = metadata_df[str_cols].apply(lambda s: s.lower()
+                                                                if type(s) == str else s)
+
+        valid_chem_types = {'specific', 'aggregate'}
+        self._check_df_col_inclusive(metadata_df, 'chemical_type', valid_chem_types)
+
+        specific_abun = metadata_df.loc[metadata_df['chemical_type'] == 'specific']
+        aggregate_abun = metadata_df.loc[metadata_df['chemical_type'] == 'aggregate']
+
+        if not specific_abun.index.empty:
+            logging.info('Start examing specific chemical abundances')
+
+            valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
+            self._check_df_col_inclusive(specific_abun, 'measurement_type', valid_measurement_types)
+
+        if not aggregate_abun.index.empty:
+            logging.info('Start examing aggregate chemical abundances')
+            pass
 
     def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
