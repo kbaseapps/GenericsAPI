@@ -101,7 +101,7 @@ class TemplateUtil:
         chemical_datas = chemical_type_data + specific_type_data + aggregate_type_data + chemical_datas
         chemical_datas = list(dict.fromkeys(chemical_datas))
 
-        return chemical_type_data
+        return chemical_datas
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
