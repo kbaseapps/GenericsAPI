@@ -1184,6 +1184,9 @@ class MatrixUtil:
 
         return df
 
+    def _check_chem_abun_metadata(self, metadata_df):
+        pass
+
     def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
         data = refs
@@ -1206,6 +1209,16 @@ class MatrixUtil:
                       'ModelSEED': 'modelseed',
                       # 'Theoretical M/Z': 'theoretical_mz',
                       # 'Reference Standard RT (seconds)': 'reference_rt',
+                      'Chemical Type': 'chemical_type',
+                      'Measurement Type': 'measurement_type',
+                      'Units': 'units',
+                      'Unit Medium': 'unit_medium',
+                      'Chemical Ontology Class': 'chemical_ontology_class',
+                      'Measured Identification Level': 'measured_identification_level',
+                      'Chomotagraphy Type': 'chomotagraphy_type',
+                      'Chemical Class': 'chemical_class',
+                      'Protocol': 'protocol',
+                      'Identifier': 'identifier'
                       }
         df.rename(columns=rename_map, inplace=True)
 
@@ -1214,9 +1227,10 @@ class MatrixUtil:
         shared_metadata_keys = list(set(metadata_keys) & set(df.columns))
         if shared_metadata_keys:
             metadata_df = df[shared_metadata_keys]
-            if set(metadata_df.all(skipna=False).tolist()) == {None}:
-                raise ValueError('All of metadata fields are None')
+            # if set(metadata_df.all(skipna=False).tolist()) == {None}:
+            #     raise ValueError('All of metadata fields are None')
             df.drop(columns=shared_metadata_keys, inplace=True)
+            self._check_chem_abun_metadata(metadata_df)
         else:
             err_msg = 'Please provide at least one of below metadata fields:\n{}'.format(
                                                                         list(rename_map.keys()))

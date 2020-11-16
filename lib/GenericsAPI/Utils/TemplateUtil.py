@@ -59,7 +59,7 @@ class TemplateUtil:
                       'polarity': 'Polarity',
                       'kegg': 'KEGG',
                       'chembi': 'ChemBi',
-                      'modelseed': 'ModelSEED',
+                      'modelseed': 'ModelSEED'
                       }
 
         if chemical_data_included:
@@ -89,6 +89,18 @@ class TemplateUtil:
         file_df.to_excel(template_file)
 
         return template_file
+
+    def _append_type(self, chemical_datas):
+        chemical_type_data = ['Chemical Type']
+        specific_type_data = ['Measurement Type', 'Units', 'Unit Medium',
+                              'Chemical Ontology Class', 'Measured Identification Level',
+                              'Chomotagraphy Type']
+        aggregate_type_data = ['Chemical Class', 'Chemical Ontology Class', 'Protocol',
+                               'Identifier']
+        chemical_datas = chemical_type_data + specific_type_data + aggregate_type_data + chemical_datas
+        chemical_datas = list(dict.fromkeys(chemical_datas))
+
+        return chemical_type_data
 
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
@@ -124,6 +136,8 @@ class TemplateUtil:
                 sample_data = self.sampleservice_util.get_sample(sample_id)
 
                 sample_names.append(sample_data['name'])
+
+        chemical_datas = self._append_type(chemical_datas)
 
         template_file = self._create_template_file(chemical_datas, sample_names)
 
