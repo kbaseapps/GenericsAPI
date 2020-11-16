@@ -91,6 +91,7 @@ class TemplateUtil:
         return template_file
 
     def _append_type(self, chemical_datas):
+        logging.info('Start appending chemical type fields to file')
         chemical_type_data = ['Chemical Type']
         specific_type_data = ['Measurement Type', 'Units', 'Unit Medium',
                               'Chemical Ontology Class', 'Measured Identification Level',

@@ -1185,6 +1185,7 @@ class MatrixUtil:
         return df
 
     def _check_chem_abun_metadata(self, metadata_df):
+        logging.info('Start checking metadata fields for Chemical Abundance Matrix')
         pass
 
     def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
