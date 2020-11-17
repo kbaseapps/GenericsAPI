@@ -1184,9 +1184,74 @@ class MatrixUtil:
 
         return df
 
+    @staticmethod
+    def _check_df_col_inclusive(df, col_name, valid_values):
+        # check if given column contains all values in valid_values
+        unmatched_type = set(df[col_name]) - valid_values
+        if unmatched_type:
+            err_msg = 'Found unsupported {}: {}\n'.format(' '.join(col_name.split('_')),
+                                                          unmatched_type)
+            err_msg += 'Please use one of {} as {}'.format(valid_values,
+                                                           ' '.join(col_name.split('_')))
+            raise ValueError(err_msg)
+
+    @staticmethod
+    def _check_df_col_non_empty(df, col_name):
+        # check if any column cell is empty(nan)
+        if df[col_name].isna().any():
+            empty_idx = list(df.loc[df[col_name].isna()].index)
+            raise ValueError('Missing [{}] value for index: {}'.format(col_name, empty_idx))
+
+    @staticmethod
+    def _check_chem_ids(df):
+        # check chemical abundance has at least one of database id
+        id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
+                     'kegg', 'chembi', 'modelseed'}
+
+        common_ids = list(df.columns & id_fields)
+        if not common_ids:
+            raise ValueError('Missing compund identification columns')
+
+        ids_df = df.loc[:, common_ids]
+        missing_ids_idx = list(ids_df.loc[ids_df.isnull().all(axis=1)].index)
+
+        if missing_ids_idx:
+            err_msg = 'Missing compound identification for {}\n'.format(missing_ids_idx)
+            err_msg += 'Please provide at least one of {}'.format(id_fields)
+            raise ValueError(err_msg)
+
     def _check_chem_abun_metadata(self, metadata_df):
         logging.info('Start checking metadata fields for Chemical Abundance Matrix')
-        pass
+
+        metadata_df.replace(r'^\s+$', np.nan, regex=True, inplace=True)
+
+        self._check_chem_ids(metadata_df)
+
+        str_cols = ['chemical_type', 'measurement_type', 'units', 'unit_medium']
+        for str_col in str_cols:
+            metadata_df[str_col] = metadata_df[str_col].apply(lambda s: s.lower()
+                                                              if type(s) == str else s)
+
+        valid_chem_types = {'specific', 'aggregate'}
+        self._check_df_col_inclusive(metadata_df, 'chemical_type', valid_chem_types)
+
+        specific_abun = metadata_df.loc[metadata_df['chemical_type'] == 'specific']
+        aggregate_abun = metadata_df.loc[metadata_df['chemical_type'] == 'aggregate']
+
+        if not specific_abun.index.empty:
+            logging.info('Start examing specific chemical abundances')
+
+            valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
+            self._check_df_col_inclusive(specific_abun, 'measurement_type', valid_measurement_types)
+
+            valid_unit_medium = {'soil', 'solvent', 'water'}
+            self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
+
+            self._check_df_col_non_empty(specific_abun, 'units')
+
+        if not aggregate_abun.index.empty:
+            logging.info('Start examing aggregate chemical abundances')
+            pass
 
     def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
@@ -1197,7 +1262,7 @@ class MatrixUtil:
         metadata_df = None
 
         rename_map = {'Aggregate M/Z': 'aggregate_mz',
-                      'Compound Name': 'name',
+                      'Compound Name': 'compound_name',
                       'Predicted Formula': 'formula',
                       'Predicted Structure (smiles)': 'smiles',
                       'Predicted Structure (inchi)': 'inchi',
@@ -1228,8 +1293,8 @@ class MatrixUtil:
         shared_metadata_keys = list(set(metadata_keys) & set(df.columns))
         if shared_metadata_keys:
             metadata_df = df[shared_metadata_keys]
-            # if set(metadata_df.all(skipna=False).tolist()) == {None}:
-            #     raise ValueError('All of metadata fields are None')
+            if set(metadata_df.all(skipna=False).tolist()) == {None}:
+                raise ValueError('All of metadata fields are None')
             df.drop(columns=shared_metadata_keys, inplace=True)
             self._check_chem_abun_metadata(metadata_df)
         else:

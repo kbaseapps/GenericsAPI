@@ -36,7 +36,7 @@ parameters :
         long-hint  : |
             Aggregate M/Z
 
-    name:
+    compound_name:
         ui-name: |
             Compound Name
         short-hint : |
