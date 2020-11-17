@@ -1199,8 +1199,8 @@ class MatrixUtil:
 
         str_cols = ['chemical_type', 'measurement_type', 'units']
         for str_col in str_cols:
-            metadata_df[str_cols] = metadata_df[str_cols].apply(lambda s: s.lower()
-                                                                if type(s) == str else s)
+            metadata_df[str_col] = metadata_df[str_col].apply(lambda s: s.lower()
+                                                              if type(s) == str else s)
 
         valid_chem_types = {'specific', 'aggregate'}
         self._check_df_col_inclusive(metadata_df, 'chemical_type', valid_chem_types)
