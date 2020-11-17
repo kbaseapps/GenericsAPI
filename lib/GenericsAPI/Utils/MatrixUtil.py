@@ -1209,6 +1209,8 @@ class MatrixUtil:
                      'kegg', 'chembi', 'modelseed'}
 
         common_ids = list(df.columns & id_fields)
+        if not common_ids:
+            raise ValueError('Missing compund identification columns')
 
         ids_df = df.loc[:, common_ids]
         missing_ids_idx = list(ids_df.loc[ids_df.isnull().all(axis=1)].index)
