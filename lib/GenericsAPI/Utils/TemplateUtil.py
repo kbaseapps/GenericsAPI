@@ -49,7 +49,7 @@ class TemplateUtil:
         chemical_datas = list()
 
         rename_map = {'aggregate_mz': 'Aggregate M/Z',
-                      'name': 'Compound Name',
+                      'compound_name': 'Compound Name',
                       'formula': 'Predicted Formula',
                       'smiles': 'Predicted Structure (smiles)',
                       'inchi': 'Predicted Structure (inchi)',

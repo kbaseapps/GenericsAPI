@@ -33,7 +33,7 @@
       }
     },
     {
-      "id": "name",
+      "id": "compound_name",
       "optional":false,
       "advanced":false,
       "allow_multiple":false,
@@ -170,7 +170,7 @@
       "id": "chemical_data_included",
       "parameters": [
         "aggregate_mz",
-        "name",
+        "compound_name",
         "formula",
         "smiles",
         "inchi",

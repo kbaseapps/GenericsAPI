@@ -1202,8 +1202,19 @@ class MatrixUtil:
             empty_idx = list(df.loc[df[col_name].isna()].index)
             raise ValueError('Missing [{}] value for index: {}'.format(col_name, empty_idx))
 
+    @staticmethod
+    def _check_chem_ids(df):
+        # check chemical abundance has at least one of database id
+        id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name'}
+
+        common_ids = list(df.columns & id_fields)
+
+        ids_df = df.loc[:, common_ids]
+
     def _check_chem_abun_metadata(self, metadata_df):
         logging.info('Start checking metadata fields for Chemical Abundance Matrix')
+
+        self._check_chem_ids(metadata_df)
 
         str_cols = ['chemical_type', 'measurement_type', 'units', 'unit_medium']
         for str_col in str_cols:
@@ -1240,7 +1251,7 @@ class MatrixUtil:
         metadata_df = None
 
         rename_map = {'Aggregate M/Z': 'aggregate_mz',
-                      'Compound Name': 'name',
+                      'Compound Name': 'compound_name',
                       'Predicted Formula': 'formula',
                       'Predicted Structure (smiles)': 'smiles',
                       'Predicted Structure (inchi)': 'inchi',
