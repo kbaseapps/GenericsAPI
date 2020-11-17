@@ -1205,14 +1205,23 @@ class MatrixUtil:
     @staticmethod
     def _check_chem_ids(df):
         # check chemical abundance has at least one of database id
-        id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name'}
+        id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
+                     'kegg', 'chembi', 'modelseed'}
 
         common_ids = list(df.columns & id_fields)
 
         ids_df = df.loc[:, common_ids]
+        missing_ids_idx = list(ids_df.loc[ids_df.isnull().all(axis=1)].index)
+
+        if missing_ids_idx:
+            err_msg = 'Missing compound identification for {}\n'.format(missing_ids_idx)
+            err_msg += 'Please provide at least one of {}'.format(id_fields)
+            raise ValueError(err_msg)
 
     def _check_chem_abun_metadata(self, metadata_df):
         logging.info('Start checking metadata fields for Chemical Abundance Matrix')
+
+        metadata_df.replace(r'^\s+$', np.nan, regex=True, inplace=True)
 
         self._check_chem_ids(metadata_df)
 
