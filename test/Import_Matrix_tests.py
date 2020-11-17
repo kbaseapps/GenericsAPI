@@ -230,7 +230,7 @@ class ImportMatrixTest(unittest.TestCase):
             returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]
 
         with self.assertRaisesRegex(ValueError, "Row IDs from the uploaded matrix do not match"):
-            params = {'obj_type': 'ChemicalAbundanceMatrix',
+            params = {'obj_type': 'ExpressionMatrix',
                       'matrix_name': 'test_ChemicalAbundanceMatrix',
                       'workspace_name': self.wsName,
                       'input_file_path': os.path.join('data', 'generic_data.csv'),
