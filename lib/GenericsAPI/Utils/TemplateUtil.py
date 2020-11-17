@@ -79,7 +79,7 @@ class TemplateUtil:
         common_ids = list(set(chemical_datas) & id_fields)
         if not common_ids:
             err_msg = 'Missing compund identification columns\n'
-            err_msg += 'Please choose at least one of {}'.format([rename_map[key] for key in id_fields])
+            err_msg += 'Please choose at least one of {}'.format(id_fields)
             raise ValueError(err_msg)
 
         return chemical_datas
