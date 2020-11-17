@@ -73,12 +73,13 @@ class TemplateUtil:
         if not chemical_datas:
             raise ValueError('Please provide at least one of chemical data or chemical ID')
 
-        id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
-                     'kegg', 'chembi', 'modelseed'}
+        id_fields = {'Theoretical Mass', 'Predicted Formula', 'Predicted Structure (inchi-key)',
+                     'Predicted Structure (inchi)', 'Predicted Structure (smiles)',
+                     'Compound Name', 'KEGG', 'ChemBi', 'ModelSEED'}
         common_ids = list(set(chemical_datas) & id_fields)
         if not common_ids:
             err_msg = 'Missing compund identification columns\n'
-            err_msg += 'Please choose at least one of {}'.format([rename_map[key] for key in id_fields])
+            err_msg += 'Please choose at least one of {}'.format(id_fields)
             raise ValueError(err_msg)
 
         return chemical_datas
