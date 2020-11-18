@@ -104,7 +104,7 @@ class TemplateUtil:
         chemical_type_data = ['Chemical Type']
         specific_type_data = ['Measurement Type', 'Units', 'Unit Medium',
                               'Chemical Ontology Class', 'Measured Identification Level',
-                              'Chomotagraphy Type']
+                              'Chromatography Type']
         aggregate_type_data = ['Chemical Class', 'Chemical Ontology Class', 'Protocol',
                                'Identifier']
         chemical_datas = chemical_type_data + specific_type_data + aggregate_type_data + chemical_datas

@@ -1247,11 +1247,15 @@ class MatrixUtil:
             valid_unit_medium = {'soil', 'solvent', 'water'}
             self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
 
-            self._check_df_col_non_empty(specific_abun, 'units')
+            non_empty_fields = ['units', 'chromatography_type']
+            for field in non_empty_fields:
+                self._check_df_col_non_empty(specific_abun, field)
 
         if not aggregate_abun.index.empty:
             logging.info('Start examing aggregate chemical abundances')
-            pass
+            non_empty_fields = ['protocol']
+            for field in non_empty_fields:
+                self._check_df_col_non_empty(aggregate_abun, field)
 
     def _file_to_chem_abun_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
@@ -1281,7 +1285,7 @@ class MatrixUtil:
                       'Unit Medium': 'unit_medium',
                       'Chemical Ontology Class': 'chemical_ontology_class',
                       'Measured Identification Level': 'measured_identification_level',
-                      'Chomotagraphy Type': 'chomotagraphy_type',
+                      'Chromatography Type': 'chromatography_type',
                       'Chemical Class': 'chemical_class',
                       'Protocol': 'protocol',
                       'Identifier': 'identifier'
