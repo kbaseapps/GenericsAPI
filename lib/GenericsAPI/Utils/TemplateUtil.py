@@ -3,6 +3,7 @@ import os
 import uuid
 import logging
 import pandas as pd
+import xlsxwriter
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.KBaseReportClient import KBaseReport
@@ -95,7 +96,40 @@ class TemplateUtil:
         file_df = pd.DataFrame.from_dict([], orient='index', columns=chemical_datas + sample_names)
         file_df.index.name = 'ID (unique value)'
 
-        file_df.to_excel(template_file)
+        # file_df.to_excel(template_file)
+
+        headers = ['ID (unique value)']
+        headers.extend(list(file_df.columns))
+        workbook = xlsxwriter.Workbook(template_file)
+        worksheet = workbook.add_worksheet()
+
+        for i, header in enumerate(headers):
+            worksheet.write(0, i, header)
+
+        chemical_type_pos = headers.index('Chemical Type')
+        worksheet.write(1, chemical_type_pos, 'specific')
+        worksheet.data_validation(1, chemical_type_pos, 1, chemical_type_pos,
+                                  {'validate': 'list',
+                                   'source': ['specific', 'aggregate']})
+
+        measurement_type_pos = headers.index('Measurement Type')
+        worksheet.write(1, measurement_type_pos, 'unknown')
+        worksheet.data_validation(1, measurement_type_pos, 1, measurement_type_pos,
+                                  {'validate': 'list',
+                                   'source': ['unknown', 'FTICR', 'Orbitrap', 'Quadrapole']})
+
+        unit_medium_pos = headers.index('Unit Medium')
+        worksheet.write(1, unit_medium_pos, 'soil')
+        worksheet.data_validation(1, unit_medium_pos, 1, unit_medium_pos,
+                                  {'validate': 'list',
+                                   'source': ['soil', 'solvent', 'water']})
+
+        units_pos = headers.index('Units')
+        worksheet.write(1, units_pos, 'mol/L')
+        worksheet.data_validation(1, units_pos, 1, units_pos,
+                                  {'validate': 'list',
+                                   'source': ['mol/L', 'ml/kg']})
+        workbook.close()
 
         return template_file
 
