@@ -79,14 +79,6 @@
       }
     },
     {
-      "id" : "unit",
-      "optional" : true,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
       "id" : "description",
       "optional" : true,
       "advanced" : false,
@@ -161,10 +153,6 @@
         {
           "input_parameter": "scale",
           "target_property": "scale"
-        },
-        {
-          "input_parameter": "unit",
-          "target_property": "unit"
         },
         {
           "input_parameter": "type",
