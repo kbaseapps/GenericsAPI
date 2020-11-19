@@ -59,7 +59,7 @@ class TemplateUtil:
                       'retention_time': 'Retention Time',
                       'polarity': 'Polarity',
                       'kegg': 'KEGG',
-                      'chembi': 'ChemBi',
+                      'chebi': 'ChEBI',
                       'modelseed': 'ModelSEED'
                       }
 
@@ -76,7 +76,7 @@ class TemplateUtil:
 
         id_fields = {'Theoretical Mass', 'Predicted Formula', 'Predicted Structure (inchi-key)',
                      'Predicted Structure (inchi)', 'Predicted Structure (smiles)',
-                     'Compound Name', 'KEGG', 'ChemBi', 'ModelSEED'}
+                     'Compound Name', 'KEGG', 'ChEBI', 'ModelSEED'}
         common_ids = list(set(chemical_datas) & id_fields)
         if not common_ids:
             err_msg = 'Missing compund identification columns\n'
