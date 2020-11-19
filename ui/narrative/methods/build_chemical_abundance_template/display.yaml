@@ -108,13 +108,13 @@ parameters :
         long-hint  : |
             KEGG
 
-    chembi:
+    chebi:
         ui-name: |
-            ChemBi
+            ChEBI
         short-hint : |
-            ChemBi
+            ChEBI
         long-hint  : |
-            ChemBi
+            ChEBI
 
     modelseed:
         ui-name: |
