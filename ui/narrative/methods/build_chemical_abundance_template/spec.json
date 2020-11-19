@@ -141,7 +141,7 @@
       }
     },
     {
-      "id": "chembi",
+      "id": "chebi",
       "optional":false,
       "advanced":false,
       "allow_multiple":false,
@@ -187,7 +187,7 @@
       "id": "chemical_ids_included",
       "parameters": [
         "kegg",
-        "chembi",
+        "chebi",
         "modelseed"
       ],
       "optional": true,

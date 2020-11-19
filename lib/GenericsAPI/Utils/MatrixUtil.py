@@ -1206,7 +1206,7 @@ class MatrixUtil:
     def _check_chem_ids(df):
         # check chemical abundance has at least one of database id
         id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
-                     'kegg', 'chembi', 'modelseed'}
+                     'kegg', 'chebi', 'modelseed'}
 
         common_ids = list(df.columns & id_fields)
         if not common_ids:
@@ -1278,7 +1278,7 @@ class MatrixUtil:
                       'Retention Time': 'retention_time',
                       'Polarity': 'polarity',
                       'KEGG': 'kegg',
-                      'ChemBi': 'chembi',
+                      'ChEBI': 'chebi',
                       'ModelSEED': 'modelseed',
                       # 'Theoretical M/Z': 'theoretical_mz',
                       # 'Reference Standard RT (seconds)': 'reference_rt',
