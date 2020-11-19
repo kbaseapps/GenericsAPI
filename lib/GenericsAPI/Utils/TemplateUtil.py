@@ -128,6 +128,13 @@ class TemplateUtil:
         worksheet.data_validation(1, units_pos, 1, units_pos,
                                   {'validate': 'list',
                                    'source': ['mol/L', 'ml/kg']})
+
+        chromatography_type_pos = headers.index('Chromatography Type')
+        worksheet.write(1, chromatography_type_pos, 'unknown')
+        worksheet.data_validation(1, chromatography_type_pos, 1, chromatography_type_pos,
+                                  {'validate': 'list',
+                                   'source': ['unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS']})
+
         workbook.close()
 
         return template_file
