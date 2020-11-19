@@ -1247,6 +1247,9 @@ class MatrixUtil:
             valid_unit_medium = {'soil', 'solvent', 'water'}
             self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
 
+            valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
+            self._check_df_col_inclusive(specific_abun, 'chromatography_type', valid_chromatography_type)
+
             non_empty_fields = ['units', 'chromatography_type']
             for field in non_empty_fields:
                 self._check_df_col_non_empty(specific_abun, field)

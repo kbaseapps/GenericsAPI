@@ -96,14 +96,13 @@ class TemplateUtil:
         file_df = pd.DataFrame.from_dict([], orient='index', columns=chemical_datas + sample_names)
         file_df.index.name = 'ID (unique value)'
 
-        # file_df.to_excel(template_file)
-
         headers = ['ID (unique value)']
         headers.extend(list(file_df.columns))
         workbook = xlsxwriter.Workbook(template_file)
         worksheet = workbook.add_worksheet()
 
         for i, header in enumerate(headers):
+            worksheet.set_column(i, i, len(header))
             worksheet.write(0, i, header)
 
         chemical_type_pos = headers.index('Chemical Type')
@@ -129,6 +128,13 @@ class TemplateUtil:
         worksheet.data_validation(1, units_pos, 1, units_pos,
                                   {'validate': 'list',
                                    'source': ['mol/L', 'ml/kg']})
+
+        chromatography_type_pos = headers.index('Chromatography Type')
+        worksheet.write(1, chromatography_type_pos, 'unknown')
+        worksheet.data_validation(1, chromatography_type_pos, 1, chromatography_type_pos,
+                                  {'validate': 'list',
+                                   'source': ['unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS']})
+
         workbook.close()
 
         return template_file
