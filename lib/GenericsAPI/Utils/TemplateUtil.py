@@ -109,7 +109,7 @@ class TemplateUtil:
         worksheet.write(1, chemical_type_pos, 'specific')
         worksheet.data_validation(1, chemical_type_pos, 1, chemical_type_pos,
                                   {'validate': 'list',
-                                   'source': ['specific', 'aggregate']})
+                                   'source': ['specific', 'aggregate', 'exometabolite']})
 
         measurement_type_pos = headers.index('Measurement Type')
         worksheet.write(1, measurement_type_pos, 'unknown')
