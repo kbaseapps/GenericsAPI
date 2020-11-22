@@ -1232,13 +1232,30 @@ class MatrixUtil:
             metadata_df[str_col] = metadata_df[str_col].apply(lambda s: s.lower()
                                                               if type(s) == str else s)
 
-        valid_chem_types = {'specific', 'aggregate'}
+        valid_chem_types = {'specific', 'aggregate', 'exometabolite'}
         self._check_df_col_inclusive(metadata_df, 'chemical_type', valid_chem_types)
 
         specific_abun = metadata_df.loc[metadata_df['chemical_type'] == 'specific']
         aggregate_abun = metadata_df.loc[metadata_df['chemical_type'] == 'aggregate']
+        exometabolite_abun = metadata_df.loc[metadata_df['chemical_type'] == 'exometabolite']
 
         if not specific_abun.index.empty:
+            logging.info('Start examing specific chemical abundances')
+
+            valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
+            self._check_df_col_inclusive(specific_abun, 'measurement_type', valid_measurement_types)
+
+            valid_unit_medium = {'soil', 'solvent', 'water'}
+            self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
+
+            valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
+            self._check_df_col_inclusive(specific_abun, 'chromatography_type', valid_chromatography_type)
+
+            non_empty_fields = ['units', 'chromatography_type']
+            for field in non_empty_fields:
+                self._check_df_col_non_empty(specific_abun, field)
+
+        if not exometabolite_abun.index.empty:
             logging.info('Start examing specific chemical abundances')
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
