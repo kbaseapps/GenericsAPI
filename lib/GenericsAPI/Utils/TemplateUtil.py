@@ -143,8 +143,7 @@ class TemplateUtil:
         logging.info('Start appending chemical type fields to file')
         chemical_type_data = ['Chemical Type']
         specific_type_data = ['Measurement Type', 'Units', 'Unit Medium',
-                              'Chemical Ontology Class', 'Measured Identification Level',
-                              'Chromatography Type']
+                              'Chemical Ontology Class', 'Chromatography Type']
         aggregate_type_data = ['Chemical Class', 'Chemical Ontology Class', 'Protocol',
                                'Identifier']
         chemical_datas = chemical_type_data + specific_type_data + aggregate_type_data + chemical_datas
