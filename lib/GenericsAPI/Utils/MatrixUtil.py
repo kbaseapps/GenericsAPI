@@ -1211,8 +1211,6 @@ class MatrixUtil:
         low_level_keys = {'compound_name', 'mass'}
 
         for idx in df.index:
-            identification_level.append('a')
-
             db_ids = ids_df.loc[idx]
             db_ids.dropna(inplace=True)
             non_empty_ids_keys = set(db_ids.index)
