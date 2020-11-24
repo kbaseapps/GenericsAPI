@@ -1206,9 +1206,9 @@ class MatrixUtil:
         logging.info('Start calculating measured identification level')
         identification_level = list()
 
-        high_level_keys = {'kegg', 'chebi', 'modelseed', 'formula', 'smiles'}
-        medium_level_keys = {'inchikey', 'inchi'}
-        low_level_keys = {'compound_name', 'mass'}
+        high_level_keys = {'kegg', 'chebi', 'modelseed', 'inchikey', 'inchi', 'smiles'}
+        medium_level_keys = {'formula', 'compound_name'}
+        low_level_keys = {'mass'}
 
         for idx in df.index:
             db_ids = ids_df.loc[idx]
