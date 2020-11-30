@@ -1202,8 +1202,32 @@ class MatrixUtil:
             empty_idx = list(df.loc[df[col_name].isna()].index)
             raise ValueError('Missing [{}] value for index: {}'.format(col_name, empty_idx))
 
-    @staticmethod
-    def _check_chem_ids(df):
+    def _cal_identification_level(self, df, ids_df):
+        logging.info('Start calculating measured identification level')
+        identification_level = list()
+
+        high_level_keys = {'kegg', 'chebi', 'modelseed', 'inchikey', 'inchi', 'smiles'}
+        medium_level_keys = {'formula', 'compound_name'}
+        low_level_keys = {'mass'}
+
+        for idx in df.index:
+            db_ids = ids_df.loc[idx]
+            db_ids.dropna(inplace=True)
+            non_empty_ids_keys = set(db_ids.index)
+
+            if non_empty_ids_keys & high_level_keys:
+                identification_level.append('high')
+            elif non_empty_ids_keys & medium_level_keys:
+                identification_level.append('medium')
+            elif non_empty_ids_keys & low_level_keys:
+                identification_level.append('low')
+            else:
+                logging.info('Cannot calculate measured identification level for {}'.format(idx))
+                identification_level.append(None)
+
+        df['measured_identification_level'] = identification_level
+
+    def _check_chem_ids(self, df):
         # check chemical abundance has at least one of database id
         id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
                      'kegg', 'chebi', 'modelseed'}
@@ -1219,6 +1243,8 @@ class MatrixUtil:
             err_msg = 'Missing compound identification for {}\n'.format(missing_ids_idx)
             err_msg += 'Please provide at least one of {}'.format(id_fields)
             raise ValueError(err_msg)
+
+        self._cal_identification_level(df, ids_df)
 
     def _check_chem_abun_metadata(self, metadata_df):
         logging.info('Start checking metadata fields for Chemical Abundance Matrix')
