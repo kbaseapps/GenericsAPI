@@ -1228,6 +1228,10 @@ class MatrixUtil:
         df['measured_identification_level'] = identification_level
 
     def _check_chem_ids(self, df):
+
+        if 'chemical_type' not in df:
+            raise ValueError('Please provide chemical type field')
+
         # check chemical abundance has at least one of database id
         id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
                      'kegg', 'chebi', 'modelseed'}
