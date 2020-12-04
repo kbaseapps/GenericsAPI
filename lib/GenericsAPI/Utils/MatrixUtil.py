@@ -1187,6 +1187,9 @@ class MatrixUtil:
     @staticmethod
     def _check_df_col_inclusive(df, col_name, valid_values):
         # check if given column contains all values in valid_values
+        if col_name not in df:
+            raise ValueError('Please provide {} column'.format(col_name))
+
         unmatched_type = set(df[col_name]) - valid_values
         if unmatched_type:
             err_msg = 'Found unsupported {}: {}\n'.format(' '.join(col_name.split('_')),
@@ -1197,6 +1200,9 @@ class MatrixUtil:
 
     @staticmethod
     def _check_df_col_non_empty(df, col_name):
+        if col_name not in df:
+            raise ValueError('Please provide {} column'.format(col_name))
+
         # check if any column cell is empty(nan)
         if df[col_name].isna().any():
             empty_idx = list(df.loc[df[col_name].isna()].index)
@@ -1228,10 +1234,6 @@ class MatrixUtil:
         df['measured_identification_level'] = identification_level
 
     def _check_chem_ids(self, df):
-
-        if 'chemical_type' not in df:
-            raise ValueError('Please provide chemical type field')
-
         # check chemical abundance has at least one of database id
         id_fields = {'mass', 'formula', 'inchikey', 'inchi', 'smiles', 'compound_name',
                      'kegg', 'chebi', 'modelseed'}
@@ -1257,10 +1259,12 @@ class MatrixUtil:
 
         self._check_chem_ids(metadata_df)
 
+        # convert string field to lower case
         str_cols = ['chemical_type', 'measurement_type', 'units', 'unit_medium']
         for str_col in str_cols:
-            metadata_df[str_col] = metadata_df[str_col].apply(lambda s: s.lower()
-                                                              if type(s) == str else s)
+            if str_col in metadata_df:
+                metadata_df[str_col] = metadata_df[str_col].apply(lambda s: s.lower()
+                                                                  if type(s) == str else s)
 
         valid_chem_types = {'specific', 'aggregate', 'exometabolite'}
         self._check_df_col_inclusive(metadata_df, 'chemical_type', valid_chem_types)
