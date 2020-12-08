@@ -123,13 +123,13 @@ class CorrelationUtil:
         if len(original_matrix_ref) == 1:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
-            matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+            matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
             columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
         elif len(original_matrix_ref) == 2:
             for matrix_ref in original_matrix_ref[::-1]:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
-                matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+                matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
                 columns.append(matrix_type)
         else:
             columns = ['Variable 1', 'Variable 2']
@@ -289,7 +289,7 @@ class CorrelationUtil:
         if len(original_matrix_ref) == 1:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
-            matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+            matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
             # if matrix_type == 'Amplicon':
             #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
             #     if amplicon_set_ref:
@@ -299,7 +299,7 @@ class CorrelationUtil:
             for matrix_ref in original_matrix_ref[::-1]:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
-                matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+                matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
                 # if matrix_type == 'Amplicon':
                 #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
                 #     if amplicon_set_ref:
