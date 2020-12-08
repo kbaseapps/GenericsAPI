@@ -150,7 +150,7 @@ class CorrelationUtil:
         # sort by absolute value
         links = links.iloc[(-links[value_col_name].abs()).argsort()].reset_index(drop=True)
 
-        top_corr_limit = 20
+        top_corr_limit = 200
         top_corr = links[:top_corr_limit]
 
         if sig_df is not None:
