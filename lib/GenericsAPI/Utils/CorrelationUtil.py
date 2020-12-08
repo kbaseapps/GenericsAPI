@@ -123,13 +123,13 @@ class CorrelationUtil:
         if len(original_matrix_ref) == 1:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
-            matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
+            matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
             columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
         elif len(original_matrix_ref) == 2:
-            for matrix_ref in original_matrix_ref[::-1]:
+            for matrix_ref in original_matrix_ref:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
-                matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
+                matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
                 columns.append(matrix_type)
         else:
             columns = ['Variable 1', 'Variable 2']
@@ -156,8 +156,8 @@ class CorrelationUtil:
         fig = make_subplots(rows=num_rows, cols=num_cols)
         for i in range(num_plots):
             corr_pair = top_corr.iloc[i]
-            first_item = corr_pair[0]
-            second_item = corr_pair[1]
+            first_item = corr_pair[0][:20]
+            second_item = corr_pair[1][:20]
             corr_r = corr_pair[2]
 
             first_item_matrix_value = list(df1.loc[first_item].values)
@@ -289,7 +289,7 @@ class CorrelationUtil:
         if len(original_matrix_ref) == 1:
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
-            matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
+            matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
             # if matrix_type == 'Amplicon':
             #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
             #     if amplicon_set_ref:
@@ -299,7 +299,7 @@ class CorrelationUtil:
             for matrix_ref in original_matrix_ref[::-1]:
                 res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
                 obj_type = res['info'][2]
-                matrix_type = obj_type.split('‑')[0].split('Matrix')[0].split('.')[-1]
+                matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
                 # if matrix_type == 'Amplicon':
                 #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
                 #     if amplicon_set_ref:
@@ -504,7 +504,7 @@ class CorrelationUtil:
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(output_directory)
-        result_file_path = os.path.join(output_directory, 'corr_report.html')
+        result_file_path = os.path.join(output_directory, 'compute_correlation_report.html')
 
         visualization_content = self._generate_visualization_content(
                                                                      output_directory,
