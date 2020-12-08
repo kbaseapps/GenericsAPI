@@ -101,14 +101,22 @@ class CorrelationUtil:
 
         return taxons, taxons_level
 
-    def _build_top_scatter_plot(self, matrix_2D, output_directory, df1, df2,
-                                original_matrix_ref=[]):
+    def _build_top_corr_table(self, matrix_2D, output_directory, df1, df2,
+                              original_matrix_ref=[], sig_matrix_2D=None):
+
         row_ids = matrix_2D.get('row_ids')
         col_ids = matrix_2D.get('col_ids')
         values = matrix_2D.get('values')
 
         data_df = pd.DataFrame(values, index=row_ids, columns=col_ids)
         data_df.fillna(0, inplace=True)
+
+        sig_df = None
+        if sig_matrix_2D is not None:
+            sig_df = pd.DataFrame(sig_matrix_2D.get('values'),
+                                  index=sig_matrix_2D.get('row_ids'),
+                                  columns=sig_matrix_2D.get('col_ids'))
+            sig_df.fillna(0, inplace=True)
 
         links = data_df.stack().reset_index()
         links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
@@ -134,7 +142,104 @@ class CorrelationUtil:
         else:
             columns = ['Variable 1', 'Variable 2']
 
-        value_col_name = 'Correlation'
+        value_col_name = 'Correlation Coefficient'
+        columns.append(value_col_name)
+
+        links.columns = columns
+
+        # sort by absolute value
+        links = links.iloc[(-links[value_col_name].abs()).argsort()].reset_index(drop=True)
+
+        top_corr_limit = 200
+        top_corr = links[:top_corr_limit]
+
+        if sig_df is not None:
+            sig_values = list()
+            for i in range(top_corr.index.size):
+                corr_pair = top_corr.iloc[i]
+                first_item = corr_pair[0]
+                second_item = corr_pair[1]
+                sig_value = sig_df.loc[first_item, second_item]
+                sig_values.append(sig_value)
+
+            top_corr['P-Value'] = sig_values
+
+        headerColor = 'grey'
+        rowEvenColor = 'lightgrey'
+        rowOddColor = 'white'
+
+        fig = go.Figure(data=[go.Table(
+            header=dict(values=list(top_corr.columns),
+                        line_color='darkslategray',
+                        fill_color=headerColor,
+                        align='left',
+                        font=dict(color='white', size=12)),
+            cells=dict(values=top_corr.T.values,
+                       line_color='darkslategray',
+                       fill_color=[[rowOddColor, rowEvenColor]*top_corr_limit],
+                       align='left',
+                       font=dict(color='darkslategray', size=11)))
+        ])
+
+        fig_title = 'Top {} Coefficient Pairs'.format(top_corr_limit)
+        fig.update_layout(
+            width=1000,
+            height=2000,
+            title=dict(text=fig_title, x=0.5,
+                       font=dict(family='Times New Roman', size=30, color='Purple')))
+
+        table_file_name = 'top_corr_table.html'
+        table_file_path = os.path.join(output_directory, table_file_name)
+        fig.write_html(table_file_path)
+
+        tab_content = ''
+        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += 'src="{}" '.format(table_file_name)
+        tab_content += 'style="border:none;"></iframe>'
+
+        return tab_content
+
+    def _build_top_scatter_plot(self, matrix_2D, output_directory, df1, df2,
+                                original_matrix_ref=[], sig_matrix_2D=None):
+        row_ids = matrix_2D.get('row_ids')
+        col_ids = matrix_2D.get('col_ids')
+        values = matrix_2D.get('values')
+
+        data_df = pd.DataFrame(values, index=row_ids, columns=col_ids)
+        data_df.fillna(0, inplace=True)
+
+        sig_df = None
+        if sig_matrix_2D is not None:
+            sig_df = pd.DataFrame(sig_matrix_2D.get('values'),
+                                  index=sig_matrix_2D.get('row_ids'),
+                                  columns=sig_matrix_2D.get('col_ids'))
+            sig_df.fillna(0, inplace=True)
+
+        links = data_df.stack().reset_index()
+        links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
+
+        # remove identical comparison
+        try:
+            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
+        except Exception:
+            raise ValueError('Cannot remove identical comparison')
+
+        columns = list()
+        if len(original_matrix_ref) == 1:
+            res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
+            obj_type = res['info'][2]
+            matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
+            columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
+        elif len(original_matrix_ref) == 2:
+            for matrix_ref in original_matrix_ref:
+                res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+                obj_type = res['info'][2]
+                matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
+                columns.append(matrix_type)
+        else:
+            columns = ['Variable 1', 'Variable 2']
+
+        value_col_name = 'Correlation Coefficient'
         columns.append(value_col_name)
 
         links.columns = columns
@@ -162,7 +267,7 @@ class CorrelationUtil:
 
             first_item_matrix_value = list(df1.loc[first_item].values)
             second_item_matrix_value = list(df2.loc[second_item].values)
-            anno_text = 'correlation coefficient={}'.format(corr_r)
+
             sub_fig = go.Scatter(
                 x=first_item_matrix_value,
                 y=second_item_matrix_value,
@@ -173,6 +278,7 @@ class CorrelationUtil:
 
             fig.add_trace(sub_fig, row=i//num_cols + 1, col=i % num_cols + 1)
 
+            anno_text = 'correlation coefficient={}'.format(corr_r)
             if i == 0:
                 fig.update_layout({'xaxis': {'title': '{} ({})'.format(first_item[:10], links.columns[0])}})
                 fig.update_layout({'yaxis': {'title': '{} ({})'.format(second_item[:10], links.columns[1])}})
@@ -188,6 +294,19 @@ class CorrelationUtil:
                     yanchor='top',
                     showarrow=False
                   )
+                if sig_df is not None:
+                    sig_value = sig_df.loc[first_item, second_item]
+                    anno_text = 'p-value={}'.format(sig_value)
+                    fig.add_annotation(
+                        text=anno_text,
+                        x=(x_end - x_start) / 2 + x_start,
+                        y=fig['layout']['yaxis']['domain'][1] - 0.007,
+                        xref='paper',
+                        yref='paper',
+                        xanchor='center',
+                        yanchor='top',
+                        showarrow=False
+                      )
             else:
                 fig.update_layout({'xaxis{}'.format(i+1): {'title': '{} ({})'.format(first_item[:10], links.columns[0])}})
                 fig.update_layout({'yaxis{}'.format(i+1): {'title': '{} ({})'.format(second_item[:10], links.columns[1])}})
@@ -203,6 +322,19 @@ class CorrelationUtil:
                     yanchor='top',
                     showarrow=False
                   )
+                if sig_df is not None:
+                    sig_value = sig_df.loc[first_item, second_item]
+                    anno_text = 'p-value={}'.format(sig_value)
+                    fig.add_annotation(
+                        text=anno_text,
+                        x=(x_end - x_start) / 2 + x_start,
+                        y=fig['layout']['yaxis{}'.format(i+1)]['domain'][1] - 0.007,
+                        xref='paper',
+                        yref='paper',
+                        xanchor='center',
+                        yanchor='top',
+                        showarrow=False
+                      )
 
         fig_title = 'Scatter Plot For Top {} Coefficient Pairs'.format(num_plots)
         fig.update_layout(
@@ -395,35 +527,40 @@ class CorrelationUtil:
 
         tab_def_content += """
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix Heatmap</button>
+            <button class="tablinks" onclick="openTab(event, 'CorrelationTable')" id="defaultOpen">Top Coefficient Table</button>
         """
-
-        # corr_table_content = self._build_table_content(coefficient_data, output_directory,
-        #                                                original_matrix_ref=original_matrix_ref,
-        #                                                type='corr')
-        corr_table_content = self._build_heatmap_content(coefficient_data, output_directory)
+        corr_table_content = self._build_top_corr_table(coefficient_data, output_directory,
+                                                        df1, df2,
+                                                        original_matrix_ref=original_matrix_ref,
+                                                        sig_matrix_2D=significance_data)
         tab_content += """
-        <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_table_content)
-
-        if significance_data:
-            tab_def_content += """
-            <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix Heatmap</button>
-            """
-            # sig_table_content = self._build_table_content(significance_data, output_directory,
-            #                                               original_matrix_ref=original_matrix_ref,
-            #                                               type='sig')
-            sig_table_content = self._build_heatmap_content(significance_data, output_directory)
-            tab_content += """
-            <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
+        <div id="CorrelationTable" class="tabcontent">{}</div>""".format(corr_table_content)
 
         tab_def_content += """
         <button class="tablinks" onclick="openTab(event, 'ScatterTopMatrix')">Plot Top Coefficient Pairs</button>
         """
         scatter_top_content = self._build_top_scatter_plot(coefficient_data, output_directory,
                                                            df1, df2,
-                                                           original_matrix_ref=original_matrix_ref)
+                                                           original_matrix_ref=original_matrix_ref,
+                                                           sig_matrix_2D=significance_data)
         tab_content += """
         <div id="ScatterTopMatrix" class="tabcontent">{}</div>""".format(scatter_top_content)
+
+        tab_def_content += """
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')">Correlation Matrix Heatmap</button>
+        """
+        corr_heatmap_content = self._build_heatmap_content(coefficient_data, output_directory)
+        tab_content += """
+        <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_heatmap_content)
+
+        if significance_data:
+            tab_def_content += """
+            <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix Heatmap</button>
+            """
+            sig_heatmap_content = self._build_heatmap_content(significance_data, output_directory)
+            tab_content += """
+            <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_heatmap_content)
 
         if corr_matrix_plot_path:
             tab_def_content += """
@@ -971,7 +1108,7 @@ class CorrelationUtil:
             err_msg += 'Please choose one of {}'.format(CORR_METHOD)
             raise ValueError(err_msg)
         plot_corr_matrix = params.get('plot_corr_matrix', False)
-        compute_significance = params.get('compute_significance', False)
+        compute_significance = params.get('compute_significance', True)
 
         matrix_1_type = self.dfu.get_objects({'object_refs': [matrix_ref_1]})['data'][0]['info'][2]
 
