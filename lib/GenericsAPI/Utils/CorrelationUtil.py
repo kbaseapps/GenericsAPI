@@ -156,8 +156,8 @@ class CorrelationUtil:
         fig = make_subplots(rows=num_rows, cols=num_cols)
         for i in range(num_plots):
             corr_pair = top_corr.iloc[i]
-            first_item = corr_pair[0][:20]
-            second_item = corr_pair[1][:20]
+            first_item = corr_pair[0]
+            second_item = corr_pair[1]
             corr_r = corr_pair[2]
 
             first_item_matrix_value = list(df1.loc[first_item].values)
@@ -174,8 +174,8 @@ class CorrelationUtil:
             fig.add_trace(sub_fig, row=i//num_cols + 1, col=i % num_cols + 1)
 
             if i == 0:
-                fig.update_layout({'xaxis': {'title': '{} ({})'.format(first_item, links.columns[0])}})
-                fig.update_layout({'yaxis': {'title': '{} ({})'.format(second_item, links.columns[1])}})
+                fig.update_layout({'xaxis': {'title': '{} ({})'.format(first_item[:10], links.columns[0])}})
+                fig.update_layout({'yaxis': {'title': '{} ({})'.format(second_item[:10], links.columns[1])}})
                 x_start = fig['layout']['xaxis']['domain'][0]
                 x_end = fig['layout']['xaxis']['domain'][1]
                 fig.add_annotation(
@@ -189,8 +189,8 @@ class CorrelationUtil:
                     showarrow=False
                   )
             else:
-                fig.update_layout({'xaxis{}'.format(i+1): {'title': '{} ({})'.format(first_item, links.columns[0])}})
-                fig.update_layout({'yaxis{}'.format(i+1): {'title': '{} ({})'.format(second_item, links.columns[1])}})
+                fig.update_layout({'xaxis{}'.format(i+1): {'title': '{} ({})'.format(first_item[:10], links.columns[0])}})
+                fig.update_layout({'yaxis{}'.format(i+1): {'title': '{} ({})'.format(second_item[:10], links.columns[1])}})
                 x_start = fig['layout']['xaxis{}'.format(i+1)]['domain'][0]
                 x_end = fig['layout']['xaxis{}'.format(i+1)]['domain'][1]
                 fig.add_annotation(
@@ -206,7 +206,7 @@ class CorrelationUtil:
 
         fig_title = 'Scatter Plot For Top {} Coefficient Pairs'.format(num_plots)
         fig.update_layout(
-            width=1000,
+            width=1200,
             height=2000,
             title=dict(text=fig_title, x=0.5,
                        font=dict(family='Times New Roman', size=30, color='Purple')),
