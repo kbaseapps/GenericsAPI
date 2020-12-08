@@ -218,7 +218,7 @@ class CorrelationUtil:
 
         tab_content = ''
         tab_content += '\n<iframe height="900px" width="100%" '
-        tab_content += 'src="{}" '.format(plot_file_path)
+        tab_content += 'src="{}" '.format(plot_file_name)
         tab_content += 'style="border:none;"></iframe>'
 
         return tab_content
