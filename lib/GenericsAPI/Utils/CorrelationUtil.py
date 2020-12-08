@@ -5,9 +5,11 @@ import os
 import shutil
 import traceback
 import uuid
+import math
 
 import pandas as pd
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 from matplotlib import pyplot as plt
 from plotly.offline import plot
 from scipy import stats
@@ -99,6 +101,128 @@ class CorrelationUtil:
 
         return taxons, taxons_level
 
+    def _build_top_scatter_plot(self, matrix_2D, output_directory, df1, df2,
+                                original_matrix_ref=[]):
+        row_ids = matrix_2D.get('row_ids')
+        col_ids = matrix_2D.get('col_ids')
+        values = matrix_2D.get('values')
+
+        data_df = pd.DataFrame(values, index=row_ids, columns=col_ids)
+        data_df.fillna(0, inplace=True)
+
+        links = data_df.stack().reset_index()
+        links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
+
+        # remove identical comparison
+        try:
+            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
+        except Exception:
+            raise ValueError('Cannot remove identical comparison')
+
+        columns = list()
+        if len(original_matrix_ref) == 1:
+            res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
+            obj_type = res['info'][2]
+            matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+            columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
+        elif len(original_matrix_ref) == 2:
+            for matrix_ref in original_matrix_ref[::-1]:
+                res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+                obj_type = res['info'][2]
+                matrix_type = obj_type.split('Matrix')[0].split('.')[-1]
+                columns.append(matrix_type)
+        else:
+            columns = ['Variable 1', 'Variable 2']
+
+        value_col_name = 'Correlation'
+        columns.append(value_col_name)
+
+        links.columns = columns
+
+        # sort by absolute value
+        links = links.iloc[(-links[value_col_name].abs()).argsort()].reset_index(drop=True)
+
+        top_corr_limit = 20
+        top_corr = links[:top_corr_limit]
+        num_plots = top_corr.index.size
+
+        warnings = ''
+        if top_corr_limit < links.index.size:
+            warnings += 'Note: Limiting to top {} plots'.format(top_corr_limit)
+
+        num_cols = 3
+        num_rows = math.ceil(num_plots/num_cols)
+
+        fig = make_subplots(rows=num_rows, cols=num_cols)
+        for i in range(num_plots):
+            corr_pair = top_corr.iloc[i]
+            first_item = corr_pair[0]
+            second_item = corr_pair[1]
+            corr_r = corr_pair[2]
+
+            first_item_matrix_value = list(df1.loc[first_item].values)
+            second_item_matrix_value = list(df2.loc[second_item].values)
+            anno_text = 'correlation coefficient={}'.format(corr_r)
+            sub_fig = go.Scatter(
+                x=first_item_matrix_value,
+                y=second_item_matrix_value,
+                mode='markers',
+                showlegend=False,
+                marker=dict(size=8,)
+            )
+
+            fig.add_trace(sub_fig, row=i//num_cols + 1, col=i % num_cols + 1)
+
+            if i == 0:
+                fig.update_layout({'xaxis': {'title': '{} ({})'.format(first_item, links.columns[0])}})
+                fig.update_layout({'yaxis': {'title': '{} ({})'.format(second_item, links.columns[1])}})
+                x_start = fig['layout']['xaxis']['domain'][0]
+                x_end = fig['layout']['xaxis']['domain'][1]
+                fig.add_annotation(
+                    text=anno_text,
+                    x=(x_end - x_start) / 2 + x_start,
+                    y=fig['layout']['yaxis']['domain'][1],
+                    xref='paper',
+                    yref='paper',
+                    xanchor='center',
+                    yanchor='top',
+                    showarrow=False
+                  )
+            else:
+                fig.update_layout({'xaxis{}'.format(i+1): {'title': '{} ({})'.format(first_item, links.columns[0])}})
+                fig.update_layout({'yaxis{}'.format(i+1): {'title': '{} ({})'.format(second_item, links.columns[1])}})
+                x_start = fig['layout']['xaxis{}'.format(i+1)]['domain'][0]
+                x_end = fig['layout']['xaxis{}'.format(i+1)]['domain'][1]
+                fig.add_annotation(
+                    text=anno_text,
+                    x=(x_end - x_start) / 2 + x_start,
+                    y=fig['layout']['yaxis{}'.format(i+1)]['domain'][1],
+                    xref='paper',
+                    yref='paper',
+                    xanchor='center',
+                    yanchor='top',
+                    showarrow=False
+                  )
+
+        fig_title = 'Scatter Plot For Top {} Coefficient Pairs'.format(num_plots)
+        fig.update_layout(
+            width=1000,
+            height=2000,
+            title=dict(text=fig_title, x=0.5,
+                       font=dict(family='Times New Roman', size=30, color='Purple')),
+            font=dict(family="Courier New, monospace", size=10, color="RebeccaPurple"))
+
+        plot_file_name = 'top_scatter_plot.html'
+        plot_file_path = os.path.join(output_directory, plot_file_name)
+        fig.write_html(plot_file_path)
+
+        tab_content = ''
+        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += 'src="{}" '.format(plot_file_path)
+        tab_content += 'style="border:none;"></iframe>'
+
+        return tab_content
+
     def _build_heatmap_content(self, matrix_2D, output_directory):
         row_ids = matrix_2D.get('row_ids')
         col_ids = matrix_2D.get('col_ids')
@@ -124,7 +248,7 @@ class CorrelationUtil:
 
             shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
                          output_directory)
-        tab_content = ''
+        tab_content = '\n'
 
         if heatmap_index_page:
             tab_content += '\n<iframe height="900px" width="100%" '
@@ -182,10 +306,16 @@ class CorrelationUtil:
                 #         taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
                 columns.append(matrix_type)
         else:
-            links.columns = ['Variable 1', 'Variable 2']
+            columns = ['Variable 1', 'Variable 2']
 
         # remove self-comparison
         links = links[links.iloc[:, 0] != links.iloc[:, 1]]
+
+        # remove identical comparison
+        try:
+            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
+        except Exception:
+            raise print('Cannot remove identical comparison')
 
         if type == 'corr':
             columns.append('Correlation')
@@ -243,7 +373,7 @@ class CorrelationUtil:
         return page_content
 
     def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
-                                        corr_matrix_plot_path, scatter_plot_path):
+                                        corr_matrix_plot_path, scatter_plot_path, df1, df2):
 
         """
         <div class="tab">
@@ -265,7 +395,7 @@ class CorrelationUtil:
 
         tab_def_content += """
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix</button>
+            <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')" id="defaultOpen">Correlation Matrix Heatmap</button>
         """
 
         # corr_table_content = self._build_table_content(coefficient_data, output_directory,
@@ -277,7 +407,7 @@ class CorrelationUtil:
 
         if significance_data:
             tab_def_content += """
-            <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix</button>
+            <button class="tablinks" onclick="openTab(event, 'SignificanceMatrix')">Significance Matrix Heatmap</button>
             """
             # sig_table_content = self._build_table_content(significance_data, output_directory,
             #                                               original_matrix_ref=original_matrix_ref,
@@ -285,6 +415,15 @@ class CorrelationUtil:
             sig_table_content = self._build_heatmap_content(significance_data, output_directory)
             tab_content += """
             <div id="SignificanceMatrix" class="tabcontent">{}</div>""".format(sig_table_content)
+
+        tab_def_content += """
+        <button class="tablinks" onclick="openTab(event, 'ScatterTopMatrix')">Plot Top Coefficient Pairs</button>
+        """
+        scatter_top_content = self._build_top_scatter_plot(coefficient_data, output_directory,
+                                                           df1, df2,
+                                                           original_matrix_ref=original_matrix_ref)
+        tab_content += """
+        <div id="ScatterTopMatrix" class="tabcontent">{}</div>""".format(scatter_top_content)
 
         if corr_matrix_plot_path:
             tab_def_content += """
@@ -354,7 +493,7 @@ class CorrelationUtil:
         return tab_def_content + tab_content
 
     def _generate_corr_html_report(self, corr_matrix_obj_ref, corr_matrix_plot_path,
-                                   scatter_plot_path):
+                                   scatter_plot_path, df1, df2):
 
         """
         _generate_corr_html_report: generate html summary report for correlation
@@ -371,7 +510,7 @@ class CorrelationUtil:
                                                                      output_directory,
                                                                      corr_matrix_obj_ref,
                                                                      corr_matrix_plot_path,
-                                                                     scatter_plot_path)
+                                                                     scatter_plot_path, df1, df2)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'corr_template.html'),
@@ -392,7 +531,7 @@ class CorrelationUtil:
         return html_report
 
     def _generate_corr_report(self, corr_matrix_obj_ref, workspace_name, corr_matrix_plot_path,
-                              scatter_plot_path=None):
+                              scatter_plot_path=None, df1=None, df2=None):
         """
         _generate_report: generate summary report
         """
@@ -400,7 +539,7 @@ class CorrelationUtil:
 
         output_html_files = self._generate_corr_html_report(corr_matrix_obj_ref,
                                                             corr_matrix_plot_path,
-                                                            scatter_plot_path)
+                                                            scatter_plot_path, df1, df2)
 
         report_params = {'message': '',
                          'objects_created': [{'ref': corr_matrix_obj_ref,
@@ -671,7 +810,7 @@ class CorrelationUtil:
         if not compute_significance:
             sig_df = None
 
-        return corr_df, sig_df
+        return corr_df, sig_df, df1, df2
 
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
@@ -843,7 +982,7 @@ class CorrelationUtil:
         df1 = self._fetch_matrix_data(matrix_ref_1)
         df2 = self._fetch_matrix_data(matrix_ref_2)
 
-        corr_df, sig_df = self._compute_metrices_corr(df1, df2, method, compute_significance)
+        corr_df, sig_df, df1, df2 = self._compute_metrices_corr(df1, df2, method, compute_significance)
 
         if plot_corr_matrix:
             corr_matrix_plot_path = self.plotly_corr_matrix(corr_df)
@@ -858,7 +997,7 @@ class CorrelationUtil:
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
         report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
-                                                   corr_matrix_plot_path)
+                                                   corr_matrix_plot_path, df1=df1, df2=df2)
 
         returnVal.update(report_output)
 
@@ -920,7 +1059,9 @@ class CorrelationUtil:
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
         report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
-                                                   corr_matrix_plot_path, scatter_plot_path)
+                                                   corr_matrix_plot_path,
+                                                   scatter_plot_path=scatter_plot_path,
+                                                   df1=data_df, df2=data_df)
 
         returnVal.update(report_output)
 
