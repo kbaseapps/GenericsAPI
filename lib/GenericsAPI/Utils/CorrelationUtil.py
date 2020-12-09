@@ -148,10 +148,11 @@ class CorrelationUtil:
 
         top_corr_limit = 200
         top_corr = links[:top_corr_limit]
+        top_corr_size = top_corr.index.size
 
         if sig_df is not None:
             sig_values = list()
-            for i in range(top_corr.index.size):
+            for i in range(top_corr_size):
                 corr_pair = top_corr.iloc[i]
                 first_item = corr_pair[0]
                 second_item = corr_pair[1]
@@ -186,9 +187,12 @@ class CorrelationUtil:
                        font=dict(color='darkslategray', size=11)))
         ])
 
-        fig_title = 'Top {} Coefficient Pairs'.format(top_corr_limit)
+        if top_corr_size > top_corr_limit:
+            fig_title = 'Top {} Coefficient Pairs'.format(top_corr_limit)
+        else:
+            fig_title = 'All {} Coefficient Pairs'.format(top_corr_size)
         fig.update_layout(
-            width=1000,
+            width=1200,
             height=2000,
             title=dict(text=fig_title, x=0.5,
                        font=dict(family='Times New Roman', size=30, color='Purple')))
@@ -369,7 +373,8 @@ class CorrelationUtil:
         data_df.to_csv(tsv_file_path)
         heatmap_dir = self.report_util.build_heatmap_html({
                                             'tsv_file_path': tsv_file_path,
-                                            'cluster_data': True})['html_dir']
+                                            'cluster_data': True,
+                                            'centered_by': 0})['html_dir']
 
         heatmap_report_files = os.listdir(heatmap_dir)
 
