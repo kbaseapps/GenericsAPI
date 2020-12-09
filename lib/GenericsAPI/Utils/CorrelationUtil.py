@@ -8,6 +8,7 @@ import uuid
 import math
 
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from matplotlib import pyplot as plt
@@ -168,6 +169,12 @@ class CorrelationUtil:
         rowEvenColor = 'lightgrey'
         rowOddColor = 'white'
 
+        # color codes from px.colors.diverging.RdBu
+        colors = ['rgb(247,247,247)', 'rgb(253,219,199)', 'rgb(244,165,130)', 'rgb(214,96,77)',
+                  'rgb(67,147,195)', 'rgb(146,197,222)', 'rgb(209,229,240)']
+        interval = 0.3
+        corr_color_idx = (top_corr[value_col_name]/interval).apply(int)  # divid coefficient by interval and round to int
+
         fig = go.Figure(data=[go.Table(
             header=dict(values=list(top_corr.columns),
                         line_color='darkslategray',
@@ -176,7 +183,10 @@ class CorrelationUtil:
                         font=dict(color='white', size=12)),
             cells=dict(values=top_corr.T.values,
                        line_color='darkslategray',
-                       fill_color=[[rowOddColor, rowEvenColor]*top_corr_limit],
+                       fill_color=[[rowOddColor, rowEvenColor]*top_corr_limit,
+                                   [rowOddColor, rowEvenColor]*top_corr_limit,
+                                   np.array(colors)[corr_color_idx],
+                                   [rowOddColor, rowEvenColor]*top_corr_limit],
                        align='left',
                        font=dict(color='darkslategray', size=11)))
         ])
