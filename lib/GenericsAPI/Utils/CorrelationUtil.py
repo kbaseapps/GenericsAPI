@@ -359,7 +359,7 @@ class CorrelationUtil:
 
         return tab_content
 
-    def _build_heatmap_content(self, matrix_2D, output_directory):
+    def _build_heatmap_content(self, matrix_2D, output_directory, centered_by=None):
         row_ids = matrix_2D.get('row_ids')
         col_ids = matrix_2D.get('col_ids')
         values = matrix_2D.get('values')
@@ -374,7 +374,7 @@ class CorrelationUtil:
         heatmap_dir = self.report_util.build_heatmap_html({
                                             'tsv_file_path': tsv_file_path,
                                             'cluster_data': True,
-                                            'centered_by': 0})['html_dir']
+                                            'centered_by': centered_by})['html_dir']
 
         heatmap_report_files = os.listdir(heatmap_dir)
 
@@ -549,7 +549,8 @@ class CorrelationUtil:
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'CorrelationMatrix')">Correlation Matrix Heatmap</button>
         """
-        corr_heatmap_content = self._build_heatmap_content(coefficient_data, output_directory)
+        corr_heatmap_content = self._build_heatmap_content(coefficient_data, output_directory,
+                                                           centered_by=0)
         tab_content += """
         <div id="CorrelationMatrix" class="tabcontent">{}</div>""".format(corr_heatmap_content)
 
