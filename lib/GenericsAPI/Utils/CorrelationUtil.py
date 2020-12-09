@@ -119,17 +119,9 @@ class CorrelationUtil:
                                   columns=sig_matrix_2D.get('col_ids'))
             sig_df.fillna(0, inplace=True)
 
-        links = data_df.stack().reset_index()
-        links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
-
-        # remove identical comparison
-        try:
-            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
-        except Exception:
-            raise ValueError('Cannot remove identical comparison')
-
         columns = list()
         if len(original_matrix_ref) == 1:
+            data_df = data_df.mask(np.tril(np.ones(data_df.shape)).astype(np.bool))  # remove duplicate entries
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
             matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
@@ -145,6 +137,9 @@ class CorrelationUtil:
 
         value_col_name = 'Correlation Coefficient'
         columns.append(value_col_name)
+
+        links = data_df.stack().reset_index()
+        # links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
 
         links.columns = columns
 
@@ -225,17 +220,9 @@ class CorrelationUtil:
                                   columns=sig_matrix_2D.get('col_ids'))
             sig_df.fillna(0, inplace=True)
 
-        links = data_df.stack().reset_index()
-        links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
-
-        # remove identical comparison
-        try:
-            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
-        except Exception:
-            raise ValueError('Cannot remove identical comparison')
-
         columns = list()
         if len(original_matrix_ref) == 1:
+            data_df = data_df.mask(np.tril(np.ones(data_df.shape)).astype(np.bool))
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
             matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
@@ -251,6 +238,9 @@ class CorrelationUtil:
 
         value_col_name = 'Correlation Coefficient'
         columns.append(value_col_name)
+
+        links = data_df.stack().reset_index()
+        # links = links[links.iloc[:, 0] != links.iloc[:, 1]]  # remove self-comparison
 
         links.columns = columns
 
@@ -422,13 +412,12 @@ class CorrelationUtil:
         values = matrix_2D.get('values')
 
         df = pd.DataFrame(values, index=row_ids, columns=col_ids)
-        df = df.T
-        links = df.stack().reset_index()
 
         columns = list()
         taxons = None
         taxons_level = None
         if len(original_matrix_ref) == 1:
+            df = df.mask(np.tril(np.ones(df.shape)).astype(np.bool))
             res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
             obj_type = res['info'][2]
             matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
@@ -450,14 +439,9 @@ class CorrelationUtil:
         else:
             columns = ['Variable 1', 'Variable 2']
 
+        links = df.stack().reset_index()
         # remove self-comparison
         links = links[links.iloc[:, 0] != links.iloc[:, 1]]
-
-        # remove identical comparison
-        try:
-            links = links[links.iloc[:, 1] + links.iloc[:, 0] != links.iloc[:, 0] + links.iloc[:, 1]]
-        except Exception:
-            raise print('Cannot remove identical comparison')
 
         if type == 'corr':
             columns.append('Correlation')
