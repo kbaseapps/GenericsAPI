@@ -526,7 +526,7 @@ class CorrelationUtil:
 
         tab_def_content += """
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'CorrelationTable')" id="defaultOpen">Top Coefficient Table</button>
+            <button class="tablinks" onclick="openTab(event, 'CorrelationTable')" id="defaultOpen">Coefficient Table</button>
         """
         corr_table_content = self._build_top_corr_table(coefficient_data, output_directory,
                                                         df1, df2,
