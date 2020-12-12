@@ -62,7 +62,7 @@ class AttributesUtil:
         attr_mapping = self._file_to_am_obj(scratch_file_path)
 
         if params.get('import_fbamodel_attri_mapping'):
-            data_type = 'KBaseExperiments.FBAModelAttributeMapping'
+            data_type = 'KBaseExperiments.FBAModelSet'
         else:
             data_type = 'KBaseExperiments.AttributeMapping'
 
