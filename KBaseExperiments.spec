@@ -134,6 +134,15 @@ module KBaseExperiments {
       string ontology_mapping_method;
      } FBAModelAttributeMapping;
 
+     /*
+        duplicate FBAModelAttributeMapping
+     */
+     typedef structure{
+      mapping<string, list<string>> instances;
+      list<Attribute> attributes;
+      string ontology_mapping_method;
+     } FBAModelSet;
+
 
      /*
         id_to_data_position - simple representation of a cluster, which maps features/conditions of the cluster to the
