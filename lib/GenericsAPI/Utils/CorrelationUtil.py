@@ -1100,6 +1100,7 @@ class CorrelationUtil:
         workspace_name = params.get('workspace_name')
         corr_matrix_name = params.get('corr_matrix_name')
         corr_threshold = params.get('corr_threshold')
+        dimension = params.get('dimension', 'row')
 
         method = params.get('method', 'pearson')
         if method not in CORR_METHOD:
@@ -1117,6 +1118,10 @@ class CorrelationUtil:
 
         df1 = self._fetch_matrix_data(matrix_ref_1)
         df2 = self._fetch_matrix_data(matrix_ref_2)
+
+        if dimension == 'col':
+            df1 = df1.T
+            df2 = df2.T
 
         corr_df, sig_df, df1, df2 = self._compute_metrices_corr(df1, df2, method, compute_significance)
 

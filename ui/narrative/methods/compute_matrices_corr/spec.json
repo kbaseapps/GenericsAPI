@@ -62,6 +62,40 @@
       }
     },
     {
+      "id" : "dimension",
+      "optional" : false,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : ["row"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "row",
+              "value": "row"
+          },
+          {
+              "display": "column",
+              "value": "col"
+          }
+        ]
+      }
+    },
+    {
+      "id": "compute_significance",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[1],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+        }
+    },
+    {
       "id": "corr_threshold",
       "optional": false,
       "advanced": true,
@@ -112,8 +146,16 @@
           "target_property" : "method"
         },
         {
+          "input_parameter" : "dimension",
+          "target_property" : "dimension"
+        },
+        {
           "constant_value": 0,
           "target_property" : "plot_corr_matrix"
+        },
+        {
+          "input_parameter" : "compute_significance",
+          "target_property" : "compute_significance"
         },
         {
           "input_parameter" : "corr_threshold",
