@@ -102,7 +102,7 @@ class CorrelationUtil:
 
         return taxons, taxons_level
 
-    def _build_top_corr_table(self, matrix_2D, output_directory, df1, df2,
+    def _build_top_corr_table(self, matrix_2D, output_directory,
                               original_matrix_ref=[], sig_matrix_2D=None):
 
         row_ids = matrix_2D.get('row_ids')
@@ -529,7 +529,6 @@ class CorrelationUtil:
             <button class="tablinks" onclick="openTab(event, 'CorrelationTable')" id="defaultOpen">Coefficient Table</button>
         """
         corr_table_content = self._build_top_corr_table(coefficient_data, output_directory,
-                                                        df1, df2,
                                                         original_matrix_ref=original_matrix_ref,
                                                         sig_matrix_2D=significance_data)
         tab_content += """
@@ -1201,6 +1200,8 @@ class CorrelationUtil:
 
         data_df.index = data_df.index.astype('str')
         data_df.columns = data_df.columns.astype('str')
+        if dimension == 'col':
+            data_df = data_df.T
         report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
                                                    corr_matrix_plot_path,
                                                    scatter_plot_path=scatter_plot_path,
