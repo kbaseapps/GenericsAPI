@@ -1135,8 +1135,8 @@ class CorrelationUtil:
 
         df1.index = df1.index.astype('str')
         df1.columns = df1.columns.astype('str')
-        df2.index = df1.index.astype('str')
-        df2.columns = df1.columns.astype('str')
+        df2.index = df2.index.astype('str')
+        df2.columns = df2.columns.astype('str')
         report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
                                                    corr_matrix_plot_path, df1=df1, df2=df2)
 
@@ -1199,6 +1199,8 @@ class CorrelationUtil:
 
         returnVal = {'corr_matrix_obj_ref': corr_matrix_obj_ref}
 
+        if dimension == 'row':
+            data_df = data_df.T
         data_df.index = data_df.index.astype('str')
         data_df.columns = data_df.columns.astype('str')
         report_output = self._generate_corr_report(corr_matrix_obj_ref, workspace_name,
