@@ -528,6 +528,8 @@ class BiomUtil:
                     err_msg += 'Please list any non-numeric column names in  Metadata Keys field'
                     raise ValueError(err_msg)
                 df.fillna(0, inplace=True)
+                df.index = df.index.astype('str')
+                df.columns = df.columns.astype('str')
                 matrix_data = {'row_ids': df.index.tolist(),
                                'col_ids': df.columns.tolist(),
                                'values': df.values.tolist()}

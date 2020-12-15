@@ -748,8 +748,8 @@ class CorrelationUtil:
                     drop_idx.append(idx)
             df.drop(index=drop_idx, inplace=True, errors='ignore')
 
-        matrix_data = {'row_ids': df.index.tolist(),
-                       'col_ids': df.columns.tolist(),
+        matrix_data = {'row_ids': df.index.astype(str).tolist(),
+                       'col_ids': df.index.astype(str).tolist(),
                        'values': df.values.tolist()}
 
         return matrix_data
