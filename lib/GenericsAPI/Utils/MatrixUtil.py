@@ -1367,6 +1367,8 @@ class MatrixUtil:
             err_msg += 'Please list any non-numeric column names in  Metadata Keys field'
             raise ValueError(err_msg)
         df.fillna(0, inplace=True)
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
                        'values': df.values.tolist()}
@@ -1385,6 +1387,9 @@ class MatrixUtil:
         data = refs
 
         df = self._file_to_df(file_path)
+
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
 
         matrix_data = {'row_ids': df.index.tolist(),
                        'col_ids': df.columns.tolist(),
@@ -1978,6 +1983,8 @@ class MatrixUtil:
         standardize_df = self._standardize_df(df, dimension=dimension,
                                               with_mean=with_mean, with_std=with_std)
 
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
                            'values': standardize_df.values.tolist()}
@@ -2487,6 +2494,8 @@ class MatrixUtil:
         else:
             df = selected_df.T.combine_first(original_df.T).T
 
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
                            'values': df.values.tolist()}
@@ -2638,6 +2647,8 @@ class MatrixUtil:
 
             df_results.append(df.copy(deep=True))
 
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
         new_matrix_data = {'row_ids': df.index.tolist(),
                            'col_ids': df.columns.tolist(),
                            'values': df.values.tolist()}
