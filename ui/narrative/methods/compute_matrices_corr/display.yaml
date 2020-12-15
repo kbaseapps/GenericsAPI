@@ -44,6 +44,22 @@ parameters :
         long-hint  : |
             Correlation method, one of ['pearson', 'kendall', 'spearman']
 
+    dimension:
+        ui-name: |
+            Compute Correlation Matrix On
+        short-hint : |
+            Compute correlation on column or row
+        long-hint  : |
+            Compute correlation on column or row
+
+    compute_significance:
+        ui-name: |
+            Compute Significance
+        short-hint : |
+            Also compute Significance in addition to correlation matrix
+        long-hint  : |
+            Also compute Significance in addition to correlation matrix
+
     corr_threshold:
         ui-name: |
             Correlation Coefficient Threshold
