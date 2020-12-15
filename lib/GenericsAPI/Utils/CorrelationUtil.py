@@ -187,10 +187,10 @@ class CorrelationUtil:
                        font=dict(color='darkslategray', size=11)))
         ])
 
-        if top_corr_size > top_corr_limit:
-            fig_title = 'Top {} Coefficient Pairs'.format(top_corr_limit)
-        else:
+        if top_corr_size < top_corr_limit:
             fig_title = 'All {} Coefficient Pairs'.format(top_corr_size)
+        else:
+            fig_title = 'Top {} Coefficient Pairs'.format(top_corr_limit)
         fig.update_layout(
             width=1200,
             height=2000,
