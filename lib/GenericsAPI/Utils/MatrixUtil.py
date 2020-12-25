@@ -1177,13 +1177,13 @@ class MatrixUtil:
                 except Exception:
                     raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
 
+        # remove NaN indexed rows
+        df = df[df.index.notnull()]
+
         df.index = df.index.astype('str')
         df.columns = df.columns.astype('str')
         # fill NA with "None" so that they are properly represented as nulls in the KBase Object
         df = df.where((pd.notnull(df)), None)
-
-        # remove NaN indexed rows
-        df = df[df.index.notnull()]
 
         return df
 
