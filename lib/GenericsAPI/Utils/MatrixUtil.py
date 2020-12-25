@@ -1182,6 +1182,9 @@ class MatrixUtil:
         # fill NA with "None" so that they are properly represented as nulls in the KBase Object
         df = df.where((pd.notnull(df)), None)
 
+        # remove NaN indexed rows
+        df = df[df.index.notnull()]
+
         return df
 
     @staticmethod
