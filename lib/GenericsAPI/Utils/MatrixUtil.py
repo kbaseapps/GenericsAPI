@@ -575,7 +575,7 @@ class MatrixUtil:
                                                     chemical_type[0].upper() + chemical_type[1:])
             html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
             tab_content += html
-            tab_content += '\n</div>\n'
+        tab_content += '\n</div>\n'
 
         for chemical_type, data_df in data_groups.items():
             viewer_name = '{}_MatrixHeatmapViewer'.format(chemical_type)
