@@ -577,6 +577,44 @@ class MatrixUtil:
             tab_content += html
             tab_content += '\n</div>\n'
 
+        for chemical_type, data_df in data_groups.items():
+            viewer_name = '{}_MatrixHeatmapViewer'.format(chemical_type)
+            tab_def_content += '''\n<button class="tablinks" '''
+            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+            tab_def_content += '''>{} Abundance Heatmap</button>\n'''.format(
+                                                    chemical_type[0].upper() + chemical_type[1:])
+
+            result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+            self._mkdir_p(result_directory)
+            tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
+                                                                                str(uuid.uuid4())))
+            data_df.to_csv(tsv_file_path)
+            heatmap_dir = self.report_util.build_heatmap_html({
+                                                        'tsv_file_path': tsv_file_path,
+                                                        'cluster_data': True})['html_dir']
+
+            heatmap_report_files = os.listdir(heatmap_dir)
+
+            heatmap_index_page = None
+            for heatmap_report_file in heatmap_report_files:
+                if heatmap_report_file.endswith('.html'):
+                    heatmap_index_page = heatmap_report_file
+
+                shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
+                             output_directory)
+
+            if heatmap_index_page:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += 'src="{}" '.format(heatmap_index_page)
+                tab_content += 'style="border:none;"></iframe>'
+                tab_content += '\n</div>\n'
+            else:
+                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+                tab_content += '''\n<p style="color:red;" >'''
+                tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+                tab_content += '\n</div>\n'
+
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
 
