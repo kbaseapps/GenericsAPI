@@ -690,8 +690,8 @@ class BiomUtil:
     def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
                                         top_heatmap_dir, top_percent):
 
-        row_data_summary = data_df.T.describe().to_string()
-        col_data_summary = data_df.describe().to_string()
+        row_data_summary = data_df.T.describe().round(2).to_string()
+        col_data_summary = data_df.describe().round(2).to_string()
 
         tab_def_content = ''
         tab_content = ''

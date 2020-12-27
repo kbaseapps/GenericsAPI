@@ -364,8 +364,8 @@ class MatrixUtil:
         tab_def_content = ''
         tab_content = ''
 
-        row_data_summary = random_rare_df.T.describe().to_string()
-        col_data_summary = random_rare_df.describe().to_string()
+        row_data_summary = random_rare_df.T.describe().round(2).to_string()
+        col_data_summary = random_rare_df.describe().round(2).to_string()
 
         tab_def_content = ''
         tab_content = ''
@@ -447,8 +447,8 @@ class MatrixUtil:
     def _generate_trans_visualization_content(self, output_directory,
                                               operations, heatmap_html_dir_l,
                                               transformed_matrix_df, variable_specific):
-        row_data_summary = transformed_matrix_df.T.describe().to_string()
-        col_data_summary = transformed_matrix_df.describe().to_string()
+        row_data_summary = transformed_matrix_df.T.describe().round(2).to_string()
+        col_data_summary = transformed_matrix_df.describe().round(2).to_string()
 
         tab_def_content = ''
         tab_content = ''
@@ -538,11 +538,53 @@ class MatrixUtil:
 
         return linear_plot_path
 
+    def _generate_chem_visualization_content(self, output_directory, data_groups):
+        tab_def_content = ''
+        tab_content = ''
+
+        viewer_name = 'data_summary'
+        tab_def_content += '''\n<div class="tab">\n'''
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += ''' id="defaultOpen"'''
+        tab_def_content += '''>Matrix Statistics</button>\n'''
+
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
+                                                                                    viewer_name)
+
+        chemical_types = list(data_groups.keys())
+        type_text = 'Chemical Type' if len(chemical_types) == 1 else 'Chemical Types'
+        tab_content += '''\n<h5>{}: {}</h5>'''.format(type_text,
+                                                      ', '.join(chemical_types))
+
+        for chemical_type, data_df in data_groups.items():
+            tab_content += '''\n<br>'''
+            tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
+            tab_content += '''\n<br>'''
+            row_data_summary = data_df.T.describe().round(2).to_string()
+            col_data_summary = data_df.describe().round(2).to_string()
+            tab_content += '''\n<h5>{} Chemical Matrix Size: {} x {}</h5>'''.format(
+                                                    chemical_type[0].upper() + chemical_type[1:],
+                                                    len(data_df.index),
+                                                    len(data_df.columns))
+            tab_content += '''\n<h5>{} Row Aggregating Statistics</h5>'''.format(
+                                                    chemical_type[0].upper() + chemical_type[1:])
+            html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
+            tab_content += html
+            tab_content += '''\n<h5>{} Column Aggregating Statistics</h5>'''.format(
+                                                    chemical_type[0].upper() + chemical_type[1:])
+            html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
+            tab_content += html
+            tab_content += '\n</div>\n'
+
+        tab_def_content += '\n</div>\n'
+        return tab_def_content + tab_content
+
     def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
                                         top_heatmap_dir, top_percent):
 
-        row_data_summary = data_df.T.describe().to_string()
-        col_data_summary = data_df.describe().to_string()
+        row_data_summary = data_df.T.describe().round(2).to_string()
+        col_data_summary = data_df.describe().round(2).to_string()
 
         tab_def_content = ''
         tab_content = ''
@@ -887,6 +929,49 @@ class MatrixUtil:
                             })
         return html_report
 
+    def _generate_chem_abund_heatmap_html_report(self, data, metadata_df):
+
+        logging.info('Start generating chemical abundance heatmap report page')
+
+        data_df = pd.DataFrame(data['values'], index=data['row_ids'], columns=data['col_ids'])
+        result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        self._mkdir_p(result_directory)
+
+        metadata_groups = metadata_df.groupby(by=['chemical_type']).groups
+
+        data_groups = dict()
+        for chemical_type, ids in metadata_groups.items():
+            data_groups[chemical_type] = data_df.loc[ids]
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        logging.info('Start generating html report in {}'.format(output_directory))
+
+        html_report = list()
+
+        self._mkdir_p(output_directory)
+        result_file_path = os.path.join(output_directory, 'matrix_viewer_report.html')
+
+        visualization_content = self._generate_chem_visualization_content(output_directory,
+                                                                          data_groups)
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Visualization_Content</p>',
+                                                          visualization_content)
+                result_file.write(report_template)
+
+        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
+                                                  'pack': 'zip'})['shock_id']
+
+        html_report.append({'shock_id': report_shock_id,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for Import Matrix App'
+                            })
+        return html_report
+
     def _generate_heatmap_html_report(self, data):
 
         logging.info('Start generating heatmap report page')
@@ -1076,7 +1161,7 @@ class MatrixUtil:
         return report_output
 
     def _generate_report(self, matrix_obj_ref, workspace_name, new_row_attr_ref=None,
-                         new_col_attr_ref=None, data=None):
+                         new_col_attr_ref=None, data=None, metadata_df=None):
         """
         _generate_report: generate summary report
         """
@@ -1092,7 +1177,11 @@ class MatrixUtil:
                                     'description': 'Imported Column Attribute Mapping'})
 
         if data:
-            output_html_files = self._generate_heatmap_html_report(data)
+            if metadata_df is not None:
+                output_html_files = self._generate_chem_abund_heatmap_html_report(data,
+                                                                                  metadata_df)
+            else:
+                output_html_files = self._generate_heatmap_html_report(data)
 
             report_params = {'message': '',
                              'objects_created': objects_created,
@@ -1101,7 +1190,6 @@ class MatrixUtil:
                              'direct_html_link_index': 0,
                              'html_window_height': 660,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
-
         else:
             report_params = {'message': '',
                              'objects_created': objects_created,
@@ -1383,7 +1471,7 @@ class MatrixUtil:
         data.update(self._get_axis_attributes('row', matrix_data, refs, file_path, matrix_name,
                                               workspace_id, metadata_df=metadata_df))
 
-        return data
+        return data, metadata_df
 
     def _file_to_data(self, file_path, refs, matrix_name, workspace_id):
         logging.info('Start reading and converting excel file data')
@@ -2812,8 +2900,10 @@ class MatrixUtil:
         else:
             workspace_id = workspace_name
 
+        metadata_df = None
         if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
-            data = self._file_to_chem_abun_data(file_path, refs, matrix_name, workspace_id)
+            data, metadata_df = self._file_to_chem_abun_data(file_path, refs, matrix_name,
+                                                             workspace_id)
         else:
             data = self._file_to_data(file_path, refs, matrix_name, workspace_id)
 
@@ -2865,7 +2955,7 @@ class MatrixUtil:
         report_output = self._generate_report(matrix_obj_ref, workspace_name,
                                               new_row_attr_ref=new_row_attr_ref,
                                               new_col_attr_ref=new_col_attr_ref,
-                                              data=data['data'])
+                                              data=data['data'], metadata_df=metadata_df)
 
         returnVal.update(report_output)
 
