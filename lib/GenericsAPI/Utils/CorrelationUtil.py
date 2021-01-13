@@ -9,6 +9,7 @@ import math
 
 import pandas as pd
 import numpy as np
+import plotly.express as px
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from matplotlib import pyplot as plt
@@ -16,6 +17,7 @@ from plotly.offline import plot
 from scipy import stats
 from natsort import natsorted
 from sklearn import metrics
+from sklearn.linear_model import LinearRegression
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
@@ -263,6 +265,8 @@ class CorrelationUtil:
         num_rows = math.ceil(num_plots/num_cols)
 
         fig = make_subplots(rows=num_rows, cols=num_cols)
+        colors = px.colors.qualitative.Plotly
+        colors_size = len(colors)
         for i in range(num_plots):
             corr_pair = top_corr.iloc[i]
             first_item = corr_pair[0]
@@ -277,10 +281,25 @@ class CorrelationUtil:
                 y=second_item_matrix_value,
                 mode='markers',
                 showlegend=False,
+                opacity=0.65,
+                marker_color=colors[i % colors_size],
                 marker=dict(size=8,)
+            )
+            X = df1.loc[first_item].values.reshape(-1, 1)
+            model = LinearRegression()
+            model.fit(X, df2.loc[second_item].values)
+            x_range = np.linspace(X.min(), X.max(), 100)
+            y_range = model.predict(x_range.reshape(-1, 1))
+
+            sub_fig_trend = go.Scatter(
+                x=x_range,
+                y=y_range,
+                showlegend=False,
+                marker_color=colors[i % colors_size],
             )
 
             fig.add_trace(sub_fig, row=i//num_cols + 1, col=i % num_cols + 1)
+            fig.add_trace(sub_fig_trend, row=i//num_cols + 1, col=i % num_cols + 1)
 
             anno_text = 'correlation coefficient={}'.format(corr_r)
             if i == 0:
