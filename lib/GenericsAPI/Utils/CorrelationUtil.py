@@ -720,6 +720,7 @@ class CorrelationUtil:
         data_df = pd.read_json(data_matrix)
         data_df = data_df.reindex(index=natsorted(data_df.index))
         data_df = data_df.reindex(columns=natsorted(data_df.columns))
+        data_df.fillna(0, inplace=True)
 
         corr_df = self.df_to_corr(data_df, method=method, dimension=dimension)
 
