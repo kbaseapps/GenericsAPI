@@ -578,13 +578,13 @@ class MatrixUtil:
             for i in range(len(data_label_groups_pos)):
                 data_label_idx = list(data_label_groups_pos.values())[i]
                 if i == 0:
-                    fig.update_layout(yaxis=dict(range=[0, 12],
+                    fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
                                                  tickvals=data_label_idx,
                                                  tickfont=dict(color=colors[i])))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
                     fig.update_layout({'yaxis{}'.format(i + 1): dict(
-                        range=[0, 12],
+                        range=[0, data_df.index.size-1],
                         tickvals=data_label_idx,
                         ticktext=[data_df.index[i] for i in data_label_idx],
                         tickfont=dict(color=colors[i]),
