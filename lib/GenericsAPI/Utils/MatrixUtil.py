@@ -573,14 +573,26 @@ class MatrixUtil:
 
         fig.update_layout(coloraxis=dict(colorscale=colorscale))
 
-        colors = px.colors.qualitative.Set2
+        colors = px.colors.qualitative.Bold
+        text_height = 0
         if len(data_label_groups_pos) > 1:
-            for i in range(len(data_label_groups_pos)):
-                data_label_idx = list(data_label_groups_pos.values())[i]
+            for i, chemical_type in enumerate(data_label_groups_pos):
+                data_label_idx = data_label_groups_pos[chemical_type]
                 if i == 0:
                     fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
                                                  tickvals=data_label_idx,
                                                  tickfont=dict(color=colors[i])))
+
+                    text_height += len(data_label_idx) - 1
+                    fig.add_annotation(x=-0, y=0.5,
+                                       ax=0, ay=text_height,
+                                       text=chemical_type,
+                                       showarrow=True,
+                                       xref="x", yref="y",
+                                       axref="x", ayref="y",
+                                       arrowside='start',
+                                       arrowwidth=1.5,
+                                       font=dict(color=colors[i]))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
                     fig.update_layout({'yaxis{}'.format(i + 1): dict(
@@ -589,6 +601,16 @@ class MatrixUtil:
                         ticktext=[data_df.index[i] for i in data_label_idx],
                         tickfont=dict(color=colors[i]),
                         overlaying='y')})
+                    text_height += len(data_label_idx)
+                    fig.add_annotation(x=-0, y=text_height - len(data_label_idx) + 1,
+                                       ax=0, ay=text_height,
+                                       text=chemical_type,
+                                       showarrow=True,
+                                       xref="x", yref="y",
+                                       axref="x", ayref="y",
+                                       arrowside='start',
+                                       arrowwidth=1.5,
+                                       font=dict(color=colors[i]))
 
         plot(fig, filename=heatmap_path)
 
