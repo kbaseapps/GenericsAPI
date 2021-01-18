@@ -18,6 +18,8 @@ from skbio.stats.composition import ilr, clr
 from skbio import DistanceMatrix
 from skbio.stats.distance import anosim, permanova, permdisp, pwmantel
 import scipy.spatial.distance as dist
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist
 import rpy2.robjects.packages as rpackages
 import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri, numpy2ri
@@ -69,8 +71,8 @@ class MatrixUtil:
                  'file_path': self.scratch}).get('file_path')
         elif params.get('input_staging_file_path'):
             file_path = self.dfu.download_staging_file(
-                        {'staging_file_subdir_path': params.get('input_staging_file_path')}
-                        ).get('copy_file_path')
+                {'staging_file_subdir_path': params.get('input_staging_file_path')}
+            ).get('copy_file_path')
         else:
             error_msg = "Must supply either a input_shock_id or input_file_path "
             error_msg += "or input_staging_file_path"
@@ -377,10 +379,11 @@ class MatrixUtil:
         tab_def_content += ''' id="defaultOpen"'''
         tab_def_content += '''>Rarefied Matrix Statistics</button>\n'''
 
-        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(viewer_name)
+        tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
+            viewer_name)
         tab_content += '''\n<h5>Rarefied Matrix Size: {} x {}</h5>'''.format(
-                                                                    len(random_rare_df.index),
-                                                                    len(random_rare_df.columns))
+            len(random_rare_df.index),
+            len(random_rare_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
@@ -492,15 +495,15 @@ class MatrixUtil:
         else:
             tab_def_content += '''>Transformed Matrix Statistics</button>\n'''
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
-                                                                                    viewer_name)
+            viewer_name)
         if variable_specific:
             tab_content += '''\n<h5>Transformed Selected Variables Size: {} x {}</h5>'''.format(
-                                                                len(transformed_matrix_df.index),
-                                                                len(transformed_matrix_df.columns))
+                len(transformed_matrix_df.index),
+                len(transformed_matrix_df.columns))
         else:
             tab_content += '''\n<h5>Transformed Matrix Size: {} x {}</h5>'''.format(
-                                                                len(transformed_matrix_df.index),
-                                                                len(transformed_matrix_df.columns))
+                len(transformed_matrix_df.index),
+                len(transformed_matrix_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
         html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
         tab_content += html
@@ -538,6 +541,59 @@ class MatrixUtil:
 
         return linear_plot_path
 
+    def _create_chem_abun_heatmap(self, output_directory, data_groups):
+
+        data_df = pd.concat(data_groups.values())
+
+        data_label_groups_pos = dict()
+        for chemical_type, data_group_df in data_groups.items():
+            data_label_groups_pos[chemical_type] = [
+                data_df.index.to_list().index(data_id) for data_id in data_group_df.index]
+
+        heatmap_file_name = 'chem_abun_heatmap_{}.html'.format(str(uuid.uuid4()))
+        heatmap_path = os.path.join(output_directory, heatmap_file_name)
+
+        colors = px.colors.sequential.OrRd
+        colorscale = [[0, colors[1]],         # 0
+                      [1./10000, colors[2]],  # 10
+                      [1./1000, colors[3]],   # 100
+                      [1./100, colors[4]],    # 1000
+                      [1./10, colors[5]],     # 10000
+                      [1., colors[6]]]
+
+        layout = go.Layout(xaxis={'type': 'category'},
+                           yaxis={'type': 'category'})
+
+        fig = go.Figure(data=go.Heatmap(
+            z=data_df.values,
+            x=data_df.columns,
+            y=data_df.index,
+            hoverongaps=False,
+            coloraxis='coloraxis'), layout=layout)
+
+        fig.update_layout(coloraxis=dict(colorscale=colorscale))
+
+        colors = px.colors.qualitative.Set2
+        if len(data_label_groups_pos) > 1:
+            for i in range(len(data_label_groups_pos)):
+                data_label_idx = list(data_label_groups_pos.values())[i]
+                if i == 0:
+                    fig.update_layout(yaxis=dict(range=[0, 12],
+                                                 tickvals=data_label_idx,
+                                                 tickfont=dict(color=colors[i])))
+                else:
+                    fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
+                    fig.update_layout({'yaxis{}'.format(i + 1): dict(
+                        range=[0, 12],
+                        tickvals=data_label_idx,
+                        ticktext=[data_df.index[i] for i in data_label_idx],
+                        tickfont=dict(color=colors[i]),
+                        overlaying='y')})
+
+        plot(fig, filename=heatmap_path)
+
+        return heatmap_file_name
+
     def _generate_chem_visualization_content(self, output_directory, data_groups):
         tab_def_content = ''
         tab_content = ''
@@ -550,7 +606,7 @@ class MatrixUtil:
         tab_def_content += '''>Matrix Statistics</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
-                                                                                    viewer_name)
+            viewer_name)
 
         chemical_types = list(data_groups.keys())
         type_text = 'Chemical Type' if len(chemical_types) == 1 else 'Chemical Types'
@@ -564,56 +620,70 @@ class MatrixUtil:
             row_data_summary = data_df.T.describe().round(2).to_string()
             col_data_summary = data_df.describe().round(2).to_string()
             tab_content += '''\n<h5>{} Chemical Matrix Size: {} x {}</h5>'''.format(
-                                                    chemical_type[0].upper() + chemical_type[1:],
-                                                    len(data_df.index),
-                                                    len(data_df.columns))
+                chemical_type[0].upper() + chemical_type[1:],
+                len(data_df.index),
+                len(data_df.columns))
             tab_content += '''\n<h5>{} Row Aggregating Statistics</h5>'''.format(
-                                                    chemical_type[0].upper() + chemical_type[1:])
-            html = '''\n<pre class="tab">''' + str(row_data_summary).replace("\n", "<br>") + "</pre>"
+                chemical_type[0].upper() + chemical_type[1:])
+            html = '''\n<pre class="tab">''' + \
+                str(row_data_summary).replace("\n", "<br>") + "</pre>"
             tab_content += html
             tab_content += '''\n<h5>{} Column Aggregating Statistics</h5>'''.format(
-                                                    chemical_type[0].upper() + chemical_type[1:])
-            html = '''\n<pre class="tab">''' + str(col_data_summary).replace("\n", "<br>") + "</pre>"
+                chemical_type[0].upper() + chemical_type[1:])
+            html = '''\n<pre class="tab">''' + \
+                str(col_data_summary).replace("\n", "<br>") + "</pre>"
             tab_content += html
         tab_content += '\n</div>\n'
 
-        for chemical_type, data_df in data_groups.items():
-            viewer_name = '{}_MatrixHeatmapViewer'.format(chemical_type)
-            tab_def_content += '''\n<button class="tablinks" '''
-            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>{} Abundance Heatmap</button>\n'''.format(
-                                                    chemical_type[0].upper() + chemical_type[1:])
+        heatmap_index_page = self._create_chem_abun_heatmap(output_directory, data_groups)
+        viewer_name = 'MatrixHeatmapViewer'
+        tab_def_content += '''\n<button class="tablinks" '''
+        tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        tab_def_content += '''>Matrix Heatmap</button>\n'''
 
-            result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-            self._mkdir_p(result_directory)
-            tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
-            data_df.to_csv(tsv_file_path)
-            heatmap_dir = self.report_util.build_heatmap_html({
-                                                        'tsv_file_path': tsv_file_path,
-                                                        'cluster_data': True})['html_dir']
+        tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += 'src="{}" '.format(heatmap_index_page)
+        tab_content += 'style="border:none;"></iframe>'
+        tab_content += '\n</div>\n'
 
-            heatmap_report_files = os.listdir(heatmap_dir)
+        # for chemical_type, data_df in data_groups.items():
+        #     viewer_name = '{}_MatrixHeatmapViewer'.format(chemical_type)
+        #     tab_def_content += '''\n<button class="tablinks" '''
+        #     tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
+        #     tab_def_content += '''>{} Abundance Heatmap</button>\n'''.format(
+        #                                             chemical_type[0].upper() + chemical_type[1:])
 
-            heatmap_index_page = None
-            for heatmap_report_file in heatmap_report_files:
-                if heatmap_report_file.endswith('.html'):
-                    heatmap_index_page = heatmap_report_file
+        #     result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        #     self._mkdir_p(result_directory)
+        #     tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
+        #                                                                         str(uuid.uuid4())))
+        #     data_df.to_csv(tsv_file_path)
+        #     heatmap_dir = self.report_util.build_heatmap_html({
+        #                                                 'tsv_file_path': tsv_file_path,
+        #                                                 'cluster_data': True})['html_dir']
 
-                shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
-                             output_directory)
+        #     heatmap_report_files = os.listdir(heatmap_dir)
 
-            if heatmap_index_page:
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '\n<iframe height="900px" width="100%" '
-                tab_content += 'src="{}" '.format(heatmap_index_page)
-                tab_content += 'style="border:none;"></iframe>'
-                tab_content += '\n</div>\n'
-            else:
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '''\n<p style="color:red;" >'''
-                tab_content += '''Heatmap is too large to be displayed.</p>\n'''
-                tab_content += '\n</div>\n'
+        #     heatmap_index_page = None
+        #     for heatmap_report_file in heatmap_report_files:
+        #         if heatmap_report_file.endswith('.html'):
+        #             heatmap_index_page = heatmap_report_file
+
+        #         shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
+        #                      output_directory)
+
+        #     if heatmap_index_page:
+        #         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+        #         tab_content += '\n<iframe height="900px" width="100%" '
+        #         tab_content += 'src="{}" '.format(heatmap_index_page)
+        #         tab_content += 'style="border:none;"></iframe>'
+        #         tab_content += '\n</div>\n'
+        #     else:
+        #         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
+        #         tab_content += '''\n<p style="color:red;" >'''
+        #         tab_content += '''Heatmap is too large to be displayed.</p>\n'''
+        #         tab_content += '\n</div>\n'
 
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
@@ -635,7 +705,7 @@ class MatrixUtil:
         tab_def_content += '''>Matrix Statistics</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent" style="overflow:auto">'''.format(
-                                                                                    viewer_name)
+            viewer_name)
         tab_content += '''\n<h5>Matrix Size: {} x {}</h5>'''.format(len(data_df.index),
                                                                     len(data_df.columns))
         tab_content += '''\n<h5>Row Aggregating Statistics</h5>'''
@@ -667,7 +737,8 @@ class MatrixUtil:
 
             if heatmap_index_page:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                    top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
                 tab_content += '\n<iframe height="900px" width="100%" '
@@ -691,7 +762,8 @@ class MatrixUtil:
                                                               top_percent=top_percent)
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                    top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
                 tab_content += '\n<iframe height="900px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
@@ -908,11 +980,11 @@ class MatrixUtil:
         result_file_path = os.path.join(output_directory, 'rarefy_matrix_viewer_report.html')
 
         visualization_content = self._generate_rarefy_visualization_content(
-                                                                    output_directory,
-                                                                    rarefied_matrix_dir,
-                                                                    rarecurve_image,
-                                                                    obs_vs_rare_image,
-                                                                    random_rare_df)
+            output_directory,
+            rarefied_matrix_dir,
+            rarecurve_image,
+            obs_vs_rare_image,
+            random_rare_df)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -943,11 +1015,11 @@ class MatrixUtil:
         result_file_path = os.path.join(output_directory, 'transform_matrix_viewer_report.html')
 
         visualization_content = self._generate_trans_visualization_content(
-                                                                    output_directory,
-                                                                    operations,
-                                                                    heatmap_html_dir_l,
-                                                                    transformed_matrix_df,
-                                                                    variable_specific)
+            output_directory,
+            operations,
+            heatmap_html_dir_l,
+            transformed_matrix_df,
+            variable_specific)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
@@ -967,6 +1039,21 @@ class MatrixUtil:
                             })
         return html_report
 
+    def _compute_cluster_label_order(self, values, labels):
+
+        # values = [[1, 0, 21, 50, 1], [20, 0, 60, 80, 30], [30, 60, 1, -10, 20]]
+        # labels = ['model_1', 'model_2', 'model_3']
+        if len(labels) == 1:
+            return labels
+        dist_matrix = pdist(values)
+        linkage_matrix = linkage(dist_matrix, 'ward')
+
+        dn = dendrogram(linkage_matrix, labels=labels, distance_sort='ascending')
+
+        ordered_label = dn['ivl']
+
+        return ordered_label
+
     def _generate_chem_abund_heatmap_html_report(self, data, metadata_df):
 
         logging.info('Start generating chemical abundance heatmap report page')
@@ -979,7 +1066,10 @@ class MatrixUtil:
 
         data_groups = dict()
         for chemical_type, ids in metadata_groups.items():
-            data_groups[chemical_type] = data_df.loc[ids]
+            chem_type_data = data_df.loc[ids]
+            idx_ordered_label = self._compute_cluster_label_order(chem_type_data.values.tolist(),
+                                                                  chem_type_data.index.tolist())
+            data_groups[chemical_type] = chem_type_data.reindex(index=idx_ordered_label)
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -1018,11 +1108,11 @@ class MatrixUtil:
         result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(result_directory)
         tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
-                                                                            str(uuid.uuid4())))
+            str(uuid.uuid4())))
         data_df.to_csv(tsv_file_path)
         heatmap_dir = self.report_util.build_heatmap_html({
-                                                    'tsv_file_path': tsv_file_path,
-                                                    'cluster_data': True})['html_dir']
+            'tsv_file_path': tsv_file_path,
+            'cluster_data': True})['html_dir']
 
         top_heatmap_dir = None
         top_percent = 100
@@ -1031,9 +1121,9 @@ class MatrixUtil:
             top_percent = min(int(display_count / len(data_df.index) * 100), 100)
             top_percent = max(top_percent, 1)
             top_heatmap_dir = self.report_util.build_heatmap_html({
-                                                        'tsv_file_path': tsv_file_path,
-                                                        'sort_by_sum': True,
-                                                        'top_percent': top_percent})['html_dir']
+                'tsv_file_path': tsv_file_path,
+                'sort_by_sum': True,
+                'top_percent': top_percent})['html_dir']
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -1078,11 +1168,11 @@ class MatrixUtil:
         logging.info('Start generating matrix tsv files in {}'.format(data_tsv_directory))
         rarefied_matrix_tsv_path = os.path.join(data_tsv_directory,
                                                 'rarefied_matrix_{}.tsv'.format(
-                                                                                str(uuid.uuid4())))
+                                                    str(uuid.uuid4())))
         random_rare_df.to_csv(rarefied_matrix_tsv_path)
         rarefied_matrix_dir = self.report_util.build_heatmap_html({
-                                            'tsv_file_path': rarefied_matrix_tsv_path,
-                                            'cluster_data': True})['html_dir']
+            'tsv_file_path': rarefied_matrix_tsv_path,
+            'cluster_data': True})['html_dir']
 
         output_html_files = self._generate_rarefy_html_report(rarefied_matrix_dir,
                                                               rarecurve_image,
@@ -1114,7 +1204,7 @@ class MatrixUtil:
 
         heatmap_html_dir_l = []
         for i, (op, df) in enumerate(zip(operations, df_results)):
-            tsv_path = os.path.join(data_tsv_directory, 'op%d_%s.tsv' %(i, op))
+            tsv_path = os.path.join(data_tsv_directory, 'op%d_%s.tsv' % (i, op))
             df.to_csv(tsv_path)
             heatmap_html_dir = self.report_util.build_heatmap_html({
                 'tsv_file_path': tsv_path,
@@ -1301,7 +1391,8 @@ class MatrixUtil:
                     inferred_sep = reader._engine.data.dialect.delimiter
                     df = pd.read_csv(file_path, sep=inferred_sep, index_col=0)
                 except Exception:
-                    raise ValueError('Cannot parse file. Please provide valide tsv, excel or csv file')
+                    raise ValueError(
+                        'Cannot parse file. Please provide valide tsv, excel or csv file')
 
         # remove NaN indexed rows
         df = df[df.index.notnull()]
@@ -1406,13 +1497,15 @@ class MatrixUtil:
             logging.info('Start examing specific chemical abundances')
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
-            self._check_df_col_inclusive(specific_abun, 'measurement_type', valid_measurement_types)
+            self._check_df_col_inclusive(
+                specific_abun, 'measurement_type', valid_measurement_types)
 
             valid_unit_medium = {'soil', 'solvent', 'water'}
             self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
 
             valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
-            self._check_df_col_inclusive(specific_abun, 'chromatography_type', valid_chromatography_type)
+            self._check_df_col_inclusive(
+                specific_abun, 'chromatography_type', valid_chromatography_type)
 
             non_empty_fields = ['units', 'chromatography_type']
             for field in non_empty_fields:
@@ -1422,13 +1515,15 @@ class MatrixUtil:
             logging.info('Start examing specific chemical abundances')
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
-            self._check_df_col_inclusive(specific_abun, 'measurement_type', valid_measurement_types)
+            self._check_df_col_inclusive(
+                specific_abun, 'measurement_type', valid_measurement_types)
 
             valid_unit_medium = {'soil', 'solvent', 'water'}
             self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
 
             valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
-            self._check_df_col_inclusive(specific_abun, 'chromatography_type', valid_chromatography_type)
+            self._check_df_col_inclusive(
+                specific_abun, 'chromatography_type', valid_chromatography_type)
 
             non_empty_fields = ['units', 'chromatography_type']
             for field in non_empty_fields:
@@ -1486,7 +1581,7 @@ class MatrixUtil:
             self._check_chem_abun_metadata(metadata_df)
         else:
             err_msg = 'Please provide at least one of below metadata fields:\n{}'.format(
-                                                                        list(rename_map.keys()))
+                list(rename_map.keys()))
             raise ValueError(err_msg)
 
         try:
@@ -1658,7 +1753,8 @@ class MatrixUtil:
 
         logging.info('Start building html replacement')
 
-        attribute_names = [attributes.get('attribute') for attributes in attributemapping_data.get('attributes')]
+        attribute_names = [attributes.get('attribute')
+                           for attributes in attributemapping_data.get('attributes')]
 
         header_str = self._build_header_str(attribute_names)
 
@@ -1740,10 +1836,12 @@ class MatrixUtil:
 
         if dimension == 'row':
             filtered_df = val_df.drop(remove_ids, axis=0, errors='ignore')
-            filtered_df = filtered_df.drop([_norm_id(x) for x in remove_ids], axis=0, errors='ignore')
+            filtered_df = filtered_df.drop([_norm_id(x)
+                                            for x in remove_ids], axis=0, errors='ignore')
         elif dimension == 'col':
             filtered_df = val_df.drop(remove_ids, axis=1, errors='ignore')
-            filtered_df = filtered_df.drop([_norm_id(x) for x in remove_ids], axis=1, errors='ignore')
+            filtered_df = filtered_df.drop([_norm_id(x)
+                                            for x in remove_ids], axis=1, errors='ignore')
         else:
             raise ValueError('Unexpected dimension: {}'.format(dimension))
 
@@ -2052,10 +2150,10 @@ class MatrixUtil:
             # save new attribute mapping
             info = self.dfu.save_objects({"id": workspace_id,
                                           "objects": [{
-                                                "type": 'KBaseExperiments.AttributeMapping',
-                                                "data": am_data,
-                                                "name": new_attri_mapping_name
-                                            }]})[0]
+                                              "type": 'KBaseExperiments.AttributeMapping',
+                                              "data": am_data,
+                                              "name": new_attri_mapping_name
+                                          }]})[0]
 
             new_attri_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
 
@@ -2165,7 +2263,8 @@ class MatrixUtil:
         if 'KBaseMatrices' in matrix_type:
             am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
             if not am_ref:
-                raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+                raise ValueError(
+                    'Missing {} attribute mapping from original matrix'.format(dimension))
         elif 'KBaseProfile' in matrix_type:
             profile_category = input_matrix_data.get('profile_category')
             if profile_category == 'community' and dimension == 'row':
@@ -2174,7 +2273,8 @@ class MatrixUtil:
                 raise ValueError('Please choose row dimension for organism profile')
             am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
             if not am_ref:
-                raise ValueError('Missing {} attribute mapping from functional profile'.format(dimension))
+                raise ValueError(
+                    'Missing {} attribute mapping from functional profile'.format(dimension))
         else:
             raise ValueError('Unsupported data type: {}'.format(matrix_type))
 
@@ -2254,7 +2354,8 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
-                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})[
+                    'data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
 
@@ -2351,10 +2452,10 @@ class MatrixUtil:
         logging.info("Saving new rarefy matrix object")
 
         new_matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': input_matrix_info[2],
-                                                'obj_name': new_matrix_name,
-                                                'data': input_matrix_data,
-                                                'workspace_id': workspace_id})['obj_ref']
+            'obj_type': input_matrix_info[2],
+            'obj_name': new_matrix_name,
+            'data': input_matrix_data,
+            'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
@@ -2394,7 +2495,8 @@ class MatrixUtil:
             input_matrix_name = input_matrix_info[1]
             labels.append(input_matrix_name)
 
-            data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+            data_matrix = self.data_util.fetch_data(
+                {'obj_ref': input_matrix_ref}).get('data_matrix')
             df = pd.read_json(data_matrix)
 
             dm = self._create_distance_matrix(df, dist_metric=dist_metric, dimension=dimension)
@@ -2436,7 +2538,8 @@ class MatrixUtil:
         if 'KBaseMatrices' in matrix_type:
             am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
             if not am_ref:
-                raise ValueError('Missing {} attribute mapping from original matrix'.format(dimension))
+                raise ValueError(
+                    'Missing {} attribute mapping from original matrix'.format(dimension))
         elif 'KBaseProfile' in matrix_type:
             profile_category = input_matrix_data.get('profile_category')
             if profile_category == 'community' and dimension == 'row':
@@ -2445,7 +2548,8 @@ class MatrixUtil:
                 raise ValueError('Please choose row dimension for organism profile')
             am_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dimension))
             if not am_ref:
-                raise ValueError('Missing {} attribute mapping from functional profile'.format(dimension))
+                raise ValueError(
+                    'Missing {} attribute mapping from functional profile'.format(dimension))
         else:
             raise ValueError('Unsupported data type: {}'.format(matrix_type))
 
@@ -2542,8 +2646,8 @@ class MatrixUtil:
         unmatched_var = set(variables) - set(input_matrix_data['data']['{}_ids'.format(dimension)])
         if unmatched_var:
             raise ValueError('variable [{}] is not contained in {} ids from matrix'.format(
-                                                                                    unmatched_var,
-                                                                                    dimension))
+                unmatched_var,
+                dimension))
 
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
@@ -2555,7 +2659,8 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
-                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})[
+                    'data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
 
@@ -2580,27 +2685,27 @@ class MatrixUtil:
 
             if op == 'relative_abundance':
                 selected_df = self._relative_abundance(
-                                    selected_df,
-                                    dimension=relative_abundance_params.get(
-                                                'relative_abundance_dimension', 'col'))
+                    selected_df,
+                    dimension=relative_abundance_params.get(
+                        'relative_abundance_dimension', 'col'))
 
             elif op == 'standardization':
                 selected_df = self._standardize_df(
-                                    selected_df,
-                                    dimension=standardization_params.get(
-                                                            'standardization_dimension', 'col'),
-                                    with_mean=standardization_params.get(
-                                                            'standardization_with_mean', True),
-                                    with_std=standardization_params.get(
-                                                            'standardization_with_std', True))
+                    selected_df,
+                    dimension=standardization_params.get(
+                        'standardization_dimension', 'col'),
+                    with_mean=standardization_params.get(
+                        'standardization_with_mean', True),
+                    with_std=standardization_params.get(
+                        'standardization_with_std', True))
 
             elif op == 'ratio_transformation':
                 selected_df = self._ratio_trans_df(
-                                    selected_df,
-                                    method=ratio_transformation_params.get(
-                                                            'ratio_transformation_method', 'clr'),
-                                    dimension=ratio_transformation_params.get(
-                                                            'ratio_transformation_dimension', 'col'))
+                    selected_df,
+                    method=ratio_transformation_params.get(
+                        'ratio_transformation_method', 'clr'),
+                    dimension=ratio_transformation_params.get(
+                        'ratio_transformation_dimension', 'col'))
 
             elif op == 'logit':
                 selected_df = self._logit(selected_df)
@@ -2646,10 +2751,10 @@ class MatrixUtil:
 
         logging.info("Saving new transformed matrix object")
         new_matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': input_matrix_info[2],
-                                                'obj_name': new_matrix_name,
-                                                'data': input_matrix_data,
-                                                'workspace_id': workspace_id})['obj_ref']
+            'obj_type': input_matrix_info[2],
+            'obj_name': new_matrix_name,
+            'data': input_matrix_data,
+            'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
@@ -2712,7 +2817,8 @@ class MatrixUtil:
             attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
             attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
             if not attribute_mapping and attributemapping_ref:
-                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})[
+                    'data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
 
@@ -2732,35 +2838,35 @@ class MatrixUtil:
             if op == 'abundance_filtering':
                 df = self._filtering_matrix(df,
                                             row_threshold=abundance_filtering_params.get(
-                                                            'abundance_filtering_row_threshold', 0),
+                                                'abundance_filtering_row_threshold', 0),
                                             columns_threshold=abundance_filtering_params.get(
-                                                        'abundance_filtering_columns_threshold', 0),
+                                                'abundance_filtering_columns_threshold', 0),
                                             row_sum_threshold=abundance_filtering_params.get(
-                                                        'abundance_filtering_row_sum_threshold',
-                                                        10000),
+                                                'abundance_filtering_row_sum_threshold',
+                                                10000),
                                             columns_sum_threshold=abundance_filtering_params.get(
-                                                        'abundance_filtering_columns_sum_threshold',
-                                                        10000))
+                                                'abundance_filtering_columns_sum_threshold',
+                                                10000))
 
             elif op == 'relative_abundance':
                 df = self._relative_abundance(df, dimension=relative_abundance_params.get(
-                                                            'relative_abundance_dimension', 'col'))
+                    'relative_abundance_dimension', 'col'))
 
             elif op == 'standardization':
                 df = self._standardize_df(df,
                                           dimension=standardization_params.get(
-                                                                'standardization_dimension', 'col'),
+                                              'standardization_dimension', 'col'),
                                           with_mean=standardization_params.get(
-                                                                'standardization_with_mean', True),
+                                              'standardization_with_mean', True),
                                           with_std=standardization_params.get(
-                                                                'standardization_with_std', True))
+                                              'standardization_with_std', True))
 
             elif op == 'ratio_transformation':
                 df = self._ratio_trans_df(df,
                                           method=ratio_transformation_params.get(
-                                                            'ratio_transformation_method', 'clr'),
+                                              'ratio_transformation_method', 'clr'),
                                           dimension=ratio_transformation_params.get(
-                                                            'ratio_transformation_dimension', 'col'))
+                                              'ratio_transformation_dimension', 'col'))
 
             elif op == 'logit':
                 df = self._logit(df)
@@ -2799,10 +2905,10 @@ class MatrixUtil:
 
         logging.info("Saving new transformed matrix object")
         new_matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': input_matrix_info[2],
-                                                'obj_name': new_matrix_name,
-                                                'data': input_matrix_data,
-                                                'workspace_id': workspace_id})['obj_ref']
+            'obj_type': input_matrix_info[2],
+            'obj_name': new_matrix_name,
+            'data': input_matrix_data,
+            'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
 
@@ -2862,10 +2968,10 @@ class MatrixUtil:
             workspace_id = workspace_name
 
         filtered_matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
-                                                'obj_name': filtered_matrix_name,
-                                                'data': matrix_data,
-                                                'workspace_id': workspace_id})['obj_ref']
+            'obj_type': 'KBaseMatrices.{}'.format(matrix_type),
+            'obj_name': filtered_matrix_name,
+            'data': matrix_data,
+            'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'matrix_obj_refs': [filtered_matrix_obj_ref]}
 
@@ -2898,10 +3004,11 @@ class MatrixUtil:
         row_ids = matrix_data['data']['row_ids']
 
         if not (row_mapping and row_attributemapping_ref):
-            raise ValueError('Matrix obejct is missing either row_mapping or row_attributemapping_ref')
+            raise ValueError(
+                'Matrix obejct is missing either row_mapping or row_attributemapping_ref')
 
         attributemapping_data = self.dfu.get_objects(
-                                    {"object_refs": [row_attributemapping_ref]})['data'][0]['data']
+            {"object_refs": [row_attributemapping_ref]})['data'][0]['data']
 
         header_str, table_str = self._build_html_str(row_mapping, attributemapping_data, row_ids)
 
@@ -2959,23 +3066,23 @@ class MatrixUtil:
             new_col_attr_ref = data.get('col_attributemapping_ref')
 
         matrix_obj_ref = self.data_util.save_object({
-                                                'obj_type': 'KBaseMatrices.{}'.format(obj_type),
-                                                'obj_name': matrix_name,
-                                                'data': data,
-                                                'workspace_id': workspace_id})['obj_ref']
+            'obj_type': 'KBaseMatrices.{}'.format(obj_type),
+            'obj_name': matrix_name,
+            'data': data,
+            'workspace_id': workspace_id})['obj_ref']
 
         try:
             logging.info('Start trying to look up ModelSeed ID')
             if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
                 ret = self.fba_tools.lookup_modelseed_ids(
-                                                {'workspace': workspace_name,
-                                                 'chemical_abundance_matrix_id': matrix_name,
-                                                 'chemical_abundance_matrix_out_id': matrix_name})
+                    {'workspace': workspace_name,
+                     'chemical_abundance_matrix_id': matrix_name,
+                     'chemical_abundance_matrix_out_id': matrix_name})
 
                 matrix_obj_ref = ret.get('new_chemical_abundance_matrix_ref')
 
                 matrix_data = self.dfu.get_objects(
-                                    {"object_refs": [matrix_obj_ref]})['data'][0]['data']
+                    {"object_refs": [matrix_obj_ref]})['data'][0]['data']
 
                 if not params.get('row_attributemapping_ref'):
                     new_row_attr_ref = matrix_data.get('row_attributemapping_ref')
