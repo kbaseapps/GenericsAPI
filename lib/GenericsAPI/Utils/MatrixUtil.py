@@ -598,8 +598,8 @@ class MatrixUtil:
                                                  tickfont=dict(color=colors[i], size=8)))
 
                     text_height += len(data_label_idx) - 1
-                    fig.add_annotation(x=-1, y=0.5,
-                                       ax=-1, ay=text_height,
+                    fig.add_annotation(x=0, y=0.5,
+                                       ax=0, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
@@ -617,8 +617,8 @@ class MatrixUtil:
                         automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
-                    fig.add_annotation(x=-1, y=text_height - len(data_label_idx) + 1,
-                                       ax=-1, ay=text_height,
+                    fig.add_annotation(x=0, y=text_height - len(data_label_idx) + 1,
+                                       ax=0, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
