@@ -679,7 +679,7 @@ class MatrixUtil:
         tab_def_content += '''>Matrix Heatmap</button>\n'''
 
         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += '\n<iframe height="1300px" width="100%" '
         tab_content += 'src="{}" '.format(heatmap_index_page)
         tab_content += 'style="border:none;"></iframe>'
         tab_content += '\n</div>\n'
@@ -1353,7 +1353,7 @@ class MatrixUtil:
                              'workspace_name': workspace_name,
                              'html_links': output_html_files,
                              'direct_html_link_index': 0,
-                             'html_window_height': 660,
+                             'html_window_height': 1400,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
         else:
             report_params = {'message': '',
