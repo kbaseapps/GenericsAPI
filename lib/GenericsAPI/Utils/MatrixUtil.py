@@ -575,7 +575,8 @@ class MatrixUtil:
             hoverongaps=False,
             coloraxis='coloraxis'), layout=layout)
 
-        fig.update_layout(coloraxis=dict(colorscale=colorscale))
+        fig.update_layout(coloraxis=dict(colorscale=colorscale),
+                          plot_bgcolor='rgba(0,0,0,0)')
 
         colors = px.colors.qualitative.Bold
         text_height = 0
@@ -588,8 +589,8 @@ class MatrixUtil:
                                                  tickfont=dict(color=colors[i])))
 
                     text_height += len(data_label_idx) - 1
-                    fig.add_annotation(x=-0, y=0.5,
-                                       ax=0, ay=text_height,
+                    fig.add_annotation(x=data_df.columns.size - 0.3, y=0.5,
+                                       ax=data_df.columns.size - 0.3, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
@@ -606,8 +607,8 @@ class MatrixUtil:
                         tickfont=dict(color=colors[i]),
                         overlaying='y')})
                     text_height += len(data_label_idx)
-                    fig.add_annotation(x=-0, y=text_height - len(data_label_idx) + 1,
-                                       ax=0, ay=text_height,
+                    fig.add_annotation(x=data_df.columns.size - 0.3, y=text_height - len(data_label_idx) + 1,
+                                       ax=data_df.columns.size - 0.3, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
