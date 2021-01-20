@@ -545,6 +545,10 @@ class MatrixUtil:
 
         data_df = pd.concat(data_groups.values())
 
+        col_ordered_label = self._compute_cluster_label_order(data_df.T.values.tolist(),
+                                                              data_df.T.index.tolist())
+        data_df = data_df.reindex(columns=col_ordered_label)
+
         data_label_groups_pos = dict()
         for chemical_type, data_group_df in data_groups.items():
             data_label_groups_pos[chemical_type] = [
