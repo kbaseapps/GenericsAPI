@@ -606,7 +606,7 @@ class MatrixUtil:
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        arrowwidth=1.5,
-                                       font=dict(color=colors[i], size=8))
+                                       font=dict(color=colors[i]))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
                     fig.update_layout({'yaxis{}'.format(i + 1): dict(
@@ -625,7 +625,7 @@ class MatrixUtil:
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        arrowwidth=1.5,
-                                       font=dict(color=colors[i], size=8))
+                                       font=dict(color=colors[i]))
 
         plot(fig, filename=heatmap_path)
 
