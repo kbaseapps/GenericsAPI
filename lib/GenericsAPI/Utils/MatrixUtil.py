@@ -598,14 +598,14 @@ class MatrixUtil:
                                                  tickfont=dict(color=colors[i], size=8)))
 
                     text_height += len(data_label_idx) - 1
-                    fig.add_annotation(x=-0.7, y=0.5,
-                                       ax=-0.7, ay=text_height,
+                    fig.add_annotation(x=-1, y=0.5,
+                                       ax=-1, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
                                        arrowside='start',
-                                       arrowwidth=1.5,
+                                       # arrowwidth=1.5,
                                        font=dict(color=colors[i], size=8))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
@@ -617,14 +617,14 @@ class MatrixUtil:
                         automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
-                    fig.add_annotation(x=-0.7, y=text_height - len(data_label_idx) + 1,
-                                       ax=-0.7, ay=text_height,
+                    fig.add_annotation(x=-1, y=text_height - len(data_label_idx) + 1,
+                                       ax=-1, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
                                        arrowside='start',
-                                       arrowwidth=1.5,
+                                       # arrowwidth=1.5,
                                        font=dict(color=colors[i], size=8))
 
         plot(fig, filename=heatmap_path)
