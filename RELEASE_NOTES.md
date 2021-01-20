@@ -1,7 +1,7 @@
 # GenericsAPI release notes
 =========================================
 
-1.0.20
+1.0.21
 Add linear regression trendline for correlation report
 Merge different chemical abundance type into one heatmap
 
