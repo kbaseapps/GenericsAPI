@@ -575,8 +575,16 @@ class MatrixUtil:
             hoverongaps=False,
             coloraxis='coloraxis'), layout=layout)
 
+        width = max(100 * data_df.columns.size, 1400)
+        height = max(10 * data_df.index.size, 1000)
         fig.update_layout(coloraxis=dict(colorscale=colorscale),
-                          plot_bgcolor='rgba(0,0,0,0)')
+                          plot_bgcolor='rgba(0,0,0,0)',
+                          autosize=True,
+                          width=width,
+                          height=height,
+                          xaxis=dict(tickangle=45,
+                                     automargin=True,
+                                     tickfont=dict(color='black', size=8)))
 
         colors = px.colors.qualitative.Bold
         text_height = 0
@@ -586,7 +594,8 @@ class MatrixUtil:
                 if i == 0:
                     fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
                                                  tickvals=data_label_idx,
-                                                 tickfont=dict(color=colors[i])))
+                                                 automargin=True,
+                                                 tickfont=dict(color=colors[i], size=8)))
 
                     text_height += len(data_label_idx) - 1
                     fig.add_annotation(x=data_df.columns.size - 0.3, y=0.5,
@@ -604,7 +613,8 @@ class MatrixUtil:
                         range=[0, data_df.index.size-1],
                         tickvals=data_label_idx,
                         ticktext=[data_df.index[i] for i in data_label_idx],
-                        tickfont=dict(color=colors[i]),
+                        tickfont=dict(color=colors[i], size=8),
+                        automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
                     fig.add_annotation(x=data_df.columns.size - 0.3, y=text_height - len(data_label_idx) + 1,
