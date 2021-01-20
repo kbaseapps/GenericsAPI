@@ -598,15 +598,15 @@ class MatrixUtil:
                                                  tickfont=dict(color=colors[i], size=8)))
 
                     text_height += len(data_label_idx) - 1
-                    fig.add_annotation(x=-0.6, y=0.5,
-                                       ax=-0.6, ay=text_height,
+                    fig.add_annotation(x=-0.7, y=0.5,
+                                       ax=-0.7, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        arrowwidth=1.5,
-                                       font=dict(color=colors[i]))
+                                       font=dict(color=colors[i], size=8))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
                     fig.update_layout({'yaxis{}'.format(i + 1): dict(
@@ -617,15 +617,15 @@ class MatrixUtil:
                         automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
-                    fig.add_annotation(x=-0.6, y=text_height - len(data_label_idx) + 1,
-                                       ax=-0.6, ay=text_height,
+                    fig.add_annotation(x=-0.7, y=text_height - len(data_label_idx) + 1,
+                                       ax=-0.7, ay=text_height,
                                        text=chemical_type,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        arrowwidth=1.5,
-                                       font=dict(color=colors[i]))
+                                       font=dict(color=colors[i], size=8))
 
         plot(fig, filename=heatmap_path)
 
