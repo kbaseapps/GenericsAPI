@@ -320,7 +320,7 @@ class PCAUtil:
                          'objects_created': objects_created,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 1000,
+                         'html_window_height': 1050,
                          'report_object_name': 'kb_pca_report_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url)
