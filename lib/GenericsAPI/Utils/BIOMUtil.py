@@ -738,7 +738,7 @@ class BiomUtil:
                 msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(heatmap_index_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -762,7 +762,7 @@ class BiomUtil:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
                 msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -775,7 +775,7 @@ class BiomUtil:
                 linear_plot_page = self._generate_linear_plot(data_df, output_directory, row_name='OTU')
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -797,7 +797,7 @@ class BiomUtil:
 
         if heatmap_index_page:
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1300px" width="100%" '
             tab_content += 'src="{}" '.format(heatmap_index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -891,7 +891,7 @@ class BiomUtil:
                              'workspace_id': workspace_id,
                              'html_links': output_html_files,
                              'direct_html_link_index': 0,
-                             'html_window_height': 660,
+                             'html_window_height': 1400,
                              'report_object_name': 'import_matrix_from_biom_' + str(uuid.uuid4())}
 
         else:

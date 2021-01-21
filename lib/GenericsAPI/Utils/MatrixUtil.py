@@ -145,7 +145,7 @@ class MatrixUtil:
 
         if index_page:
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1300px" width="100%" '
             tab_content += 'src="{}" '.format(index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -404,7 +404,7 @@ class MatrixUtil:
             linear_plot_page = self._generate_linear_plot(random_rare_df, output_directory)
 
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1300px" width="100%" '
             tab_content += 'src="{}" '.format(linear_plot_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -584,6 +584,8 @@ class MatrixUtil:
                           height=height,
                           xaxis=dict(tickangle=45,
                                      automargin=True,
+                                     tickfont=dict(color='black', size=8)),
+                          yaxis=dict(automargin=True,
                                      tickfont=dict(color='black', size=8)))
 
         colors = px.colors.qualitative.Bold
@@ -778,7 +780,7 @@ class MatrixUtil:
                     top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(heatmap_index_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -802,7 +804,7 @@ class MatrixUtil:
                 msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
                     top_percent)
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -815,7 +817,7 @@ class MatrixUtil:
                 linear_plot_page = self._generate_linear_plot(data_df, output_directory)
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '\n<iframe height="900px" width="100%" '
+                tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
                 tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
@@ -837,7 +839,7 @@ class MatrixUtil:
 
         if heatmap_index_page:
             tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1300px" width="100%" '
             tab_content += 'src="{}" '.format(heatmap_index_page)
             tab_content += 'style="border:none;"></iframe>'
             tab_content += '\n</div>\n'
@@ -1221,7 +1223,7 @@ class MatrixUtil:
                          'workspace_id': workspace_id,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 660,
+                         'html_window_height': 1400,
                          'report_object_name': 'rarefy_matrix_' + str(uuid.uuid4()),
                          'warnings': warnings}
 
@@ -1258,7 +1260,7 @@ class MatrixUtil:
                          'workspace_id': workspace_id,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 660,
+                         'html_window_height': 1400,
                          'report_object_name': 'transform_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
