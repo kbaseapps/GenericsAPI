@@ -204,7 +204,7 @@ class CorrelationUtil:
         fig.write_html(table_file_path)
 
         tab_content = ''
-        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += '\n<iframe height="1300px" width="100%" '
         tab_content += 'src="{}" '.format(table_file_name)
         tab_content += 'style="border:none;"></iframe>'
 
@@ -372,7 +372,7 @@ class CorrelationUtil:
         fig.write_html(plot_file_path)
 
         tab_content = ''
-        tab_content += '\n<iframe height="900px" width="100%" '
+        tab_content += '\n<iframe height="1300px" width="100%" '
         tab_content += 'src="{}" '.format(plot_file_name)
         tab_content += 'style="border:none;"></iframe>'
 
@@ -407,7 +407,7 @@ class CorrelationUtil:
         tab_content = '\n'
 
         if heatmap_index_page:
-            tab_content += '\n<iframe height="900px" width="100%" '
+            tab_content += '\n<iframe height="1300px" width="100%" '
             tab_content += 'src="{}" '.format(heatmap_index_page)
             tab_content += 'style="border:none;"></iframe>'
         else:
@@ -427,7 +427,7 @@ class CorrelationUtil:
         table_file_name = '{}_table.html'.format(type)
         data_file_name = '{}_data.json'.format(type)
 
-        page_content += """<iframe height="900px" width="100%" """
+        page_content += """<iframe height="1300px" width="100%" """
         page_content += """src="{}" """.format(table_file_name)
         page_content += """style="border:none;"></iframe>\n"""
 
@@ -608,7 +608,7 @@ class CorrelationUtil:
                 shutil.copy2(corr_matrix_plot_path,
                              os.path.join(output_directory, corr_matrix_plot_name))
 
-                tab_content += '<iframe height="900px" width="100%" '
+                tab_content += '<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(corr_matrix_plot_name)
                 tab_content += 'style="border:none;"></iframe>\n<p></p>\n'
             else:
@@ -702,7 +702,7 @@ class CorrelationUtil:
                          'workspace_name': workspace_name,
                          'html_links': output_html_files,
                          'direct_html_link_index': 0,
-                         'html_window_height': 666,
+                         'html_window_height': 1400,
                          'report_object_name': 'compute_correlation_matrix_' + str(uuid.uuid4())}
 
         kbase_report_client = KBaseReport(self.callback_url, token=self.token)
