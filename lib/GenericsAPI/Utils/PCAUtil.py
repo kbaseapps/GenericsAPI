@@ -690,10 +690,11 @@ class PCAUtil:
             if not attributemapping_ref:
                 # handle Functional Profile
                 base_object_ref = obj_data.get('base_object_ref')
-                base_object_data = self.dfu.get_objects({'object_refs':
-                                                         [base_object_ref]})['data'][0]['data']
-                attributemapping_ref = base_object_data.get('row_attributemapping_ref')
-                obj_data['row_attributemapping_ref'] = attributemapping_ref
+                if base_object_ref:
+                    base_object_data = self.dfu.get_objects({'object_refs':
+                                                             [base_object_ref]})['data'][0]['data']
+                    attributemapping_ref = base_object_data.get('row_attributemapping_ref')
+                    obj_data['row_attributemapping_ref'] = attributemapping_ref
             if not attribute_mapping and attributemapping_ref:
                 am_data = self.dfu.get_objects({'object_refs':
                                                 [attributemapping_ref]})['data'][0]['data']
@@ -705,10 +706,11 @@ class PCAUtil:
             if not attributemapping_ref:
                 # handle Functional Profile
                 base_object_ref = obj_data.get('base_object_ref')
-                base_object_data = self.dfu.get_objects({'object_refs':
-                                                         [base_object_ref]})['data'][0]['data']
-                attributemapping_ref = base_object_data.get('row_attributemapping_ref')
-                obj_data['row_attributemapping_ref'] = attributemapping_ref
+                if base_object_ref:
+                    base_object_data = self.dfu.get_objects({'object_refs':
+                                                             [base_object_ref]})['data'][0]['data']
+                    attributemapping_ref = base_object_data.get('row_attributemapping_ref')
+                    obj_data['row_attributemapping_ref'] = attributemapping_ref
             if not attribute_mapping and attributemapping_ref:
                 am_data = self.dfu.get_objects({'object_refs':
                                                 [attributemapping_ref]})['data'][0]['data']
