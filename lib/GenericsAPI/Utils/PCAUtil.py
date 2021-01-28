@@ -687,15 +687,31 @@ class PCAUtil:
         if dimension == 'row':
             attribute_mapping = obj_data.get('row_mapping')
             attributemapping_ref = obj_data.get('row_attributemapping_ref')
+            if not attributemapping_ref:
+                # handle Functional Profile
+                base_object_ref = obj_data.get('base_object_ref')
+                base_object_data = self.dfu.get_objects({'object_refs':
+                                                         [base_object_ref]})['data'][0]['data']
+                attributemapping_ref = base_object_data.get('row_attributemapping_ref')
+                obj_data['row_attributemapping_ref'] = attributemapping_ref
             if not attribute_mapping and attributemapping_ref:
-                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                am_data = self.dfu.get_objects({'object_refs':
+                                                [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 obj_data['row_mapping'] = attribute_mapping
         elif dimension == 'col':
             attribute_mapping = obj_data.get('col_mapping')
             attributemapping_ref = obj_data.get('col_attributemapping_ref')
+            if not attributemapping_ref:
+                # handle Functional Profile
+                base_object_ref = obj_data.get('base_object_ref')
+                base_object_data = self.dfu.get_objects({'object_refs':
+                                                         [base_object_ref]})['data'][0]['data']
+                attributemapping_ref = base_object_data.get('row_attributemapping_ref')
+                obj_data['row_attributemapping_ref'] = attributemapping_ref
             if not attribute_mapping and attributemapping_ref:
-                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})['data'][0]['data']
+                am_data = self.dfu.get_objects({'object_refs':
+                                                [attributemapping_ref]})['data'][0]['data']
                 attribute_mapping = {x: x for x in am_data['instances'].keys()}
                 obj_data['col_mapping'] = attribute_mapping
         else:
