@@ -1559,7 +1559,8 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 specific_abun, 'chromatography_type', valid_chromatography_type)
 
-            valid_units = {'mol/l', 'ml/kg'}
+            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
             self._check_df_col_inclusive(
                 specific_abun, 'units', valid_units)
 
@@ -1581,7 +1582,8 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 exometabolite_abun, 'chromatography_type', valid_chromatography_type)
 
-            valid_units = {'mol/l', 'ml/kg'}
+            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
             self._check_df_col_inclusive(
                 exometabolite_abun, 'units', valid_units)
 
