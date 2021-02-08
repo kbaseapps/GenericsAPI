@@ -550,8 +550,14 @@ class MatrixUtil:
         data_df = data_df.reindex(columns=col_ordered_label)
 
         data_label_groups_pos = dict()
-        for chemical_type, data_group_df in data_groups.items():
-            data_label_groups_pos[chemical_type] = [
+
+        for group_name, data_group_df in data_groups.items():
+            if pd.isna(group_name[1]):
+                label_name = group_name[0]
+            else:
+                label_name = '{} ({})'.format(group_name[0], group_name[1])
+
+            data_label_groups_pos[label_name] = [
                 data_df.index.to_list().index(data_id) for data_id in data_group_df.index]
 
         heatmap_file_name = 'chem_abun_heatmap_{}.html'.format(str(uuid.uuid4()))
@@ -589,15 +595,19 @@ class MatrixUtil:
                                      tickfont=dict(color='black', size=8)))
 
         colors = px.colors.qualitative.Bold
+        chemical_types = ['aggregate', 'exometabolite', 'specific']
         text_height = 0
         if len(data_label_groups_pos) > 1:
             for i, chemical_type in enumerate(data_label_groups_pos):
                 data_label_idx = data_label_groups_pos[chemical_type]
+                chemical_type = label_name.split(' ')[0]
                 if i == 0:
                     fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
                                                  tickvals=data_label_idx,
                                                  automargin=True,
-                                                 tickfont=dict(color=colors[i], size=8)))
+                                                 tickfont=dict(
+                                                color=colors[chemical_types.index(chemical_type)],
+                                                size=8)))
 
                     text_height += len(data_label_idx) - 1
                     fig.add_annotation(x=0, y=0.5,
@@ -608,14 +618,15 @@ class MatrixUtil:
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        # arrowwidth=1.5,
-                                       font=dict(color=colors[i], size=8))
+                                       font=dict(color=colors[chemical_types.index(chemical_type)],
+                                                 size=8))
                 else:
                     fig.add_trace(dict(yaxis='y{}'.format(i + 1)))
                     fig.update_layout({'yaxis{}'.format(i + 1): dict(
                         range=[0, data_df.index.size-1],
                         tickvals=data_label_idx,
                         ticktext=[data_df.index[i] for i in data_label_idx],
-                        tickfont=dict(color=colors[i], size=8),
+                        tickfont=dict(color=colors[chemical_types.index(chemical_type)], size=8),
                         automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
@@ -627,7 +638,8 @@ class MatrixUtil:
                                        axref="x", ayref="y",
                                        arrowside='start',
                                        # arrowwidth=1.5,
-                                       font=dict(color=colors[i], size=8))
+                                       font=dict(color=colors[chemical_types.index(chemical_type)],
+                                                 size=8))
 
         plot(fig, filename=heatmap_path)
 
@@ -1101,14 +1113,15 @@ class MatrixUtil:
         result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         self._mkdir_p(result_directory)
 
-        metadata_groups = metadata_df.groupby(by=['chemical_type']).groups
+        group_by = ['chemical_type', 'units']
+        metadata_groups = metadata_df.groupby(by=group_by).groups
 
         data_groups = dict()
-        for chemical_type, ids in metadata_groups.items():
+        for group_name, ids in metadata_groups.items():
             chem_type_data = data_df.loc[ids]
             idx_ordered_label = self._compute_cluster_label_order(chem_type_data.values.tolist(),
                                                                   chem_type_data.index.tolist())
-            data_groups[chemical_type] = chem_type_data.reindex(index=idx_ordered_label)
+            data_groups[group_name] = chem_type_data.reindex(index=idx_ordered_label)
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         logging.info('Start generating html report in {}'.format(output_directory))
@@ -1546,27 +1559,37 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 specific_abun, 'chromatography_type', valid_chromatography_type)
 
-            non_empty_fields = ['units', 'chromatography_type']
-            for field in non_empty_fields:
-                self._check_df_col_non_empty(specific_abun, field)
+            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
+            self._check_df_col_inclusive(
+                specific_abun, 'units', valid_units)
+
+            # non_empty_fields = ['units', 'chromatography_type']
+            # for field in non_empty_fields:
+            #     self._check_df_col_non_empty(specific_abun, field)
 
         if not exometabolite_abun.index.empty:
-            logging.info('Start examing specific chemical abundances')
+            logging.info('Start examing exometabolite chemical abundances')
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
             self._check_df_col_inclusive(
-                specific_abun, 'measurement_type', valid_measurement_types)
+                exometabolite_abun, 'measurement_type', valid_measurement_types)
 
             valid_unit_medium = {'soil', 'solvent', 'water'}
-            self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
+            self._check_df_col_inclusive(exometabolite_abun, 'unit_medium', valid_unit_medium)
 
             valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
             self._check_df_col_inclusive(
-                specific_abun, 'chromatography_type', valid_chromatography_type)
+                exometabolite_abun, 'chromatography_type', valid_chromatography_type)
 
-            non_empty_fields = ['units', 'chromatography_type']
-            for field in non_empty_fields:
-                self._check_df_col_non_empty(specific_abun, field)
+            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
+            self._check_df_col_inclusive(
+                exometabolite_abun, 'units', valid_units)
+
+            # non_empty_fields = ['units', 'chromatography_type']
+            # for field in non_empty_fields:
+            #     self._check_df_col_non_empty(exometabolite_abun, field)
 
         if not aggregate_abun.index.empty:
             logging.info('Start examing aggregate chemical abundances')
