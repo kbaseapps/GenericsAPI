@@ -1558,12 +1558,16 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 specific_abun, 'chromatography_type', valid_chromatography_type)
 
-            non_empty_fields = ['units', 'chromatography_type']
-            for field in non_empty_fields:
-                self._check_df_col_non_empty(specific_abun, field)
+            valid_units = {'mol/l', 'ml/kg'}
+            self._check_df_col_inclusive(
+                specific_abun, 'units', valid_units)
+
+            # non_empty_fields = ['units', 'chromatography_type']
+            # for field in non_empty_fields:
+            #     self._check_df_col_non_empty(specific_abun, field)
 
         if not exometabolite_abun.index.empty:
-            logging.info('Start examing specific chemical abundances')
+            logging.info('Start examing exometabolite chemical abundances')
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
             self._check_df_col_inclusive(
@@ -1576,9 +1580,13 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 specific_abun, 'chromatography_type', valid_chromatography_type)
 
-            non_empty_fields = ['units', 'chromatography_type']
-            for field in non_empty_fields:
-                self._check_df_col_non_empty(specific_abun, field)
+            valid_units = {'mol/l', 'ml/kg'}
+            self._check_df_col_inclusive(
+                specific_abun, 'units', valid_units)
+
+            # non_empty_fields = ['units', 'chromatography_type']
+            # for field in non_empty_fields:
+            #     self._check_df_col_non_empty(specific_abun, field)
 
         if not aggregate_abun.index.empty:
             logging.info('Start examing aggregate chemical abundances')
