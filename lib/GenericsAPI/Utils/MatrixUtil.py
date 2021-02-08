@@ -581,7 +581,7 @@ class MatrixUtil:
             hoverongaps=False,
             coloraxis='coloraxis'), layout=layout)
 
-        width = max(100 * data_df.columns.size, 1400)
+        width = max(15 * data_df.columns.size, 1400)
         height = max(10 * data_df.index.size, 1000)
         fig.update_layout(coloraxis=dict(colorscale=colorscale),
                           plot_bgcolor='rgba(0,0,0,0)',
