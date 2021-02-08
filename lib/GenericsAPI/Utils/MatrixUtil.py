@@ -600,6 +600,7 @@ class MatrixUtil:
         if len(data_label_groups_pos) > 1:
             for i, chemical_type in enumerate(data_label_groups_pos):
                 data_label_idx = data_label_groups_pos[chemical_type]
+                chemical_type = label_name.split(' ')[0]
                 if i == 0:
                     fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
                                                  tickvals=data_label_idx,
