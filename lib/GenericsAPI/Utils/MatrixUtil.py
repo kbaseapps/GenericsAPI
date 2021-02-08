@@ -598,7 +598,7 @@ class MatrixUtil:
         chemical_types = ['aggregate', 'exometabolite', 'specific']
         text_height = 0
         col_size = width / data_df.columns.size
-        label_pos = 100 / col_size
+        label_pos = 70 / col_size
         if len(data_label_groups_pos) > 1:
             for i, label_name in enumerate(data_label_groups_pos):
                 data_label_idx = data_label_groups_pos[label_name]
