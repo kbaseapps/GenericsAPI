@@ -124,11 +124,12 @@ class TemplateUtil:
                                    'source': ['soil', 'solvent', 'water']})
 
         units_pos = headers.index('Units')
-        worksheet.write(1, units_pos, 'mol/L')
+        worksheet.write(1, units_pos, 'mg/Kg')
         worksheet.data_validation(1, units_pos, 1, units_pos,
                                   {'validate': 'list',
                                    'source': ['mg/Kg', 'g/Kg', 'mg/L', 'mg/g DW',
-                                              'mM (millimolar)', 'M (molar)', '% (percentage)']})
+                                              'mM (millimolar)', 'M (molar)', '% (percentage)',
+                                              'Total Weight %', 'unknown']})
 
         chromatography_type_pos = headers.index('Chromatography Type')
         worksheet.write(1, chromatography_type_pos, 'unknown')

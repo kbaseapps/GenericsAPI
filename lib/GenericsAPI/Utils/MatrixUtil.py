@@ -660,11 +660,13 @@ class MatrixUtil:
             viewer_name)
 
         chemical_types = list(data_groups.keys())
+        chemical_types = ['{} ({})'.format(item[0], item[1]) for item in chemical_types]
         type_text = 'Chemical Type' if len(chemical_types) == 1 else 'Chemical Types'
         tab_content += '''\n<h5>{}: {}</h5>'''.format(type_text,
                                                       ', '.join(chemical_types))
 
         for chemical_type, data_df in data_groups.items():
+            chemical_type = '{} ({})'.format(chemical_type[0], chemical_type[1])
             tab_content += '''\n<br>'''
             tab_content += '''\n<hr style="height:2px;border-width:0;color:gray;background-color:gray">'''
             tab_content += '''\n<br>'''
@@ -697,44 +699,6 @@ class MatrixUtil:
         tab_content += 'src="{}" '.format(heatmap_index_page)
         tab_content += 'style="border:none;"></iframe>'
         tab_content += '\n</div>\n'
-
-        # for chemical_type, data_df in data_groups.items():
-        #     viewer_name = '{}_MatrixHeatmapViewer'.format(chemical_type)
-        #     tab_def_content += '''\n<button class="tablinks" '''
-        #     tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-        #     tab_def_content += '''>{} Abundance Heatmap</button>\n'''.format(
-        #                                             chemical_type[0].upper() + chemical_type[1:])
-
-        #     result_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        #     self._mkdir_p(result_directory)
-        #     tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
-        #                                                                         str(uuid.uuid4())))
-        #     data_df.to_csv(tsv_file_path)
-        #     heatmap_dir = self.report_util.build_heatmap_html({
-        #                                                 'tsv_file_path': tsv_file_path,
-        #                                                 'cluster_data': True})['html_dir']
-
-        #     heatmap_report_files = os.listdir(heatmap_dir)
-
-        #     heatmap_index_page = None
-        #     for heatmap_report_file in heatmap_report_files:
-        #         if heatmap_report_file.endswith('.html'):
-        #             heatmap_index_page = heatmap_report_file
-
-        #         shutil.copy2(os.path.join(heatmap_dir, heatmap_report_file),
-        #                      output_directory)
-
-        #     if heatmap_index_page:
-        #         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-        #         tab_content += '\n<iframe height="900px" width="100%" '
-        #         tab_content += 'src="{}" '.format(heatmap_index_page)
-        #         tab_content += 'style="border:none;"></iframe>'
-        #         tab_content += '\n</div>\n'
-        #     else:
-        #         tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-        #         tab_content += '''\n<p style="color:red;" >'''
-        #         tab_content += '''Heatmap is too large to be displayed.</p>\n'''
-        #         tab_content += '\n</div>\n'
 
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
@@ -1559,14 +1523,15 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 specific_abun, 'chromatography_type', valid_chromatography_type)
 
-            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
-                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
-            self._check_df_col_inclusive(
-                specific_abun, 'units', valid_units)
+            # valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+            #                'mm (millimolar)', 'm (molar)', '% (percentage)',
+            #                'total weight %', 'unknown'}
+            # self._check_df_col_inclusive(
+            #     specific_abun, 'units', valid_units)
 
-            # non_empty_fields = ['units', 'chromatography_type']
-            # for field in non_empty_fields:
-            #     self._check_df_col_non_empty(specific_abun, field)
+            non_empty_fields = ['units', 'chromatography_type']
+            for field in non_empty_fields:
+                self._check_df_col_non_empty(specific_abun, field)
 
         if not exometabolite_abun.index.empty:
             logging.info('Start examing exometabolite chemical abundances')
@@ -1582,14 +1547,14 @@ class MatrixUtil:
             self._check_df_col_inclusive(
                 exometabolite_abun, 'chromatography_type', valid_chromatography_type)
 
-            valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
-                           'mm (millimolar)', 'm (molar)', '% (percentage)'}
-            self._check_df_col_inclusive(
-                exometabolite_abun, 'units', valid_units)
+            # valid_units = {'mg/kg', 'g/kg', 'mg/l', 'mg/g dw',
+            #                'mm (millimolar)', 'm (molar)', '% (percentage)'}
+            # self._check_df_col_inclusive(
+            #     exometabolite_abun, 'units', valid_units)
 
-            # non_empty_fields = ['units', 'chromatography_type']
-            # for field in non_empty_fields:
-            #     self._check_df_col_non_empty(exometabolite_abun, field)
+            non_empty_fields = ['units', 'chromatography_type']
+            for field in non_empty_fields:
+                self._check_df_col_non_empty(exometabolite_abun, field)
 
         if not aggregate_abun.index.empty:
             logging.info('Start examing aggregate chemical abundances')
@@ -3133,29 +3098,29 @@ class MatrixUtil:
             'data': data,
             'workspace_id': workspace_id})['obj_ref']
 
-        try:
-            logging.info('Start trying to look up ModelSeed ID')
-            if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
-                ret = self.fba_tools.lookup_modelseed_ids(
-                    {'workspace': workspace_name,
-                     'chemical_abundance_matrix_id': matrix_name,
-                     'chemical_abundance_matrix_out_id': matrix_name})
+        # try:
+        #     logging.info('Start trying to look up ModelSeed ID')
+        #     if obj_type in ['ChemicalAbundanceMatrix', 'MetaboliteMatrix']:
+        #         ret = self.fba_tools.lookup_modelseed_ids(
+        #             {'workspace': workspace_name,
+        #              'chemical_abundance_matrix_id': matrix_name,
+        #              'chemical_abundance_matrix_out_id': matrix_name})
 
-                matrix_obj_ref = ret.get('new_chemical_abundance_matrix_ref')
+        #         matrix_obj_ref = ret.get('new_chemical_abundance_matrix_ref')
 
-                matrix_data = self.dfu.get_objects(
-                    {"object_refs": [matrix_obj_ref]})['data'][0]['data']
+        #         matrix_data = self.dfu.get_objects(
+        #             {"object_refs": [matrix_obj_ref]})['data'][0]['data']
 
-                if not params.get('row_attributemapping_ref'):
-                    new_row_attr_ref = matrix_data.get('row_attributemapping_ref')
+        #         if not params.get('row_attributemapping_ref'):
+        #             new_row_attr_ref = matrix_data.get('row_attributemapping_ref')
 
-                if not params.get('col_attributemapping_ref'):
-                    new_col_attr_ref = matrix_data.get('col_attributemapping_ref')
-        except Exception:
-            logging.info('Failed looking up ModelSeed ID')
-            logging.warning('failed to run run_model_characterization')
-            logging.warning(traceback.format_exc())
-            logging.warning(sys.exc_info()[2])
+        #         if not params.get('col_attributemapping_ref'):
+        #             new_col_attr_ref = matrix_data.get('col_attributemapping_ref')
+        # except Exception:
+        #     logging.info('Failed looking up ModelSeed ID')
+        #     logging.warning('failed to run run_model_characterization')
+        #     logging.warning(traceback.format_exc())
+        #     logging.warning(sys.exc_info()[2])
 
         returnVal = {'matrix_obj_ref': matrix_obj_ref}
 
