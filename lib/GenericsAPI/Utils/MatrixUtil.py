@@ -597,6 +597,8 @@ class MatrixUtil:
         colors = px.colors.qualitative.Bold
         chemical_types = ['aggregate', 'exometabolite', 'specific']
         text_height = 0
+        col_size = width / data_df.columns.size
+        label_pos = 100 / col_size
         if len(data_label_groups_pos) > 1:
             for i, label_name in enumerate(data_label_groups_pos):
                 data_label_idx = data_label_groups_pos[label_name]
@@ -610,8 +612,8 @@ class MatrixUtil:
                                                 size=8)))
 
                     text_height += len(data_label_idx) - 1
-                    fig.add_annotation(x=0, y=0.5,
-                                       ax=0, ay=text_height,
+                    fig.add_annotation(x=label_pos, y=0.5,
+                                       ax=label_pos, ay=text_height,
                                        text=label_name,
                                        showarrow=True,
                                        xref="x", yref="y",
@@ -630,8 +632,8 @@ class MatrixUtil:
                         automargin=True,
                         overlaying='y')})
                     text_height += len(data_label_idx)
-                    fig.add_annotation(x=0, y=text_height - len(data_label_idx) + 1,
-                                       ax=0, ay=text_height,
+                    fig.add_annotation(x=label_pos, y=text_height - len(data_label_idx) + 1,
+                                       ax=label_pos, ay=text_height,
                                        text=label_name,
                                        showarrow=True,
                                        xref="x", yref="y",
