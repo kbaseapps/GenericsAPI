@@ -1572,22 +1572,22 @@ class MatrixUtil:
 
             valid_measurement_types = {'unknown', 'fticr', 'orbitrap', 'quadrapole'}
             self._check_df_col_inclusive(
-                specific_abun, 'measurement_type', valid_measurement_types)
+                exometabolite_abun, 'measurement_type', valid_measurement_types)
 
             valid_unit_medium = {'soil', 'solvent', 'water'}
-            self._check_df_col_inclusive(specific_abun, 'unit_medium', valid_unit_medium)
+            self._check_df_col_inclusive(exometabolite_abun, 'unit_medium', valid_unit_medium)
 
             valid_chromatography_type = {'unknown', 'HPLC', 'MS/MS', 'LCMS', 'GS'}
             self._check_df_col_inclusive(
-                specific_abun, 'chromatography_type', valid_chromatography_type)
+                exometabolite_abun, 'chromatography_type', valid_chromatography_type)
 
             valid_units = {'mol/l', 'ml/kg'}
             self._check_df_col_inclusive(
-                specific_abun, 'units', valid_units)
+                exometabolite_abun, 'units', valid_units)
 
             # non_empty_fields = ['units', 'chromatography_type']
             # for field in non_empty_fields:
-            #     self._check_df_col_non_empty(specific_abun, field)
+            #     self._check_df_col_non_empty(exometabolite_abun, field)
 
         if not aggregate_abun.index.empty:
             logging.info('Start examing aggregate chemical abundances')
