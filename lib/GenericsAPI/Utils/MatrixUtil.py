@@ -598,8 +598,8 @@ class MatrixUtil:
         chemical_types = ['aggregate', 'exometabolite', 'specific']
         text_height = 0
         if len(data_label_groups_pos) > 1:
-            for i, chemical_type in enumerate(data_label_groups_pos):
-                data_label_idx = data_label_groups_pos[chemical_type]
+            for i, label_name in enumerate(data_label_groups_pos):
+                data_label_idx = data_label_groups_pos[label_name]
                 chemical_type = label_name.split(' ')[0]
                 if i == 0:
                     fig.update_layout(yaxis=dict(range=[0, data_df.index.size-1],
@@ -612,7 +612,7 @@ class MatrixUtil:
                     text_height += len(data_label_idx) - 1
                     fig.add_annotation(x=0, y=0.5,
                                        ax=0, ay=text_height,
-                                       text=chemical_type,
+                                       text=label_name,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
@@ -632,7 +632,7 @@ class MatrixUtil:
                     text_height += len(data_label_idx)
                     fig.add_annotation(x=0, y=text_height - len(data_label_idx) + 1,
                                        ax=0, ay=text_height,
-                                       text=chemical_type,
+                                       text=label_name,
                                        showarrow=True,
                                        xref="x", yref="y",
                                        axref="x", ayref="y",
