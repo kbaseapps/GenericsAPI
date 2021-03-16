@@ -36,8 +36,8 @@
   "file_path" : "https://raw.githubusercontent.com/kbaseapps/sample_uploader/master/sample_uploader.spec"
 }, {
   "module_name" : "SampleService",
-  "type" : "core",
-  "file_path" : "https://raw.githubusercontent.com/kbase/sample_service/master/SampleService.spec"
+  "type" : "sdk",
+  "version_tag" : "dev"
 }, {
   "module_name" : "Workspace",
   "type" : "core",

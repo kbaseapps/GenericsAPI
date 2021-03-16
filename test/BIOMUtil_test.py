@@ -18,6 +18,7 @@ from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 from installed_clients.sample_uploaderClient import sample_uploader
 from installed_clients.FakeObjectsForTestsClient import FakeObjectsForTests
+from installed_clients.SampleServiceClient import SampleService
 
 
 class BioMultiTest(unittest.TestCase):
@@ -55,6 +56,7 @@ class BioMultiTest(unittest.TestCase):
         cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.sample_uploader = sample_uploader(cls.callback_url, service_ver="dev")
+        cls.sample_ser = SampleService(cls.cfg['srv-wiz-url'])
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
@@ -378,6 +380,85 @@ class BioMultiTest(unittest.TestCase):
         self.assertEqual(obj['description'], 'OTU data')
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
+
+
+    def test_import_chemical_abundance_matrix_with_sample_set(self):
+        self.start_test()
+
+        sample_set_ref = self.loadSampleSet()
+
+        obj_type = 'ChemicalAbundanceMatrix'
+        params = {'obj_type': obj_type,
+                  'matrix_name': 'test_ChemicalAbundanceMatrix',
+                  'workspace_name': self.wsName,
+                  'input_file_path': os.path.join('data', 'metabolite_data.xlsx'),
+                  'scale': 'log2',
+                  'biochemistry_ref': 'kbase/default',
+                  'description': "a biochem matrix",
+                  'sample_set_ref': sample_set_ref,
+                  }
+        returnVal = self.serviceImpl.import_matrix_from_excel(self.ctx, params)[0]
+        matrix_obj_ref = returnVal['matrix_obj_ref']
+
+        self._check_matrix_to_sample_links(matrix_obj_ref, sample_set_ref)
+
+
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def test_import_amplicon_matrix_with_sample_set(self, download_staging_file):
+        self.start_test()
+
+        sample_set_ref = self.loadSampleSet()
+
+        taxonomic_abundance_tsv = os.path.join(self.scratch, 'amplicon_test.tsv')
+        shutil.copy(os.path.join('data', 'amplicon_test.tsv'), taxonomic_abundance_tsv)
+
+        taxonomic_fasta = os.path.join(self.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), taxonomic_fasta)
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix',
+                  'workspace_id': self.wsId,
+                  'taxonomic_abundance_tsv': taxonomic_abundance_tsv,
+                  'taxonomic_fasta': taxonomic_fasta,
+                  'metadata_keys': 'taxonomy_id, taxonomy, taxonomy_source, consensus_sequence',
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method',
+                  'input_local_file': True,
+                  'sample_set_ref': sample_set_ref,
+                  }
+        returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+        matrix_obj_ref = returnVal['matrix_obj_ref']
+
+        self._check_matrix_to_sample_links(matrix_obj_ref, sample_set_ref)
+   
+
+    def _check_matrix_to_sample_links(self, matrix_obj_ref, sample_set_ref):
+        sample_set_obj = self.dfu.get_objects(
+            {'object_refs': [sample_set_ref]}
+        )['data'][0]['data']
+        sample_infos = [{'id': d['id'], 'version': d['version']} for d in sample_set_obj['samples']]
+
+        links_data = self.sample_ser.get_data_links_from_data({'upa': matrix_obj_ref})['links']
+        links_sample = [
+            link
+            for sample_info in sample_infos
+            for link in self.sample_ser.get_data_links_from_sample(sample_info)['links']
+            if link['upa'] == matrix_obj_ref
+        ]
+
+        sorted_dicts = lambda l: sorted(l, key=lambda x: str(x))
+
+        assert sorted_dicts(links_data) == sorted_dicts(links_sample), '%s vs %s' % (links_data, links_sample)
+        assert len(links_data) == len(sample_set_obj['samples'])
+
 
     @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
