@@ -5,20 +5,18 @@ import os
 import time
 import unittest
 from unittest import TestCase
-from unittest.mock import patch, create_autospec, call
+from unittest.mock import patch
 from configparser import ConfigParser
 from os import environ
 from mock import patch
 import shutil
 import sys
 import functools
+import numpy as np
+import pandas as pd
 import re
 
-import pandas as pd
-import numpy as np
-
 from installed_clients.DataFileUtilClient import DataFileUtil
-from installed_clients.SampleServiceClient import SampleService
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.MatrixValidation import MatrixValidationException
@@ -28,10 +26,52 @@ from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
+
+
+dec = '###' * 5
+skipped_tests = []
+
+def tag_kb_env(e):
+    @functools.wraps(f) # preserve wrapped's function name
+    def decorator(f):
+        f.kb_env = e
+        return f
+    return decorator
+
+def skip_cond(select_run=None, regex=None, exclude_regex=None, kb_env=None):
+    def decorator(f):
+        @functools.wraps(f) # preserve wrapped's function name
+        def f_new(self, *a, **kw):
+            if kb_env is not None and not hasattr(f, "kb_env"):
+                raise Exception("Tag function (e.g., @tag_kb_env('ci')) with kb_env first to skip with this feature")
+
+            if kb_env is not None and f.kb_env is not None and kb_env != f.kb_env:
+                skipped_tests.append(f.__name__)
+                self.skipTest("Test does not operate in this KBase environment")
+            if select_run is not None and f.__name__ not in select_run:
+                skipped_tests.append(f.__name__)
+                print(dec, 'Skipping test %s because not in select_run' % f.__name__, dec)
+                self.skipTest("Test is not in list of select_run")
+            if regex is not None and re.search(regex, f.__name__) is None:
+                skipped_tests.append(f.__name__)
+                print(dec, 'Skipping test %s because regex has no hit' % f.__name__, dec)
+                self.skipTest("Test name does not have hit from regex %s" % regex)
+
+            print(dec, 'Running test %s' % f.__name__, dec)
+            f(self, *a, **kw)
+        return f_new
+    return decorator
+
+
+select_run = None #['test_transform_pipeline']
+regex = None #'transform'
+
+
 class MatrixUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        print('In setUpClass')
         token = environ.get('KB_AUTH_TOKEN', None)
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
@@ -75,8 +115,14 @@ class MatrixUtilTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        all_tests = [k for k, v in cls.__dict__.items() if k.startswith('test') and callable(v)]
+        ran_tests = list(set(all_tests) - set(skipped_tests))
+        print('All %d tests: %s' % (len(all_tests), all_tests))
+        print('Skipped %d tests: %s' % (len(skipped_tests), skipped_tests))
+        print('Ran %d tests: %s' % (len(ran_tests), ran_tests))
 
     def shortDescription(self):
+        '''Override unittest using test*() docstrings in lieu of test*() method name in output summary'''
         return None
 
     def getWsClient(self):
@@ -266,6 +312,9 @@ class MatrixUtilTest(unittest.TestCase):
     }
     '''
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_transform_pipeline(self):
 
         with self.subTest(): # TODO subTest not catching?
@@ -482,6 +531,10 @@ class MatrixUtilTest(unittest.TestCase):
             # numericized inf
 
 
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_transform_pipeline_throws(self):
 
         with self.assertRaises(MatrixValidationException) as cm:
@@ -546,6 +599,10 @@ class MatrixUtilTest(unittest.TestCase):
                 })
 
 
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_transform_unit_op(self):
         '''
         '''
@@ -606,6 +663,9 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(out1, out2)
 
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_transform_op_validation(self):
         mu = MatrixUtil
         m = np.array(self.matrix)
@@ -655,6 +715,9 @@ class MatrixUtilTest(unittest.TestCase):
                 print(cm.exception)
 
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_transform_identity(self):
         '''
         Test identity operations
@@ -688,6 +751,12 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(matrix_out, self.matrix)
 
 
+
+
+
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_defaultSubsample(self):
         '''
         All samples should be rarefied to least sample size, 2
@@ -711,6 +780,9 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(matrix_out, self.matrix_subsample2)
 
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_medSubsample(self):
         '''
         Some samples should and should not be rarefied
@@ -739,6 +811,9 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(matrix_out, self.matrix_subsample5)
 
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_medSubsample_bootstrap9Reps(self):
         '''
         At subsample 5 and 9 bootstrap reps
@@ -780,6 +855,9 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(matrix_out_mean, self.matrix_bootstrap9Reps_mean)
 
 
+    ##########
+    ##########
+    @skip_cond(select_run=select_run, regex=regex)
     def test_rarefy_largeSubsample(self):
         '''
         All samples, bootstrapped or not, should not be rarefied and should be returned as is
@@ -848,82 +926,5 @@ class MatrixUtilTest(unittest.TestCase):
         self.assertTrue(matrix_out_median, matrix_out_mean)
 
 
-    def test_link_matrix_to_samples(self):
-        matrix_obj = {
-            'data': {
-                'col_ids': [
-                    'Sample0',
-                    'Sample1',
-                    'Sample2',
-                    'Sample3',
-                ]
-            }
-        }
-        sample_set_obj = {
-            'samples': [
-                {
-                    'name': 'Sample0',
-                    'id': '0',
-                    'version': 100,
-                }, {
-                    'name': 'Sample1',
-                    'id': '1',
-                    'version': 100,
-                }, {
-                    'name': 'Sample2',
-                    'id': '2',
-                    'version': 100,
-                }, {
-                    'name': 'Sample4',
-                    'id': '4',
-                    'version': 100
-                }
-            ]
-        }
-        get_sample_rets = [
-            {'node_tree': [{'id': 'Sample0'}]},
-            {'node_tree': [{'id': 'Sample1'}]},
-            {'node_tree': [{'id': 'Sample2'}]},
-        ]
 
-        mock_dfu = create_autospec(DataFileUtil, instance=True, spec_set=True)
-        mock_dfu.get_objects.return_value = {'data': [{'data': sample_set_obj}]}
-        mock_ss = create_autospec(SampleService, instance=True, spec_set=True)
-        mock_ss.get_sample.side_effect = get_sample_rets
-        
-        self.serviceImpl.matrix_util.dfu = mock_dfu
-        self.serviceImpl.matrix_util.sample_ser = mock_ss
-
-        self.serviceImpl.matrix_util._link_matrix_to_samples(
-            'dummy/matrix/ref',
-            matrix_obj,
-            'dummy/ss/ref',
-        )
-
-        mock_ss.create_data_link.assert_has_calls([
-            call({
-                'upa': 'dummy/matrix/ref',
-                'dataid': 'Sample0',
-                'id': '0',
-                'version': 100,
-                'node': 'Sample0',
-                'update': 1,
-            }),
-            call({
-                'upa': 'dummy/matrix/ref',
-                'dataid': 'Sample1',
-                'id': '1',
-                'version': 100,
-                'node': 'Sample1',
-                'update': 1,
-            }),
-            call({
-                'upa': 'dummy/matrix/ref',
-                'dataid': 'Sample2',
-                'id': '2',
-                'version': 100,
-                'node': 'Sample2',
-                'update': 1,
-            })
-        ])
 
