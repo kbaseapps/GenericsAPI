@@ -36,7 +36,6 @@ import GenericsAPI.Utils.MatrixValidation as vd
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.fba_toolsClient import fba_tools
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
-from installed_clients.SampleServiceClient import SampleService
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -2196,37 +2195,11 @@ class MatrixUtil:
 
         return matrix_data
 
-    
-    def _link_matrix_to_samples(self, matrix_ref, matrix_obj, sample_set_ref):
-        sample_set_obj = self.dfu.get_objects({'object_refs': [sample_set_ref]})['data'][0]['data']
-        name_2_sample = {d['name']: d for d in sample_set_obj['samples']}
-
-        links = []
-        for name in matrix_obj['data']['col_ids']:
-            if name not in name_2_sample:
-                continue
-            sample = self.sample_ser.get_sample({
-                'id': name_2_sample[name]['id']
-            })
-            link = self.sample_ser.create_data_link({
-                'upa': matrix_ref,
-                'dataid': name,
-                'id': name_2_sample[name]['id'],
-                'version': name_2_sample[name]['version'],
-                'node': sample['node_tree'][0]['id'],
-                'update': 1,
-            })
-            links.append(link)
-
-        return links
-
-
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
-        self.sample_ser = SampleService(config['srv-wiz-url'], service_ver='dev')
         self.fba_tools = fba_tools(self.callback_url)
         self.report_util = kb_GenericsReport(self.callback_url)
         self.data_util = DataUtil(config)
@@ -3126,9 +3099,6 @@ class MatrixUtil:
             'obj_name': matrix_name,
             'data': data,
             'workspace_id': workspace_id})['obj_ref']
-
-        if params.get('sample_set_ref'):
-            self._link_matrix_to_samples(matrix_obj_ref, data, params['sample_set_ref'])
 
         # try:
         #     logging.info('Start trying to look up ModelSeed ID')
