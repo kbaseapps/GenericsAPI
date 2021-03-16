@@ -891,10 +891,12 @@ class MatrixUtilTest(unittest.TestCase):
         mock_ss = create_autospec(SampleService, instance=True, spec_set=True)
         mock_ss.get_sample.side_effect = get_sample_rets
         
-        self.serviceImpl.matrix_util.dfu = mock_dfu
-        self.serviceImpl.matrix_util.sample_ser = mock_ss
+        serviceImpl = GenericsAPI(self.cfg)
 
-        self.serviceImpl.matrix_util._link_matrix_to_samples(
+        serviceImpl.matrix_util.dfu = mock_dfu
+        serviceImpl.matrix_util.sample_ser = mock_ss
+
+        serviceImpl.matrix_util._link_matrix_to_samples(
             'dummy/matrix/ref',
             matrix_obj,
             'dummy/ss/ref',
