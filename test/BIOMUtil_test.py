@@ -137,7 +137,6 @@ class BioMultiTest(unittest.TestCase):
             'workspace_id': self.wsId,
             'sample_file': sample_set_file_path,
             'file_format': "SESAR",
-            'header_row_index': 2,
             'set_name': 'test1',
             'description': "this is a test sample set."
         }
@@ -438,7 +437,7 @@ class BioMultiTest(unittest.TestCase):
         matrix_obj_ref = returnVal['matrix_obj_ref']
 
         self._check_matrix_to_sample_links(matrix_obj_ref, sample_set_ref)
-   
+
 
     def _check_matrix_to_sample_links(self, matrix_obj_ref, sample_set_ref):
         sample_set_obj = self.dfu.get_objects(
