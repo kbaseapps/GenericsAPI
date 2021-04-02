@@ -92,7 +92,6 @@ class SampleServiceTest(unittest.TestCase):
             'workspace_id': self.wsId,
             'sample_file': sample_set_file_path,
             'file_format': "SESAR",
-            'header_row_index': 2,
             'set_name': 'test1',
             'description': "this is a test sample set."
         }
