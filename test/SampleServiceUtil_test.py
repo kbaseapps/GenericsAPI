@@ -158,17 +158,16 @@ class SampleServiceTest(unittest.TestCase):
         attributes = am_data['attributes']
         attri_names = [attribute['attribute'] for attribute in attributes]
 
-        attri_names_expected = ['id', 'type', 'parent', 'id', 'name', 'latitude',
+        attri_names_expected = ['sample_id', 'type', 'parent', 'id', 'name', 'latitude',
                                 'collection_date', 'longitude', 'field_program_cruise',
                                 'name_of_physiographic_feature', 'collector_chief_scientist',
                                 'related_identifiers', 'purpose', 'current_archive_contact',
-                                'material', 'primary_physiographic_feature',
+                                'SESAR:material', 'primary_physiographic_feature',
                                 'coordinate_precision?', 'locality_description', 'relation_type',
                                 'current_archive', 'collection_method', 'location_description',
                                 'navigation_type', 'collection_date_precision']
 
         self.assertTrue(set(attri_names_expected).issubset(set(attri_names)))
-        # self.assertCountEqual(attri_names, attri_names_expected)
 
         instances = am_data['instances']
         sample_names = instances.keys()
