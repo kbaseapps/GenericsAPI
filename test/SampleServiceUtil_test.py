@@ -113,7 +113,7 @@ class SampleServiceTest(unittest.TestCase):
 
         print('Getting sample_service URL: {}'.format(ss_url))
 
-        self.assertTrue('SampleService' in ss_url)
+        self.assertTrue('services/sampleservice' in ss_url)
 
     def test_save_get_and_upsert_sample(self):
         sampleservice_util = self.getSampleServiceUtil()
