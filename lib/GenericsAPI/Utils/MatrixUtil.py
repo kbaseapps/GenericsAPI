@@ -2196,7 +2196,6 @@ class MatrixUtil:
 
         return matrix_data
 
-    
     def _link_matrix_to_samples(self, matrix_ref, matrix_obj, sample_set_ref):
         sample_set_obj = self.dfu.get_objects({'object_refs': [sample_set_ref]})['data'][0]['data']
         name_2_sample = {d['name']: d for d in sample_set_obj['samples']}
@@ -2220,13 +2219,13 @@ class MatrixUtil:
 
         return links
 
-
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
-        self.sample_ser = SampleService(config['srv-wiz-url'], service_ver='dev')
+        self.sample_url = config.get('kbase-endpoint') + '/sampleservice'
+        self.sample_ser = SampleService(self.sample_url)
         self.fba_tools = fba_tools(self.callback_url)
         self.report_util = kb_GenericsReport(self.callback_url)
         self.data_util = DataUtil(config)

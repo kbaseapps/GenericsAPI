@@ -56,7 +56,8 @@ class BioMultiTest(unittest.TestCase):
         cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.sample_uploader = sample_uploader(cls.callback_url, service_ver="dev")
-        cls.sample_ser = SampleService(cls.cfg['srv-wiz-url'])
+        cls.sample_url = cls.cfg.get('kbase-endpoint') + '/sampleservice'
+        cls.sample_ser = SampleService(cls.sample_url)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
@@ -438,7 +439,6 @@ class BioMultiTest(unittest.TestCase):
 
         self._check_matrix_to_sample_links(matrix_obj_ref, sample_set_ref)
 
-
     def _check_matrix_to_sample_links(self, matrix_obj_ref, sample_set_ref):
         sample_set_obj = self.dfu.get_objects(
             {'object_refs': [sample_set_ref]}
@@ -457,7 +457,6 @@ class BioMultiTest(unittest.TestCase):
 
         assert sorted_dicts(links_data) == sorted_dicts(links_sample), '%s vs %s' % (links_data, links_sample)
         assert len(links_data) == len(sample_set_obj['samples'])
-
 
     @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)

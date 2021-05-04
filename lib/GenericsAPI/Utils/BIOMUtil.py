@@ -22,7 +22,6 @@ from GenericsAPI.Utils.TaxonUtil import TaxonUtil
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
-from installed_clients.SampleServiceClient import SampleService
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -966,13 +965,11 @@ class BiomUtil:
 
         return merged_df
 
-
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.token = config['KB_AUTH_TOKEN']
         self.dfu = DataFileUtil(self.callback_url)
-        self.sample_ser = SampleService(self.callback_url)
         self.report_util = kb_GenericsReport(self.callback_url)
         self.data_util = DataUtil(config)
         self.sampleservice_util = SampleServiceUtil(config)

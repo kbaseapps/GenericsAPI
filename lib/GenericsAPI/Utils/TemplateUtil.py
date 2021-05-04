@@ -174,9 +174,7 @@ class TemplateUtil:
         chemical_datas = self._fetch_chemical_datas(chemical_data_included, chemical_ids_included)
 
         sample_names = list()
-        if not sample_set_ref:
-            raise ValueError('Please provide a Sample Set object')
-        else:
+        if sample_set_ref:
             sample_set = self.dfu.get_objects(
                     {"object_refs": [sample_set_ref]})['data'][0]['data']
 
