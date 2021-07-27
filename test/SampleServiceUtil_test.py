@@ -158,14 +158,32 @@ class SampleServiceTest(unittest.TestCase):
         attributes = am_data['attributes']
         attri_names = [attribute['attribute'] for attribute in attributes]
 
-        attri_names_expected = ['sample_id', 'type', 'parent', 'id', 'name', 'latitude',
-                                'collection_date', 'longitude', 'field_program_cruise',
-                                'name_of_physiographic_feature', 'collector_chief_scientist',
-                                'related_identifiers', 'purpose', 'current_archive_contact',
-                                'SESAR:material', 'primary_physiographic_feature',
-                                'coordinate_precision?', 'locality_description', 'relation_type',
-                                'current_archive', 'collection_method', 'location_description',
-                                'navigation_type', 'collection_date_precision']
+        attri_names_expected = ['sample_id',
+                                'version',
+                                'type',
+                                'parent',
+                                'sesar:igsn',
+                                'sesar:material',
+                                'sesar:field_name',
+                                'location_description',
+                                'locality_description',
+                                'sesar:collection_method',
+                                'purpose',
+                                'latitude',
+                                'longitude',
+                                'sesar:navigation_type',
+                                'sesar:physiographic_feature_primary',
+                                'sesar:physiographic_feature_name',
+                                'sesar:field_program_cruise',
+                                'sesar:collector_chief_scientist',
+                                'sesar:collection_date',
+                                'sesar:collection_date_precision',
+                                'sesar:archive_current',
+                                'sesar:archive_contact_current',
+                                'sesar:related_identifiers',
+                                'sesar:relation_type',
+                                'sample_template',
+                                'coordinate_precision?']
 
         self.assertTrue(set(attri_names_expected).issubset(set(attri_names)))
 

@@ -55,7 +55,11 @@ class SampleServiceUtil:
     def get_sample(self, sample_id, version=None):
 
         sample_url = self.get_sample_service_url()
-        headers = {"Authorization": self.token}
+
+        headers = {
+            "Authorization": self.token,
+            "Content-Type": "application/json"
+        }
         params = {
             "id": sample_id,
             "version": version
@@ -191,6 +195,7 @@ class SampleServiceUtil:
 
         attributes = [i for n, i in enumerate(attributes) if i not in attributes[n + 1:]]
         attributes = [{'attribute': 'sample_id', 'source': 'SampleService'},
+                      {'attribute': 'version', 'source': 'SampleService'},
                       {'attribute': 'type', 'source': 'SampleService'},
                       {'attribute': 'parent', 'source': 'SampleService'}] + attributes
 
@@ -202,28 +207,23 @@ class SampleServiceUtil:
             instance = list()
             node_tree = sample_data.get('node_tree', [{}])
 
-            sample_id = sample_data.get('sample_id')
-
             for node in node_tree:
 
-                meta_controlled = node.get('meta_controlled')
-                meta_user = node.get('meta_user')
+                meta_controlled = node.get('meta_controlled', {})
+                meta_user = node.get('meta_user', {})
 
                 for attribute in attributes:
                     attri_name = attribute['attribute']
 
-                    if attri_name == 'sample_id':
-                        instance.append(sample_id)
+                    if attri_name in ['sample_id', 'version']:
+                        instance.append(sample_data.get(attri_name))
                     elif attri_name in ['type', 'parent']:
                         instance.append(node.get(attri_name))
                     else:
-                        if meta_user:
-                            instance.append(meta_user.get(attri_name, {}).get('value'))
-                        elif meta_controlled:
-                            instance.append(meta_controlled.get(attri_name, {}).get('value'))
+                        attri_value = meta_user.get(attri_name, {}).get('value') or meta_controlled.get(attri_name, {}).get('value')
+                        instance.append(attri_value)
 
             instance = [str(i) for i in instance]
-
             instances[sample_data['name']] = instance
 
         return am_data
