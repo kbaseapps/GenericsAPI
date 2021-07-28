@@ -1145,7 +1145,7 @@ class MatrixUtil:
 
         top_heatmap_dir = None
         top_percent = 100
-        display_count = 500  # roughly count for display items
+        display_count = 200  # roughly count for display items
         if len(data_df.index) > 1000:
             top_percent = min(display_count / data_df.index.size * 100, 100)
             top_heatmap_dir = self.report_util.build_heatmap_html({
