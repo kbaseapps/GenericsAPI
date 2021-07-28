@@ -1133,7 +1133,7 @@ class MatrixUtil:
             str(uuid.uuid4())))
         data_df.to_csv(tsv_file_path)
 
-        if data_df.index.size < 1000:
+        if data_df.index.size < 10000:
             heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
                                                         'cluster_data': True})['html_dir']
@@ -1145,8 +1145,8 @@ class MatrixUtil:
 
         top_heatmap_dir = None
         top_percent = 100
-        if len(data_df.index) > 500:
-            display_count = 200  # roughly count for display items
+        if len(data_df.index) > 5000:
+            display_count = 2000  # roughly count for display items
             top_percent = min(display_count / data_df.index.size * 100, 100)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                 'tsv_file_path': tsv_file_path,
