@@ -688,7 +688,7 @@ class BiomUtil:
         return linear_plot_path
 
     def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
-                                        top_heatmap_dir, top_percent):
+                                        top_heatmap_dir, top_percent, display_count):
 
         row_data_summary = data_df.T.describe().round(2).to_string()
         col_data_summary = data_df.describe().round(2).to_string()
@@ -721,7 +721,9 @@ class BiomUtil:
             viewer_name = 'TopHeatmapViewer'
             tab_def_content += '''\n<button class="tablinks" '''
             tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Top {} Percent Heatmap</button>\n'''.format(top_percent)
+            tab_def_content += '''>Top {} % ({} Rows) Heatmap</button>\n'''.format(
+                                                                            round(top_percent, 2),
+                                                                            display_count)
 
             heatmap_report_files = os.listdir(top_heatmap_dir)
 
@@ -735,7 +737,8 @@ class BiomUtil:
 
             if heatmap_index_page:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                                                                            round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
                 tab_content += '\n<iframe height="1300px" width="100%" '
@@ -753,14 +756,16 @@ class BiomUtil:
                 viewer_name = 'MatrixLinearPlotViewer'
                 tab_def_content += '''\n<button class="tablinks" '''
                 tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(top_percent)
+                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(
+                                                                            round(top_percent, 2))
 
                 linear_plot_page = self._generate_linear_plot(data_df, output_directory,
                                                               row_name='OTU',
-                                                              top_percent=top_percent)
+                                                              top_percent=round(top_percent, 2))
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                                                                            round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
                 tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
@@ -820,16 +825,21 @@ class BiomUtil:
         tsv_file_path = os.path.join(result_directory, 'heatmap_data_{}.tsv'.format(
                                                                             str(uuid.uuid4())))
         data_df.to_csv(tsv_file_path)
-        heatmap_dir = self.report_util.build_heatmap_html({
-                                                    'tsv_file_path': tsv_file_path,
-                                                    'cluster_data': True})['html_dir']
 
+        if data_df.index.size < 10000:
+            heatmap_dir = self.report_util.build_heatmap_html({
+                                                        'tsv_file_path': tsv_file_path,
+                                                        'cluster_data': True})['html_dir']
+        else:
+            logging.info('Original matrix is too large. Skip clustering data in report.')
+            heatmap_dir = self.report_util.build_heatmap_html({
+                                                        'tsv_file_path': tsv_file_path,
+                                                        'cluster_data': False})['html_dir']
         top_heatmap_dir = None
         top_percent = 100
-        if len(data_df.index) > 500:
-            display_count = 200  # roughly count for display items
-            top_percent = min(int(display_count / len(data_df.index) * 100), 100)
-            top_percent = max(top_percent, 1)
+        display_count = 500  # roughly count for display items
+        if len(data_df.index) > 1000:
+            top_percent = min(display_count / data_df.index.size * 100, 100)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
                                                         'sort_by_sum': True,
@@ -847,7 +857,8 @@ class BiomUtil:
                                                                      heatmap_dir,
                                                                      data_df,
                                                                      top_heatmap_dir,
-                                                                     top_percent)
+                                                                     top_percent,
+                                                                     display_count)
 
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'templates', 'matrix_template.html'),
