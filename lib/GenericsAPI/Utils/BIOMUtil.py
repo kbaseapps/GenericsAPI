@@ -737,7 +737,8 @@ class BiomUtil:
 
             if heatmap_index_page:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                                                                            round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
                 tab_content += '\n<iframe height="1300px" width="100%" '
@@ -755,14 +756,16 @@ class BiomUtil:
                 viewer_name = 'MatrixLinearPlotViewer'
                 tab_def_content += '''\n<button class="tablinks" '''
                 tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(top_percent)
+                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(
+                                                                            round(top_percent, 2))
 
                 linear_plot_page = self._generate_linear_plot(data_df, output_directory,
                                                               row_name='OTU',
-                                                              top_percent=top_percent)
+                                                              top_percent=round(top_percent, 2))
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(top_percent)
+                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
+                                                                            round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
                 tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
@@ -837,7 +840,6 @@ class BiomUtil:
         if len(data_df.index) > 500:
             display_count = 200  # roughly count for display items
             top_percent = min(display_count / data_df.index.size * 100, 100)
-            # top_percent = max(top_percent, 1)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
                                                         'sort_by_sum': True,

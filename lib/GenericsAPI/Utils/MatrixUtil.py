@@ -758,7 +758,7 @@ class MatrixUtil:
             if heatmap_index_page:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
                 msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
-                    top_percent)
+                    round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
 
                 tab_content += '\n<iframe height="1300px" width="100%" '
@@ -776,14 +776,15 @@ class MatrixUtil:
                 viewer_name = 'MatrixLinearPlotViewer'
                 tab_def_content += '''\n<button class="tablinks" '''
                 tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(top_percent)
+                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(
+                                                                            round(top_percent, 2))
 
                 linear_plot_page = self._generate_linear_plot(data_df, output_directory,
-                                                              top_percent=top_percent)
+                                                              top_percent=round(top_percent, 2))
 
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
                 msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
-                    top_percent)
+                    round(top_percent, 2))
                 tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
                 tab_content += '\n<iframe height="1300px" width="100%" '
                 tab_content += 'src="{}" '.format(linear_plot_page)
