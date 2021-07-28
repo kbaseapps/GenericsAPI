@@ -741,7 +741,7 @@ class MatrixUtil:
             viewer_name = 'TopHeatmapViewer'
             tab_def_content += '''\n<button class="tablinks" '''
             tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Top {} % ({} Rows) Heatmap</button>\n'''.format(
+            tab_def_content += '''>Top {}% ({} Rows) Heatmap</button>\n'''.format(
                                                                             round(top_percent, 2),
                                                                             display_count)
 
