@@ -1145,8 +1145,8 @@ class MatrixUtil:
 
         top_heatmap_dir = None
         top_percent = 100
+        display_count = 2000  # roughly count for display items
         if len(data_df.index) > 5000:
-            display_count = 2000  # roughly count for display items
             top_percent = min(display_count / data_df.index.size * 100, 100)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                 'tsv_file_path': tsv_file_path,
