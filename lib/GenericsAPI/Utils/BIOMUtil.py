@@ -721,7 +721,7 @@ class BiomUtil:
             viewer_name = 'TopHeatmapViewer'
             tab_def_content += '''\n<button class="tablinks" '''
             tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Top {} Percent ({} Rows) Heatmap</button>\n'''.format(
+            tab_def_content += '''>Top {} % ({} Rows) Heatmap</button>\n'''.format(
                                                                             round(top_percent, 2),
                                                                             display_count)
 
@@ -837,8 +837,8 @@ class BiomUtil:
                                                         'cluster_data': False})['html_dir']
         top_heatmap_dir = None
         top_percent = 100
-        display_count = 2000  # roughly count for display items
-        if len(data_df.index) > 5000:
+        display_count = 500  # roughly count for display items
+        if len(data_df.index) > 1000:
             top_percent = min(display_count / data_df.index.size * 100, 100)
             top_heatmap_dir = self.report_util.build_heatmap_html({
                                                         'tsv_file_path': tsv_file_path,
