@@ -2703,6 +2703,11 @@ class MatrixUtil:
             if op not in OPS:
                 raise Exception('Operation %s not in allowed %s' % (str(op), OPS))
 
+        singular_operations = {'standardization', 'ratio_transformation', 'log'}
+        intersection = set(operations) & singular_operations
+        if len(intersection) > 1:
+            raise Exception('Please choose only one operation from {}'.format(singular_operations))
+
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
         input_matrix_name = input_matrix_info[1]
@@ -2866,6 +2871,11 @@ class MatrixUtil:
         for op in operations:
             if op not in OPS:
                 raise Exception('Operation %s not in allowed %s' % (str(op), OPS))
+
+        singular_operations = {'standardization', 'ratio_transformation', 'log'}
+        intersection = set(operations) & singular_operations
+        if len(intersection) > 1:
+            raise Exception('Please choose only one operation from {}'.format(singular_operations))
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
