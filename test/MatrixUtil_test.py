@@ -378,7 +378,6 @@ class MatrixUtilTest(unittest.TestCase):
                         'abundance_filtering',
                         "relative_abundance",
                         'log',
-                        # 'standardization',
                     ],
                     "abundance_filtering_params": {
                         "abundance_filtering_row_threshold": 0,
@@ -467,7 +466,6 @@ class MatrixUtilTest(unittest.TestCase):
                         'abundance_filtering',
                         'relative_abundance',
                         'ratio_transformation',
-                        # 'standardization',
                     ],
                     'abundance_filtering_params': {
                         'abundance_filtering_row_threshold': -1,
@@ -538,6 +536,7 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 0
                     },
                 })
+        print(cm.exception)
 
         with self.assertRaises(Exception):
             '''
