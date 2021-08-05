@@ -2688,6 +2688,7 @@ class MatrixUtil:
         standardization_params = params.get('standardization_params', {})
         ratio_transformation_params = params.get('ratio_transformation_params', {})
         log_params = params.get('log_params', {})
+        normalization_params = params.get('normalization_params', {})
 
         dimension = params.get('dimension', 'row')
         variables = params.get('variables', list())
@@ -2758,6 +2759,38 @@ class MatrixUtil:
                     selected_df,
                     dimension=relative_abundance_params.get(
                         'relative_abundance_dimension', 'col'))
+
+            elif op == 'normalization':
+                norm_op = normalization_params.get('normalization_operation')
+                norm_dimension = normalization_params.get('normalization_dimension', 'col')
+
+                if norm_op == 'standardization':
+                    df = self._standardize_df(df,
+                                              dimension=norm_dimension,
+                                              with_mean=normalization_params.get(
+                                                  'standardization_with_mean', True),
+                                              with_std=normalization_params.get(
+                                                  'standardization_with_std', True))
+
+                elif norm_op == 'ratio_transformation':
+                    df = self._ratio_trans_df(df,
+                                              method=normalization_params.get(
+                                                  'ratio_transformation_method', 'clr'),
+                                              dimension=norm_dimension)
+
+                elif norm_op == 'logit':
+                    df = self._logit(df)
+
+                elif norm_op == 'sqrt':
+                    df = self._sqrt(df)
+
+                elif norm_op == 'log':
+                    df = self._log(df,
+                                   base=normalization_params.get('log_base', 10),
+                                   a=normalization_params.get('log_offset', 1))
+
+                else:
+                    raise NotImplementedError('Unknown op `%s`' % op)
 
             elif op == 'standardization':
                 selected_df = self._standardize_df(
