@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
-import inspect
-import json
+
 import os
 import time
 import unittest
-from unittest import TestCase
 from unittest.mock import patch, create_autospec, call
 from configparser import ConfigParser
 from os import environ
-from mock import patch
 import shutil
-import sys
-import functools
-import re
 
 import pandas as pd
 import numpy as np
@@ -22,7 +16,6 @@ from installed_clients.SampleServiceClient import SampleService
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.MatrixValidation import MatrixValidationException
-from GenericsAPI.Utils import MatrixValidation as vd
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
@@ -286,8 +279,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 3
                     },
                     "log_params": {
-                        "base": 2.718281828459045,
-                        "offset": 1e-10
+                        "log_base": 2.718281828459045,
+                        "log_offset": 1e-10
                     }
                 })
 
@@ -378,7 +371,6 @@ class MatrixUtilTest(unittest.TestCase):
                         'abundance_filtering',
                         "relative_abundance",
                         'log',
-                        'standardization',
                     ],
                     "abundance_filtering_params": {
                         "abundance_filtering_row_threshold": 0,
@@ -387,8 +379,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 0
                     },
                     "log_params": {
-                        "base": 2,
-                        "offset": 1
+                        "log_base": 2,
+                        "log_offset": 1
                     },
                     "standardization_params": {
                         "standardization_with_mean": 1,
@@ -398,17 +390,15 @@ class MatrixUtilTest(unittest.TestCase):
                 })
 
             out1 = [
-                [-0.73896682, -1.22474487,  0.5       , -0.76804287, -0.79845904, -0.81649658],
-                [ 1.78093082,  0.81649658, -2.        ,  0.61548897,  1.52819859,  1.22474487],
-                [-0.73896682, -1.22474487,  0.5       ,  1.68863963,  0.86717852, -0.81649658],
-                [ 0.43596963,  0.81649658,  0.5       , -0.76804287, -0.79845904,  1.22474487],
-                [-0.73896682,  0.81649658,  0.5       , -0.76804287, -0.79845904, -0.81649658]
+                [0.0, 0.0, 0.32192809488736235, 0.0, 0.0, 0.0],
+                [0.7776075786635522, 0.4150374992788437, 0.0, 0.4150374992788437, 0.6780719051126378, 0.5849625007211562],
+                [0.0, 0.0, 0.32192809488736235, 0.7369655941662061, 0.4854268271702417, 0.0],
+                [0.36257007938470814, 0.4150374992788437, 0.32192809488736235, 0.0, 0.0, 0.5849625007211562],
+                [0.0, 0.4150374992788437, 0.32192809488736235, 0.0, 0.0, 0.0]
             ]
 
             _, out2 = self.get_out_data(ret)
-
             self.assert_matrices_equal(out1, out2)
-
 
         with self.subTest():
             '''
@@ -430,8 +420,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 0
                     },
                     "log_params": {
-                        "base": 2,
-                        "offset": 3
+                        "log_base": 2,
+                        "log_offset": 3
                     },
                     "standardization_params": {
                         "standardization_with_mean": 1,
@@ -469,7 +459,6 @@ class MatrixUtilTest(unittest.TestCase):
                         'abundance_filtering',
                         'relative_abundance',
                         'ratio_transformation',
-                        'standardization',
                     ],
                     'abundance_filtering_params': {
                         'abundance_filtering_row_threshold': -1,
@@ -508,6 +497,20 @@ class MatrixUtilTest(unittest.TestCase):
 
         with self.assertRaises(Exception) as cm:
             '''
+            singular operation
+            '''
+            ret = self.getImpl().transform_matrix(
+                self.ctx, {
+                    'workspace_id': self.getWsId(),
+                    'input_matrix_ref': self.amplicon_matrix_ref,
+                    'operations': [
+                        'ratio_transformation',
+                        'standardization',
+                    ],
+                })
+
+        with self.assertRaises(Exception) as cm:
+            '''
             Unknown op
             '''
             ret = self.getImpl().transform_matrix(
@@ -540,8 +543,8 @@ class MatrixUtilTest(unittest.TestCase):
                         'log' #
                     ],
                     "log_params": {
-                        "base": 10,
-                        "offset": 0
+                        "log_base": 10,
+                        "log_offset": 0
                     },
                 })
 
