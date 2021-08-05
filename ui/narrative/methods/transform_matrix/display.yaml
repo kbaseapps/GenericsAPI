@@ -76,6 +76,22 @@ parameters :
         long-hint  : |
             Standardize row or column
 
+    normalization_operation:
+        ui-name: |
+            Normalization Algorithm
+        short-hint : |
+            Normalization Algorithm
+        long-hint  : |
+            Normalization Algorithm
+
+    normalization_dimension:
+        ui-name: |
+            Perform Normalization Algorithm On
+        short-hint : |
+            Normalize row or column
+        long-hint  : |
+            Normalize row or column
+
     standardization_with_mean:
         ui-name: |
             Center The Data Before Scaling
@@ -92,14 +108,6 @@ parameters :
         long-hint  : |
             calculated standard score (z = (x - u) / s) where s is the standard deviation of the training samples or one if this option is turned off
 
-    standardization_dimension:
-        ui-name: |
-            Perform Standardization Algorithm On
-        short-hint : |
-            Standardize row or column
-        long-hint  : |
-            Standardize row or column
-
     ratio_transformation_method:
         ui-name: |
             Ratio Transformation Method
@@ -108,17 +116,9 @@ parameters :
         long-hint  : |
             Please select centre (clr) or isometric (ilr) log ratio transformation
 
-    ratio_transformation_dimension:
-        ui-name: |
-            Perform Ratio Transformation Algorithm On
-        short-hint : |
-            Standardize row or column
-        long-hint  : |
-            Standardize row or column
-
     log_base:
         ui-name: |
-            Base
+            Take Log Base
         short-hint: |
             Logarithmic base in <code>log(a+x)</code>
         long-hint: |
@@ -126,7 +126,7 @@ parameters :
 
     log_offset:
         ui-name: |
-            Offset
+            Take Log Offset
         short-hint: |
             Offset <code>a</code> in <code>log(a+x)</code>
         long-hint: |
@@ -147,15 +147,9 @@ parameter-groups :
     relative_abundance_params:
         ui-name : Perform Transform Relative Abundance
         short-hint :  Perform Transform Relative Abundance
-    standardization_params:
-        ui-name : Perform Standardization
-        short-hint :  Perform Standardization
-    ratio_transformation_params:
-        ui-name : Perform Ratio Transformation
-        short-hint :  Perform Ratio Transformation
-    log_params:
-        ui-name: Take Log
-        short-hint: Apply <code>log(a+x)</code> to entries
+    normalization_params:
+        ui-name : Perform Normalization
+        short-hint :  Perform Normalization
 
 description : |
     <p> Apply a series of operations to input matrix. </p>

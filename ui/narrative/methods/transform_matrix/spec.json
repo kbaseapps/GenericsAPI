@@ -27,24 +27,8 @@
                     "value": "relative_abundance"
                 },
                 {
-                    "display": "Perform Standardization",
-                    "value": "standardization"
-                },
-                {
-                    "display": "Perform Ratio Transform",
-                    "value": "ratio_transformation"
-                },
-                {
-                    "display": "Take Log",
-                    "value": "log"
-                },
-                {
-                    "display": "Take Square Root",
-                    "value": "sqrt"
-                },
-                {
-                    "display": "Take Logit",
-                    "value": "logit"
+                    "display": "Perform Normalization",
+                    "value": "normalization"
                 }
             ]
         }
@@ -127,6 +111,56 @@
       }
     },
     {
+        "id": "normalization_operation",
+        "optional": false,
+        "advanced": false,
+        "allow_multiple": false,
+        "default_values": ["standardization"],
+        "field_type": "dropdown",
+        "dropdown_options": {
+            "options": [
+                {
+                    "display": "Perform Standardization",
+                    "value": "standardization"
+                },
+                {
+                    "display": "Perform Ratio Transform",
+                    "value": "ratio_transformation"
+                },
+                {
+                    "display": "Take Log",
+                    "value": "log"
+                },
+                {
+                    "display": "Take Square Root",
+                    "value": "sqrt"
+                }
+            ]
+        }
+    },
+    {
+      "id" : "normalization_dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
       "id": "standardization_with_mean",
       "optional":false,
       "advanced":false,
@@ -151,28 +185,6 @@
         }
     },
     {
-      "id" : "standardization_dimension",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : ["col"],
-      "field_type" : "dropdown",
-      "dropdown_options":
-      {
-        "options":
-        [
-          {
-              "display": "Column",
-              "value": "col"
-          },
-          {
-              "display": "Row",
-              "value": "row"
-          }
-        ]
-      }
-    },
-    {
       "id" : "ratio_transformation_method",
       "optional" : false,
       "advanced" : false,
@@ -190,28 +202,6 @@
           {
               "display": "Isometric Log Ratio Transformation",
               "value": "ilr"
-          }
-        ]
-      }
-    },
-    {
-      "id" : "ratio_transformation_dimension",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : ["col"],
-      "field_type" : "dropdown",
-      "dropdown_options":
-      {
-        "options":
-        [
-          {
-              "display": "Column",
-              "value": "col"
-          },
-          {
-              "display": "Row",
-              "value": "row"
           }
         ]
       }
@@ -277,33 +267,15 @@
       "advanced" : true
     },
     {
-      "id": "standardization_params",
+      "id": "normalization_params",
       "parameters": [
+        "normalization_operation",
         "standardization_with_mean",
         "standardization_with_std",
-        "standardization_dimension"
-      ],
-      "optional": false,
-      "allow_multiple": false,
-      "with_border": false,
-      "advanced" : true
-    },
-    {
-      "id": "ratio_transformation_params",
-      "parameters": [
         "ratio_transformation_method",
-        "ratio_transformation_dimension"
-      ],
-      "optional": false,
-      "allow_multiple": false,
-      "with_border": false,
-      "advanced" : true
-    },
-    {
-      "id": "log_params",
-      "parameters": [
         "log_base",
-        "log_offset"
+        "log_offset",
+        "normalization_dimension"
       ],
       "optional": false,
       "allow_multiple": false,
@@ -339,16 +311,8 @@
           "target_property" : "relative_abundance_params"
         },
         {
-          "input_parameter" : "standardization_params",
-          "target_property" : "standardization_params"
-        },
-        {
-          "input_parameter" : "ratio_transformation_params",
-          "target_property" : "ratio_transformation_params"
-        },
-        {
-          "input_parameter" : "log_params",
-          "target_property" : "log_params"
+          "input_parameter" : "normalization_params",
+          "target_property" : "normalization_params"
         },
         {
           "input_parameter" : "new_matrix_name",

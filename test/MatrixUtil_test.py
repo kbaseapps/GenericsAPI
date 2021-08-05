@@ -286,8 +286,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 3
                     },
                     "log_params": {
-                        "base": 2.718281828459045,
-                        "offset": 1e-10
+                        "log_base": 2.718281828459045,
+                        "log_offset": 1e-10
                     }
                 })
 
@@ -386,8 +386,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 0
                     },
                     "log_params": {
-                        "base": 2,
-                        "offset": 1
+                        "log_base": 2,
+                        "log_offset": 1
                     },
                     "standardization_params": {
                         "standardization_with_mean": 1,
@@ -427,8 +427,8 @@ class MatrixUtilTest(unittest.TestCase):
                         "abundance_filtering_columns_sum_threshold": 0
                     },
                     "log_params": {
-                        "base": 2,
-                        "offset": 3
+                        "log_base": 2,
+                        "log_offset": 3
                     },
                     "standardization_params": {
                         "standardization_with_mean": 1,
@@ -550,8 +550,8 @@ class MatrixUtilTest(unittest.TestCase):
                         'log' #
                     ],
                     "log_params": {
-                        "base": 10,
-                        "offset": 0
+                        "log_base": 10,
+                        "log_offset": 0
                     },
                 })
 
