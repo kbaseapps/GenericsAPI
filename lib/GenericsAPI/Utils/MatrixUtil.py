@@ -2752,7 +2752,8 @@ class MatrixUtil:
 
         # iterate over operations
         df_results = []
-        for op in operations:
+        norm_ops_pos = dict()
+        for idx, op in enumerate(operations):
 
             if op == 'relative_abundance':
                 selected_df = self._relative_abundance(
@@ -2763,6 +2764,7 @@ class MatrixUtil:
             elif op == 'normalization':
                 norm_op = normalization_params.get('normalization_operation')
                 norm_dimension = normalization_params.get('normalization_dimension', 'col')
+                norm_ops_pos[idx] = norm_op
 
                 if norm_op == 'standardization':
                     df = self._standardize_df(df,
@@ -2825,6 +2827,9 @@ class MatrixUtil:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
             df_results.append(selected_df.copy(deep=True))
+
+        for pos, norm_op in norm_ops_pos.items():
+            operations[pos] = norm_op
 
         if dimension == 'row':
             df = selected_df.combine_first(original_df)
@@ -2943,7 +2948,8 @@ class MatrixUtil:
 
         # iterate over operations
         df_results = []
-        for op in operations:
+        norm_ops_pos = dict()
+        for idx, op in enumerate(operations):
 
             if op == 'abundance_filtering':
                 df = self._filtering_matrix(df,
@@ -2964,6 +2970,7 @@ class MatrixUtil:
 
             elif op == 'normalization':
                 norm_op = normalization_params.get('normalization_operation')
+                norm_ops_pos[idx] = norm_op
                 norm_dimension = normalization_params.get('normalization_dimension', 'col')
 
                 if norm_op == 'standardization':
@@ -3025,6 +3032,9 @@ class MatrixUtil:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
             df_results.append(df.copy(deep=True))
+
+        for pos, norm_op in norm_ops_pos.items():
+            operations[pos] = norm_op
 
         df.index = df.index.astype('str')
         df.columns = df.columns.astype('str')
