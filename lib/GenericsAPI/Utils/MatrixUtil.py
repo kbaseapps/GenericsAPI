@@ -463,6 +463,7 @@ class MatrixUtil:
             'logit': 'Logit',
             'sqrt': 'Square Root',
             'log': 'Log',
+            'normalization': 'Normalized',
         }
 
         ## Start tabs ##
