@@ -2670,6 +2670,7 @@ class MatrixUtil:
 
         OPS = [
             'relative_abundance',
+            'normalization',
             'standardization',
             'ratio_transformation',
             'log',
