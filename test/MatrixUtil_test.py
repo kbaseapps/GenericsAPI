@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
-import inspect
-import json
+
 import os
 import time
 import unittest
-from unittest import TestCase
 from unittest.mock import patch, create_autospec, call
 from configparser import ConfigParser
 from os import environ
-from mock import patch
 import shutil
-import sys
-import functools
-import re
 
 import pandas as pd
 import numpy as np
@@ -22,7 +16,6 @@ from installed_clients.SampleServiceClient import SampleService
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.Utils.MatrixUtil import MatrixUtil
 from GenericsAPI.Utils.MatrixValidation import MatrixValidationException
-from GenericsAPI.Utils import MatrixValidation as vd
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
