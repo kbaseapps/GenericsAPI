@@ -2683,7 +2683,7 @@ class MatrixUtil:
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
 
-        operations = params.get('operations')
+        operations = params.get('operations', [])
         relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
         ratio_transformation_params = params.get('ratio_transformation_params', {})
@@ -2708,6 +2708,8 @@ class MatrixUtil:
         intersection = set(operations) & singular_operations
         if len(intersection) > 1:
             raise Exception('Please choose only one operation from {}'.format(singular_operations))
+        if operations.count('normalization') > 1:
+            raise Exception('Please choose only one normalization operation')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -2896,7 +2898,7 @@ class MatrixUtil:
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
 
-        operations = params.get('operations')
+        operations = params.get('operations', [])
         abundance_filtering_params = params.get('abundance_filtering_params', {})
         relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
@@ -2916,6 +2918,8 @@ class MatrixUtil:
         intersection = set(operations) & singular_operations
         if len(intersection) > 1:
             raise Exception('Please choose only one operation from {}'.format(singular_operations))
+        if operations.count('normalization') > 1:
+            raise Exception('Please choose only one normalization operation')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -2959,10 +2963,10 @@ class MatrixUtil:
                                                 'abundance_filtering_columns_threshold', 0),
                                             row_sum_threshold=abundance_filtering_params.get(
                                                 'abundance_filtering_row_sum_threshold',
-                                                10000),
+                                                0),
                                             columns_sum_threshold=abundance_filtering_params.get(
                                                 'abundance_filtering_columns_sum_threshold',
-                                                10000))
+                                                0))
 
             elif op == 'relative_abundance':
                 df = self._relative_abundance(df, dimension=relative_abundance_params.get(
