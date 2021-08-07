@@ -60,7 +60,7 @@
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
-      "default_values":["10000"],
+      "default_values":["0"],
       "field_type" : "text",
       "text_options": {
           "validate_as": "float"
@@ -82,7 +82,7 @@
       "optional":false,
       "advanced":true,
       "allow_multiple":false,
-      "default_values":["10000"],
+      "default_values":["0"],
       "field_type" : "text",
       "text_options": {
           "validate_as": "float"

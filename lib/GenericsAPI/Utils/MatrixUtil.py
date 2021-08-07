@@ -463,6 +463,7 @@ class MatrixUtil:
             'logit': 'Logit',
             'sqrt': 'Square Root',
             'log': 'Log',
+            'normalization': 'Normalized',
         }
 
         ## Start tabs ##
@@ -2682,7 +2683,7 @@ class MatrixUtil:
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
 
-        operations = params.get('operations')
+        operations = params.get('operations', [])
         relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
         ratio_transformation_params = params.get('ratio_transformation_params', {})
@@ -2707,6 +2708,8 @@ class MatrixUtil:
         intersection = set(operations) & singular_operations
         if len(intersection) > 1:
             raise Exception('Please choose only one operation from {}'.format(singular_operations))
+        if operations.count('normalization') > 1:
+            raise Exception('Please choose only one normalization operation')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -2751,7 +2754,8 @@ class MatrixUtil:
 
         # iterate over operations
         df_results = []
-        for op in operations:
+        norm_ops_pos = dict()
+        for idx, op in enumerate(operations):
 
             if op == 'relative_abundance':
                 selected_df = self._relative_abundance(
@@ -2762,6 +2766,7 @@ class MatrixUtil:
             elif op == 'normalization':
                 norm_op = normalization_params.get('normalization_operation')
                 norm_dimension = normalization_params.get('normalization_dimension', 'col')
+                norm_ops_pos[idx] = norm_op
 
                 if norm_op == 'standardization':
                     df = self._standardize_df(df,
@@ -2824,6 +2829,9 @@ class MatrixUtil:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
             df_results.append(selected_df.copy(deep=True))
+
+        for pos, norm_op in norm_ops_pos.items():
+            operations[pos] = norm_op
 
         if dimension == 'row':
             df = selected_df.combine_first(original_df)
@@ -2890,7 +2898,7 @@ class MatrixUtil:
         workspace_id = params.get('workspace_id')
         new_matrix_name = params.get('new_matrix_name')
 
-        operations = params.get('operations')
+        operations = params.get('operations', [])
         abundance_filtering_params = params.get('abundance_filtering_params', {})
         relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
@@ -2910,6 +2918,8 @@ class MatrixUtil:
         intersection = set(operations) & singular_operations
         if len(intersection) > 1:
             raise Exception('Please choose only one operation from {}'.format(singular_operations))
+        if operations.count('normalization') > 1:
+            raise Exception('Please choose only one normalization operation')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -2942,7 +2952,8 @@ class MatrixUtil:
 
         # iterate over operations
         df_results = []
-        for op in operations:
+        norm_ops_pos = dict()
+        for idx, op in enumerate(operations):
 
             if op == 'abundance_filtering':
                 df = self._filtering_matrix(df,
@@ -2952,10 +2963,10 @@ class MatrixUtil:
                                                 'abundance_filtering_columns_threshold', 0),
                                             row_sum_threshold=abundance_filtering_params.get(
                                                 'abundance_filtering_row_sum_threshold',
-                                                10000),
+                                                0),
                                             columns_sum_threshold=abundance_filtering_params.get(
                                                 'abundance_filtering_columns_sum_threshold',
-                                                10000))
+                                                0))
 
             elif op == 'relative_abundance':
                 df = self._relative_abundance(df, dimension=relative_abundance_params.get(
@@ -2963,6 +2974,7 @@ class MatrixUtil:
 
             elif op == 'normalization':
                 norm_op = normalization_params.get('normalization_operation')
+                norm_ops_pos[idx] = norm_op
                 norm_dimension = normalization_params.get('normalization_dimension', 'col')
 
                 if norm_op == 'standardization':
@@ -3024,6 +3036,9 @@ class MatrixUtil:
                 raise NotImplementedError('Unknown op `%s`' % op)
 
             df_results.append(df.copy(deep=True))
+
+        for pos, norm_op in norm_ops_pos.items():
+            operations[pos] = norm_op
 
         df.index = df.index.astype('str')
         df.columns = df.columns.astype('str')
