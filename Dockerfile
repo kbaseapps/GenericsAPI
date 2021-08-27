@@ -25,6 +25,8 @@ RUN Rscript -e "install.packages('vegan')"
 RUN pip install --upgrade pip \
     && python --version
 
+RUN pip install coverage==5.5
+
 RUN pip install numpy==1.19.1 \
     && pip install scikit-bio==0.5.6 --ignore-installed certifi \
     && pip install networkx==2.5 \

@@ -1,0 +1,3 @@
+ignore:
+  - "lib/installed_clients"
+  - "lib/GenericsAPI/GenericsAPIServer.py"
