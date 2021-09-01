@@ -1,0 +1,17 @@
+ID (unique value)	Chemical Type	Measurement Type	Units	Unit Medium	Chemical Ontology Class	Measured Identification Level	Chromatography Type	Chemical Class	Protocol	Identifier	Compound Name	Predicted Formula	KEGG	PB-Low-5	PB-High-5	PB-Low-6	PB-High-6	PB-Low-7	PB-High-7	PB-Low-8	PB-High-8
+Peak_1	Specific	FTICR	mol/L	soil			unknown					C2H5NO2		40	759	37	432	348	209	890	379
+Peak_2	SPECIFIC	FTICR	mol/L	soil			unknown				butanoate			14	228	508	951	446	976	692	810
+Peak_3	specific	orbitrap	mol/L	soil			HPLC				sarcosine	C3H7NO2		762	525	332	376	466	670	472	754
+Peak_4	specific	orbitrap	mol/L	soil			HPLC				alanine	C3H7NO2		365	390	46	16	183	17	121	491
+Peak_5	specific	Quadrapole	mol/L	soil			MS/MS				lactate	C3H6O3		939	898	273	986	150	126	735	258
+Peak_6	specific	Quadrapole	mol/L	solvent			MS/MS				4-aminobutanoate	C4H9NO2		82	250	293	974	134	975	201	342
+Peak_7	specific	unknown	mol/L	solvent			GS				"hydroxybutyric acids (coeluting isomers: 2-hydroxybutyric acid, alpha-hydroxyisobutyric acid)"	C4H8O3		729	695	869	295	311	761	1023	689
+Peak_8	specific	unknown	mol/L	water			GS				glycerate	C3H6O4		981	746	119	896	49	902	516	217
+Peak_9	specific	unknown	mol/L	water			GS				maleic acid	C4H4O4		857	387	905	746	652	966	661	475
+Peak_10	specific	unknown	mol/L	water			LCMS				cytosine	C4H5N3O		165	130	20	922	324	1004	193	1007
+Peak_11	aggregate								test_protocol		uracil	C4H4N2O2		298	779	781	808	634	257	723	312
+Peak_12	aggregate								test_protocol		creatinine	C4H7N3O		137	472	238	547	582	886	47	169
+Peak_13	aggregate								test_protocol		proline	C5H9NO2		677	814	502	778	831	403	909	613
+																					
+																					
+																					
