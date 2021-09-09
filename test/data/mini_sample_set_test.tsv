@@ -2,9 +2,5 @@ Object Type:	Individual Sample
 Sample Name	IGSN	Material	Primary physiographic feature	Related Identifiers	Relation Type
 PB-Low-5	IEAWH0001	Soil	Hollow	IEAWH0002	grouped
 PB-High-5	IEAWH0002	Soil	Hummock_2	IEAWH0001	grouped
-PB-Low-6	IEAWH0003	Soil	Hollow	IEAWH0004	grouped
-PB-High-6	IEAWH0004	Soil	Hummock	IEAWH0003	grouped
-PB-Low-7	IEAWH0005	Water	Hollow	IEAWH0006	grouped
-PB-High-7	IEAWH0006	Water	Hummock_2	IEAWH0005	grouped
-PB-Low-8	IEAWH0007	Water	Hollow	IEAWH0008	grouped
-PB-High-8	IEAWH0008	Water	Hummock	IEAWH0007	grouped
+PB-Low-6	IEAWH0003	Water	Hollow	IEAWH0004	grouped
+PB-High-6	IEAWH0004	Water	Hummock	IEAWH0003	grouped
