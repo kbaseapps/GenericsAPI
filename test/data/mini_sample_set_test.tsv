@@ -1,10 +1,10 @@
-Object Type:	Individual Sample	User Code:	IEAWH																						
-Sample Name	IGSN	Parent IGSN	Release date	Material	Field name (informal classification)	Location Description	Locality Description	Collection method	Purpose	Latitude	Longitude	Coordinate Precision?	Elevation start	Elevation unit	Navigation type	Primary physiographic feature	Name of physiographic feature	Field program/cruise	Collector/Chief Scientist	Collection date	Collection date precision	Current archive	Current archive contact	Related Identifiers	Relation Type
-PB-Low-5	IEAWH0001			Soil	20	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hollow	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0002	grouped
-PB-High-5	IEAWH0002			Soil	2	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hummock_2	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0001	grouped
-PB-Low-6	IEAWH0003			Soil	30	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hollow	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0004	grouped
-PB-High-6	IEAWH0004			Soil	3	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hummock	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0003	grouped
-PB-Low-7	IEAWH0005			Soil	40	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hollow	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0006	grouped
-PB-High-7	IEAWH0006			Soil	4	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hummock_2	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0005	grouped
-PB-Low-8	IEAWH0007			Soil	10	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hollow	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0008	grouped
-PB-High-8	IEAWH0008			Soil	3	Savannah River Site	Pine Backwater	Coring > Syringe	Microbial Characterization 1	33.3375	81.71861111	30			GPS	Hummock	Tims Branch watershed	Argonne Wetlands Hydrobiogeochemistry SFA	Pamela Weisenhorn	6/26/19	day	Argonne National Lab	pweisenhorn@anl.gov	IEAWH0007	grouped
+Object Type:	Individual Sample				
+Sample Name	IGSN	Material	Primary physiographic feature	Related Identifiers	Relation Type
+PB-Low-5	IEAWH0001	Soil	Hollow	IEAWH0002	grouped
+PB-High-5	IEAWH0002	Soil	Hummock_2	IEAWH0001	grouped
+PB-Low-6	IEAWH0003	Soil	Hollow	IEAWH0004	grouped
+PB-High-6	IEAWH0004	Soil	Hummock	IEAWH0003	grouped
+PB-Low-7	IEAWH0005	Water	Hollow	IEAWH0006	grouped
+PB-High-7	IEAWH0006	Water	Hummock_2	IEAWH0005	grouped
+PB-Low-8	IEAWH0007	Water	Hollow	IEAWH0008	grouped
+PB-High-8	IEAWH0008	Water	Hummock	IEAWH0007	grouped
