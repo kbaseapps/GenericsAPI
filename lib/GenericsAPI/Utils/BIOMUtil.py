@@ -1002,6 +1002,8 @@ class BiomUtil:
 
         logging.info('using workspace to fetch object')
         input_matrix_obj = self.ws.get_objects2({"objects": [{'ref': matrix_ref}]})['data'][0]
+        print('return from ws')
+        print(input_matrix_obj)
 
         input_matrix_info = input_matrix_obj['info']
         matrix_name = input_matrix_info[1]
