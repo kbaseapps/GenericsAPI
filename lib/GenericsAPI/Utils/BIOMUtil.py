@@ -22,6 +22,7 @@ from GenericsAPI.Utils.TaxonUtil import TaxonUtil
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.KBaseSearchEngineClient import KBaseSearchEngine
 from installed_clients.kb_GenericsReportClient import kb_GenericsReport
+from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
@@ -992,11 +993,14 @@ class BiomUtil:
         self.taxon_wsname = config['taxon-workspace-name']
         self.kbse = KBaseSearchEngine(config['search-url'])
         self.taxon_cache = dict()
+        self.ws = workspaceService(config["workspace-url"], token=self.token)
 
     def fetch_sequence(self, matrix_ref):
         logging.info('start to fetch consensus sequence')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
+        input_matrix_obj = self.ws.get_objects2({"objects": [{'ref': matrix_ref}]})['data'][0]
+
         input_matrix_info = input_matrix_obj['info']
         matrix_name = input_matrix_info[1]
         matrix_type = input_matrix_info[2]
