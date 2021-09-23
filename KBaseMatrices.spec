@@ -9,8 +9,8 @@ module KBaseMatrices{
     typedef string ws_genome_id;
 
     /*
-     * Reference to a handle ID
-     * @id handle
+      Reference to a handle ID
+      @id handle
      */
     typedef string handle_ref;
 
