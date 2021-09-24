@@ -2932,8 +2932,14 @@ class MatrixUtil:
             output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
             logging.info('Start generating consensus sequence file in {}'.format(output_directory))
             self._mkdir_p(output_directory)
-            self.dfu.shock_to_file({'handle_id': handle, 'file_path': self.scratch})
-            input_matrix_data['sequencing_file_handle'] = None
+            matrix_fasta_file = self.dfu.shock_to_file({
+                'handle_id': handle,
+                'file_path': self.scratch}).get('file_path')
+            logging.info('start saving consensus sequence file to shock: {}'.format(
+                                                                                matrix_fasta_file))
+            handle_id = self.dfu.file_to_shock({'file_path': matrix_fasta_file,
+                                                'make_handle': True})['handle']['hid']
+            input_matrix_data['sequencing_file_handle'] = handle_id
 
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
