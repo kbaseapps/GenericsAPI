@@ -5,6 +5,7 @@ import os
 import json
 from dotmap import DotMap
 import uuid
+import errno
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.GenericsServiceClient import GenericsService
@@ -153,6 +154,21 @@ class DataUtil:
         return validated, failed_constraints
 
     @staticmethod
+    def _mkdir_p(path):
+        """
+        _mkdir_p: make directory for given path
+        """
+        if not path:
+            return
+        try:
+            os.makedirs(path)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else:
+                raise
+
+    @staticmethod
     def _raise_validation_error(params, validate):
         """Raise a meaningful error message for failed validation"""
         logging.error('Data failed type checking')
@@ -290,6 +306,21 @@ class DataUtil:
 
         if not validate.get('validated'):
             self._raise_validation_error(params, validate)
+
+        # make sure users with shared object have access to the handle file upon saving
+        handle = data.get('sequencing_file_handle')
+        if handle:
+            output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+            logging.info('Start downloading consensus sequence file in {}'.format(output_directory))
+            self._mkdir_p(output_directory)
+            matrix_fasta_file = self.dfu.shock_to_file({
+                'handle_id': handle,
+                'file_path': self.scratch}).get('file_path')
+            logging.info('start saving consensus sequence file to shock: {}'.format(
+                                                                                matrix_fasta_file))
+            handle_id = self.dfu.file_to_shock({'file_path': matrix_fasta_file,
+                                                'make_handle': True})['handle']['hid']
+            data['sequencing_file_handle'] = handle_id
 
         ws_name_id = params.get('workspace_id')
         workspace_name = params.get('workspace_name')

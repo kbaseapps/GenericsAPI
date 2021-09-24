@@ -2926,28 +2926,10 @@ class MatrixUtil:
         input_matrix_name = input_matrix_info[1]
         input_matrix_data = input_matrix_obj['data']
 
-        handle = input_matrix_data.get('sequencing_file_handle')
-        if handle:
-            # make sure users with shared object have access to the handle upon saving
-            output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-            logging.info('Start generating consensus sequence file in {}'.format(output_directory))
-            self._mkdir_p(output_directory)
-            matrix_fasta_file = self.dfu.shock_to_file({
-                'handle_id': handle,
-                'file_path': self.scratch}).get('file_path')
-            logging.info('start saving consensus sequence file to shock: {}'.format(
-                                                                                matrix_fasta_file))
-            handle_id = self.dfu.file_to_shock({'file_path': matrix_fasta_file,
-                                                'make_handle': True})['handle']['hid']
-            input_matrix_data['sequencing_file_handle'] = handle_id
-
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
                 subobj_ref = input_matrix_data[key]
-                subobj_ref_chain = '{};{}'.format(input_matrix_ref, subobj_ref)
-                # make sure user have access to all sub objects
-                self.dfu.get_objects({'object_refs': [subobj_ref_chain]})['data'][0]
-                input_matrix_data[key] = subobj_ref_chain
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
                 logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
 
         for dim in ['row', 'col']:
