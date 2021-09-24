@@ -2929,7 +2929,10 @@ class MatrixUtil:
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
                 subobj_ref = input_matrix_data[key]
-                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                subobj_ref_chain = '{};{}'.format(input_matrix_ref, subobj_ref)
+                # make sure user have access to all sub objects
+                self.dfu.get_objects({'object_refs': [subobj_ref_chain]})['data'][0]
+                input_matrix_data[key] = subobj_ref_chain
                 logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
 
         for dim in ['row', 'col']:
