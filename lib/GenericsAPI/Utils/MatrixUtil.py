@@ -2933,6 +2933,7 @@ class MatrixUtil:
             logging.info('Start generating consensus sequence file in {}'.format(output_directory))
             self._mkdir_p(output_directory)
             self.dfu.shock_to_file({'handle_id': handle, 'file_path': self.scratch})
+            input_matrix_data['sequencing_file_handle'] = None
 
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
