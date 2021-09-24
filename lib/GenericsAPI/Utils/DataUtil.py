@@ -311,13 +311,12 @@ class DataUtil:
         handle = data.get('sequencing_file_handle')
         if handle:
             output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-            logging.info('Start downloading consensus sequence file in {}'.format(output_directory))
+            logging.info('Downloading consensus sequence file in {}'.format(output_directory))
             self._mkdir_p(output_directory)
             matrix_fasta_file = self.dfu.shock_to_file({
                 'handle_id': handle,
                 'file_path': self.scratch}).get('file_path')
-            logging.info('start saving consensus sequence file to shock: {}'.format(
-                                                                                matrix_fasta_file))
+            logging.info('Saving consensus sequence file to shock: {}'.format(matrix_fasta_file))
             handle_id = self.dfu.file_to_shock({'file_path': matrix_fasta_file,
                                                 'make_handle': True})['handle']['hid']
             data['sequencing_file_handle'] = handle_id
