@@ -2926,6 +2926,14 @@ class MatrixUtil:
         input_matrix_name = input_matrix_info[1]
         input_matrix_data = input_matrix_obj['data']
 
+        handle = input_matrix_data.get('sequencing_file_handle')
+        if handle:
+            # make sure users with shared object have access to the handle upon saving
+            output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+            logging.info('Start generating consensus sequence file in {}'.format(output_directory))
+            self._mkdir_p(output_directory)
+            self.dfu.shock_to_file({'handle_id': handle, 'file_path': self.scratch})
+
         for key, obj_data in input_matrix_data.items():
             if key.endswith('_ref'):
                 subobj_ref = input_matrix_data[key]
