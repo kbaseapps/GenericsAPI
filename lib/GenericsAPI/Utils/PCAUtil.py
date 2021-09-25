@@ -14,7 +14,6 @@ import plotly.graph_objs as go
 from matplotlib import pyplot as plt
 from plotly.offline import plot
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.DataUtil import DataUtil

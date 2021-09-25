@@ -79,6 +79,12 @@ class CorrUtilTest(unittest.TestCase):
     def getCorrUtil(self):
         return self.__class__.corr_util
 
+    def mock_generate_corr_report(corr_matrix_obj_ref, workspace_name, corr_matrix_plot_path,
+                                  scatter_plot_path=None, df1=None, df2=None):
+        print('Mocking CorrelationUtil._generate_corr_report')
+
+        return {'report_name': 'fake_report_name', 'report_ref': 'fake_report_ref'}
+
     def loadDF(self):
 
         if hasattr(self.__class__, 'test_random_df'):
@@ -373,7 +379,8 @@ class CorrUtilTest(unittest.TestCase):
         self.assertCountEqual(obj_data.get('significance_data').get('row_ids'), expected_index)
         self.assertCountEqual(obj_data.get('significance_data').get('col_ids'), expected_index)
 
-    def test_compute_correlation_across_matrices_ok(self):
+    @patch.object(CorrelationUtil, "_generate_corr_report", side_effect=mock_generate_corr_report)
+    def test_compute_correlation_across_matrices_ok(self, _generate_corr_report):
         self.start_test()
         expr_matrix_ref = self.loadExpressionMatrix()
         expr_matrix_ref_2 = self.loadExpressionMatrix2()
@@ -416,7 +423,8 @@ class CorrUtilTest(unittest.TestCase):
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_compute_correlation_matrix(invalidate_params, error_msg)
 
-    def test_comp_corr_matrix_ok(self):
+    @patch.object(CorrelationUtil, "_generate_corr_report", side_effect=mock_generate_corr_report)
+    def test_comp_corr_matrix_ok(self, _generate_corr_report):
         self.start_test()
         expr_matrix_ref = self.loadExpressionMatrix()
 
