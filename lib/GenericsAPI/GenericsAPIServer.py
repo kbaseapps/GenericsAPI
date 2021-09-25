@@ -438,10 +438,6 @@ class Application(object):
                              name='GenericsAPI.export_pca_matrix_excel',
                              types=[dict])
         self.method_authentication['GenericsAPI.export_pca_matrix_excel'] = 'required'  # noqa
-        self.rpc_service.add(impl_GenericsAPI.export_amplicon_set_tsv,
-                             name='GenericsAPI.export_amplicon_set_tsv',
-                             types=[dict])
-        self.method_authentication['GenericsAPI.export_amplicon_set_tsv'] = 'required'  # noqa
         self.rpc_service.add(impl_GenericsAPI.compute_correlation_matrix,
                              name='GenericsAPI.compute_correlation_matrix',
                              types=[dict])

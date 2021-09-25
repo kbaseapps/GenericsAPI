@@ -394,20 +394,6 @@ class MatrixUtil:
         tab_content += html
         tab_content += '\n</div>\n'
 
-        if False and len(random_rare_df.columns) <= 200:
-            viewer_name = 'MatrixLinearPlotViewer'
-            tab_def_content += '''\n<button class="tablinks" '''
-            tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-            tab_def_content += '''>Matrix Linear Plot</button>\n'''
-
-            linear_plot_page = self._generate_linear_plot(random_rare_df, output_directory)
-
-            tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-            tab_content += '\n<iframe height="1300px" width="100%" '
-            tab_content += 'src="{}" '.format(linear_plot_page)
-            tab_content += 'style="border:none;"></iframe>'
-            tab_content += '\n</div>\n'
-
         viewer_name = 'RarefiedMatrixViewer'
         tab_def_content += '''\n<button class="tablinks" '''
         tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
@@ -517,29 +503,6 @@ class MatrixUtil:
 
         tab_def_content += '\n</div>\n'
         return tab_def_content + tab_content
-
-    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance',
-                              top_percent=100):
-        linear_plot_path = 'linear_plot.html'
-
-        sum_order = data_df.sum(axis=1).sort_values(ascending=False).index
-        data_df = data_df.reindex(sum_order)
-
-        top_index = data_df.index[:int(data_df.index.size * top_percent / 100)]
-        data_df = data_df.loc[top_index]
-
-        links = data_df.stack().reset_index()
-
-        col_names = links.columns
-        links.rename(columns={col_names[0]: row_name,
-                              col_names[1]: 'samples',
-                              col_names[2]: 'value'},
-                     inplace=True)
-        fig = px.line(links, x=row_name, y='value', color='samples')
-
-        plot(fig, filename=os.path.join(output_directory, linear_plot_path))
-
-        return linear_plot_path
 
     def _create_chem_abun_heatmap(self, output_directory, data_groups):
 
@@ -768,39 +731,6 @@ class MatrixUtil:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
                 tab_content += '''\n<p style="color:red;" >'''
                 tab_content += '''Heatmap is too large to be displayed.</p>\n'''
-                tab_content += '\n</div>\n'
-
-        if False and len(data_df.columns) <= 200:
-            if top_heatmap_dir:
-                viewer_name = 'MatrixLinearPlotViewer'
-                tab_def_content += '''\n<button class="tablinks" '''
-                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(
-                                                                            round(top_percent, 2))
-
-                linear_plot_page = self._generate_linear_plot(data_df, output_directory,
-                                                              top_percent=round(top_percent, 2))
-
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
-                    round(top_percent, 2))
-                tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
-                tab_content += '\n<iframe height="1300px" width="100%" '
-                tab_content += 'src="{}" '.format(linear_plot_page)
-                tab_content += 'style="border:none;"></iframe>'
-                tab_content += '\n</div>\n'
-            else:
-                viewer_name = 'MatrixLinearPlotViewer'
-                tab_def_content += '''\n<button class="tablinks" '''
-                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Matrix Linear Plot</button>\n'''
-
-                linear_plot_page = self._generate_linear_plot(data_df, output_directory)
-
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '\n<iframe height="1300px" width="100%" '
-                tab_content += 'src="{}" '.format(linear_plot_page)
-                tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
@@ -1944,20 +1874,6 @@ class MatrixUtil:
         ratio_transformed_df.replace(-np.inf, -2 ** 32, inplace=True)
 
         return ratio_transformed_df
-
-    def _remove_all_zero(self, df):
-
-        logging.info("Removing all zero rows")
-        row_check = (df != 0).any(axis=1)
-        removed_row_ids = list(row_check[row_check == False].index)
-        df = df.loc[row_check]
-
-        logging.info("Removing all zero columns")
-        col_check = (df != 0).any(axis=0)
-        removed_col_ids = list(col_check[col_check == False].index)
-        df = df.loc[:, col_check]
-
-        return df, removed_row_ids, removed_col_ids
 
     def _filtering_matrix(self, df, row_threshold=0, columns_threshold=0,
                           row_sum_threshold=10000, columns_sum_threshold=10000):

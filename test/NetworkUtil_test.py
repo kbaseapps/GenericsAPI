@@ -174,9 +174,10 @@ class NetworkUtilTest(unittest.TestCase):
         params = {'corr_matrix_ref': corr_matrix_ref,
                   'workspace_name': self.wsName,
                   'network_obj_name': 'test_network_obj',
-                  'filter_on_threshold': {'coefficient_threshold': 0.8}}
+                  'filter_on_threshold': {'coefficient_threshold': 0,
+                                          'significance_threshold': 0}}
 
-        ret = self.getImpl().build_network(self.ctx, params)[0]
+        _ = self.getImpl().build_network(self.ctx, params)[0]
 
     def test_init_ok(self):
         self.start_test()

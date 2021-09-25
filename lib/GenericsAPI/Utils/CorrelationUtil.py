@@ -70,40 +70,6 @@ class CorrelationUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-    def _fetch_taxon(self, amplicon_set_ref, amplicon_ids):
-        logging.info('start fetching taxon info from AmpliconSet')
-        taxons = dict()
-        taxons_level = dict()
-        amplicon_set_data = self.dfu.get_objects(
-                                            {'object_refs': [amplicon_set_ref]})['data'][0]['data']
-
-        amplicons = amplicon_set_data.get('amplicons')
-
-        for amplicon_id in amplicon_ids:
-            scientific_name = 'None'
-            level = 'Unknown'
-            try:
-                scientific_name = amplicons.get(amplicon_id).get('taxonomy').get('scientific_name')
-            except Exception:
-                pass
-
-            try:
-                level = amplicons.get(amplicon_id).get('taxonomy').get('taxon_level')
-            except Exception:
-                pass
-
-            taxons.update({amplicon_id: scientific_name})
-            taxons_level.update({amplicon_id: level})
-
-        # default empty taxons and taxons_level
-        if set(taxons.values()) == {'None'}:
-            taxons = None
-
-        if set(taxons_level.values()) == {'Unknown'}:
-            taxons_level = None
-
-        return taxons, taxons_level
-
     def _build_top_corr_table(self, matrix_2D, output_directory,
                               original_matrix_ref=[], sig_matrix_2D=None):
 
@@ -415,112 +381,6 @@ class CorrelationUtil:
             tab_content += '''Heatmap is too large to be displayed.</p>\n'''
 
         return tab_content
-
-    def _build_table_content(self, matrix_2D, output_directory, original_matrix_ref=[],
-                             type='corr'):
-        """
-        _build_table_content: generate HTML table content for FloatMatrix2D object
-        """
-
-        page_content = """\n"""
-
-        table_file_name = '{}_table.html'.format(type)
-        data_file_name = '{}_data.json'.format(type)
-
-        page_content += """<iframe height="1300px" width="100%" """
-        page_content += """src="{}" """.format(table_file_name)
-        page_content += """style="border:none;"></iframe>\n"""
-
-        row_ids = matrix_2D.get('row_ids')
-        col_ids = matrix_2D.get('col_ids')
-        values = matrix_2D.get('values')
-
-        df = pd.DataFrame(values, index=row_ids, columns=col_ids)
-
-        columns = list()
-        taxons = None
-        taxons_level = None
-        if len(original_matrix_ref) == 1:
-            df = df.mask(np.tril(np.ones(df.shape)).astype(np.bool))
-            res = self.dfu.get_objects({'object_refs': [original_matrix_ref[0]]})['data'][0]
-            obj_type = res['info'][2]
-            matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
-            # if matrix_type == 'Amplicon':
-            #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
-            #     if amplicon_set_ref:
-            #         taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
-            columns.extend(['{} 1'.format(matrix_type), '{} 2'.format(matrix_type)])
-        elif len(original_matrix_ref) == 2:
-            for matrix_ref in original_matrix_ref[::-1]:
-                res = self.dfu.get_objects({'object_refs': [matrix_ref]})['data'][0]
-                obj_type = res['info'][2]
-                matrix_type = obj_type.split('-')[0].split('Matrix')[0].split('.')[-1]
-                # if matrix_type == 'Amplicon':
-                #     amplicon_set_ref = res['data'].get('amplicon_set_ref')
-                #     if amplicon_set_ref:
-                #         taxons, taxons_level = self._fetch_taxon(amplicon_set_ref, col_ids)
-                columns.append(matrix_type)
-        else:
-            columns = ['Variable 1', 'Variable 2']
-
-        links = df.stack().reset_index()
-        # remove self-comparison
-        links = links[links.iloc[:, 0] != links.iloc[:, 1]]
-
-        if type == 'corr':
-            columns.append('Correlation')
-        elif type == 'sig':
-            columns.append('Significance')
-        else:
-            columns.append('Value')
-
-        links.columns = columns
-
-        if taxons:
-            links['Taxon'] = links.iloc[:, 0].map(taxons)
-
-        if taxons_level:
-            links['Taxon Level'] = links.iloc[:, 0].map(taxons_level)
-
-        table_headers = links.columns.tolist()
-        table_content = """\n"""
-        # build header and footer
-        table_content += """\n<thead>\n<tr>\n"""
-        for table_header in table_headers:
-            table_content += """\n <th>{}</th>\n""".format(table_header)
-        table_content += """\n</tr>\n</thead>\n"""
-
-        table_content += """\n<tfoot>\n<tr>\n"""
-        for table_header in table_headers:
-            table_content += """\n <th>{}</th>\n""".format(table_header)
-        table_content += """\n</tr>\n</tfoot>\n"""
-
-        logging.info('start generating table json file')
-        data_array = links.values.tolist()
-
-        total_rec = len(data_array)
-        json_dict = {'draw': 1,
-                     'recordsTotal': total_rec,
-                     'recordsFiltered': total_rec,
-                     'data': data_array}
-
-        with open(os.path.join(output_directory, data_file_name), 'w') as fp:
-            json.dump(json_dict, fp)
-
-        logging.info('start generating table html')
-        with open(os.path.join(output_directory, table_file_name), 'w') as result_file:
-            with open(os.path.join(os.path.dirname(__file__), 'templates', 'table_template.html'),
-                      'r') as report_template_file:
-                report_template = report_template_file.read()
-                report_template = report_template.replace('<p>table_header</p>',
-                                                          table_content)
-                report_template = report_template.replace('ajax_file_path',
-                                                          data_file_name)
-                report_template = report_template.replace('deferLoading_size',
-                                                          str(total_rec))
-                result_file.write(report_template)
-
-        return page_content
 
     def _generate_visualization_content(self, output_directory, corr_matrix_obj_ref,
                                         corr_matrix_plot_path, scatter_plot_path, df1, df2):
@@ -857,36 +717,6 @@ class CorrelationUtil:
             significance_df.to_excel(writer, "significance_data", index=True)
 
         writer.close()
-
-    def _update_taxonomy_index(self, data_df, amplicon_set_ref):
-
-        logging.info('start updating index with taxonomy info from AmpliconSet')
-
-        amplicon_set_data = self.dfu.get_objects(
-                                            {'object_refs': [amplicon_set_ref]})['data'][0]['data']
-
-        amplicons = amplicon_set_data.get('amplicons')
-
-        index = data_df.index.values
-
-        replace_index = list()
-
-        for idx in index:
-            scientific_name = None
-            try:
-                scientific_name = amplicons.get(idx).get('taxonomy').get('scientific_name')
-            except Exception:
-                pass
-
-            if scientific_name:
-                replace_index.append(scientific_name + '_' + idx)
-            else:
-                replace_index.append(idx)
-
-        for idx, val in enumerate(replace_index):
-            index[idx] = val
-
-        return data_df
 
     def _fetch_matrix_data(self, matrix_ref):
 
