@@ -6,6 +6,7 @@ import time
 from configparser import ConfigParser
 import uuid
 import pandas as pd
+from mock import patch
 
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -74,6 +75,14 @@ class PCAUtilTest(unittest.TestCase):
 
     def getPCAUtil(self):
         return self.__class__.pca_util
+
+    def mock_generate_pca_report(pca_ref, score_plots, loading_plots, bi_plots,
+                                 workspace_name, n_components):
+        print('Mocking PCAUtil._generate_pca_report')
+
+        # shock_id = 'fake shock id'
+
+        return {'report_name': 'fake_report_name', 'report_ref': 'fake_report_ref'}
 
     def loadExpressionMatrix(self):
         if hasattr(self.__class__, 'expr_matrix_ref'):
@@ -239,7 +248,8 @@ class PCAUtilTest(unittest.TestCase):
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_run_pca(invalidate_params, error_msg)
 
-    def test_run_pca_ok(self):
+    @patch.object(PCAUtil, "_generate_pca_report", side_effect=mock_generate_pca_report)
+    def test_run_pca_ok(self, _generate_pca_report):
         self.start_test()
 
         expr_matrix_ref = self.loadExpressionMatrix()

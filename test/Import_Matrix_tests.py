@@ -119,6 +119,7 @@ class ImportMatrixTest(unittest.TestCase):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
 
+    @unittest.skip("redundant test")
     def test_import_matrix_from_excel(self):
         self.start_test()
 
