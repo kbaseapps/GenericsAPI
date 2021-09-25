@@ -32,8 +32,8 @@ class GenericsAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "1.0.26"
-    GIT_URL = "https://github.com/Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "5ffbb2b592486ca91d782821291ee94249ba142a"
+    GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
+    GIT_COMMIT_HASH = "3094bf8d2ec35e5dcd52364a3848dee2eb6652b8"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -165,19 +165,19 @@ class GenericsAPI:
            reference) -> structure: parameter "obj_type" of String, parameter
            "input_shock_id" of String, parameter "input_file_path" of String,
            parameter "input_staging_file_path" of String, parameter
-           "matrix_name" of String, parameter "amplicon_set_name" of String,
-           parameter "scale" of String, parameter "description" of String,
-           parameter "workspace_name" of type "workspace_name" (workspace
-           name of the object), parameter "genome_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "col_attributemapping_ref" of
-           type "obj_ref" (An X/Y/Z style reference), parameter
-           "row_attributemapping_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "diff_expr_matrix_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "biochemistry_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter "reads_set_ref" of
-           type "obj_ref" (An X/Y/Z style reference), parameter
-           "sample_set_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "unit" of String, parameter "type" of String
+           "matrix_name" of String, parameter "scale" of String, parameter
+           "description" of String, parameter "workspace_name" of type
+           "workspace_name" (workspace name of the object), parameter
+           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
+           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
+           style reference), parameter "row_attributemapping_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter
+           "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "biochemistry_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "reads_set_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "sample_set_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter "unit" of
+           String, parameter "type" of String
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z
@@ -777,26 +777,6 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(result, dict):
             raise ValueError('Method export_pca_matrix_excel return value ' +
-                             'result is not type dict as required.')
-        # return the results
-        return [result]
-
-    def export_amplicon_set_tsv(self, ctx, params):
-        """
-        :param params: instance of type "ExportObjectParams" -> structure:
-           parameter "input_ref" of type "obj_ref" (An X/Y/Z style reference)
-        :returns: instance of type "ExportOutput" -> structure: parameter
-           "shock_id" of String
-        """
-        # ctx is the context object
-        # return variables are: result
-        #BEGIN export_amplicon_set_tsv
-        result = self.biom_util.export_amplicon_set_tsv(params)
-        #END export_amplicon_set_tsv
-
-        # At some point might do deeper type checking...
-        if not isinstance(result, dict):
-            raise ValueError('Method export_amplicon_set_tsv return value ' +
                              'result is not type dict as required.')
         # return the results
         return [result]

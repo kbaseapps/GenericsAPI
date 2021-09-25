@@ -61,52 +61,6 @@ class NetworkUtil:
 
         return links
 
-    def _generate_visualization_content(self, graph):
-        """
-        _generate_visualization_content: generate visualization html content
-        """
-
-        graph_nodes_content = str(graph.nodes()).replace('u', '')
-        graph_edges_content = str([list(edge) for edge in graph.edges()]).replace('u', '')
-
-        return graph_nodes_content, graph_edges_content
-
-    def _generate_network_html_report(self, graph):
-        """
-        _generate_network_html_report: generate html summary report
-        """
-
-        logging.info('Start generating html report')
-        html_report = list()
-
-        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(output_directory)
-        result_file_path = os.path.join(output_directory, 'network_report.html')
-
-        shutil.copytree(self.SIGMA_PATH, os.path.join(output_directory, 'sigma_js'))
-
-        graph_nodes_content, graph_edges_content = self._generate_visualization_content(graph)
-
-        with open(result_file_path, 'w') as result_file:
-            with open(os.path.join(os.path.dirname(__file__), 'templates', 'network_template.html'),
-                      'r') as report_template_file:
-                report_template = report_template_file.read()
-                report_template = report_template.replace('//GRAPH_NODES',
-                                                          graph_nodes_content)
-                report_template = report_template.replace('//GRAPH_EDGES',
-                                                          graph_edges_content)
-                result_file.write(report_template)
-
-        report_shock_id = self.dfu.file_to_shock({'file_path': output_directory,
-                                                  'pack': 'zip'})['shock_id']
-
-        html_report.append({'shock_id': report_shock_id,
-                            'name': os.path.basename(result_file_path),
-                            'label': os.path.basename(result_file_path),
-                            'description': 'HTML summary report for Build Network App'
-                            })
-        return html_report
-
     def _generate_plotly_network(self, graph):
         """
         _generate_ploty_network: generate html summary report
@@ -133,11 +87,13 @@ class NetworkUtil:
 
     def _plotly_network(self, graph, result_file_path):
         logging.info('start ploting network using plotly')
+        logging.info('Graph has {} edges'.format(len(graph.edges)))
 
         # create node position
         seed(1)
         nodes = dict()
         for edge in list(graph.edges(data=True)):
+            logging.info('Plotting edge: {}'.format(edge))
             node1 = edge[0]
             node2 = edge[1]
             weight = (1 - abs(edge[2]['weight'])) * 100

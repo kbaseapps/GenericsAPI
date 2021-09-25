@@ -112,7 +112,6 @@ module GenericsAPI {
       string input_file_path;
       string input_staging_file_path;
       string matrix_name;
-      string amplicon_set_name;
       string scale;
       string description;
       workspace_name workspace_name;
@@ -466,10 +465,6 @@ module GenericsAPI {
 
     funcdef export_pca_matrix_excel(ExportObjectParams params)
         returns (ExportOutput result) authentication required;
-
-    funcdef export_amplicon_set_tsv(ExportObjectParams params)
-        returns (ExportOutput result) authentication required;
-
 
   /* Input of the compute_correlation_matrix function
     input_obj_ref: object reference of a matrix

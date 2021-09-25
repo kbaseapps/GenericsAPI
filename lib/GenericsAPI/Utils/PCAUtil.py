@@ -172,27 +172,6 @@ class PCAUtil:
 
         return "%s/%s/%s" % (info[6], info[0], info[4])
 
-    def _creat_biplot(self, xs, ys, coeff, first_component, second_component, bi_plot_path,
-                      labels=None):
-        plt.clf()
-        n = coeff.shape[0]
-        scalex = 1.0/(xs.max() - xs.min())
-        scaley = 1.0/(ys.max() - ys.min())
-        plt.scatter(xs * scalex, ys * scaley, s=5)
-        for i in range(n):
-            plt.arrow(0, 0, coeff[i, 0], coeff[i, 1], color='r', alpha=0.5)
-            if labels is None:
-                plt.text(coeff[i, 0] * 1.15, coeff[i, 1] * 1.15, "Var"+str(i+1),
-                         color='green', ha='center', va='center')
-            else:
-                plt.text(coeff[i, 0] * 1.15, coeff[i, 1] * 1.15, labels[i],
-                         color='green', ha='center', va='center')
-
-        plt.xlabel("PC{}".format(first_component))
-        plt.ylabel("PC{}".format(second_component))
-        plt.grid()
-        plt.savefig(bi_plot_path)
-
     def _pca_for_matrix(self, input_obj_ref, n_components, dimension):
         """
         _pca_for_matrix: perform PCA analysis for matrix object

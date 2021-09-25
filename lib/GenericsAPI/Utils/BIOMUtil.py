@@ -334,29 +334,6 @@ class BiomUtil:
         })[0]
         return f'{info[6]}/{info[0]}/{info[4]}'
 
-    def _generate_linear_plot(self, data_df, output_directory, row_name='abundance',
-                              top_percent=100):
-        linear_plot_path = 'linear_plot.html'
-
-        sum_order = data_df.sum(axis=1).sort_values(ascending=False).index
-        data_df = data_df.reindex(sum_order)
-
-        top_index = data_df.index[:int(data_df.index.size * top_percent / 100)]
-        data_df = data_df.loc[top_index]
-
-        links = data_df.stack().reset_index()
-
-        col_names = links.columns
-        links.rename(columns={col_names[0]: row_name,
-                              col_names[1]: 'samples',
-                              col_names[2]: 'value'},
-                     inplace=True)
-        fig = px.line(links, x=row_name, y='value', color='samples')
-
-        plot(fig, filename=os.path.join(output_directory, linear_plot_path))
-
-        return linear_plot_path
-
     def _generate_visualization_content(self, output_directory, heatmap_dir, data_df,
                                         top_heatmap_dir, top_percent, display_count):
 
@@ -419,40 +396,6 @@ class BiomUtil:
                 tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
                 tab_content += '''\n<p style="color:red;" >'''
                 tab_content += '''Heatmap is too large to be displayed.</p>\n'''
-                tab_content += '\n</div>\n'
-
-        if False and len(data_df.columns) <= 200:
-            if top_heatmap_dir:
-                viewer_name = 'MatrixLinearPlotViewer'
-                tab_def_content += '''\n<button class="tablinks" '''
-                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Top {} Percent Linear Plot</button>\n'''.format(
-                                                                            round(top_percent, 2))
-
-                linear_plot_page = self._generate_linear_plot(data_df, output_directory,
-                                                              row_name='OTU',
-                                                              top_percent=round(top_percent, 2))
-
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                msg = 'Top {} percent of matrix sorted by sum of abundance values.'.format(
-                                                                            round(top_percent, 2))
-                tab_content += '''<p style="color:red;" >{}</p>'''.format(msg)
-                tab_content += '\n<iframe height="1300px" width="100%" '
-                tab_content += 'src="{}" '.format(linear_plot_page)
-                tab_content += 'style="border:none;"></iframe>'
-                tab_content += '\n</div>\n'
-            else:
-                viewer_name = 'MatrixLinearPlotViewer'
-                tab_def_content += '''\n<button class="tablinks" '''
-                tab_def_content += '''onclick="openTab(event, '{}')"'''.format(viewer_name)
-                tab_def_content += '''>Matrix Linear Plot</button>\n'''
-
-                linear_plot_page = self._generate_linear_plot(data_df, output_directory, row_name='OTU')
-
-                tab_content += '''\n<div id="{}" class="tabcontent">'''.format(viewer_name)
-                tab_content += '\n<iframe height="1300px" width="100%" '
-                tab_content += 'src="{}" '.format(linear_plot_page)
-                tab_content += 'style="border:none;"></iframe>'
                 tab_content += '\n</div>\n'
 
         viewer_name = 'MatrixHeatmapViewer'
@@ -588,64 +531,6 @@ class BiomUtil:
 
         return report_output
 
-    def _df_to_tsv(self, amplicon_set_df, result_dir, amplicon_set_ref):
-        logging.info('writting amplicon set data frame to tsv file')
-        amplicon_set_obj = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]
-        amplicon_set_info = amplicon_set_obj['info']
-        amplicon_set_name = amplicon_set_info[1]
-
-        file_path = os.path.join(result_dir, amplicon_set_name + ".tsv")
-
-        amplicon_set_df.to_csv(file_path, sep='\t', index=True, header=True)
-
-        return file_path
-
-    def _amplicon_set_to_df(self, amplicon_set_ref):
-        logging.info('converting amplicon set to data frame')
-        am_set_data = self.dfu.get_objects({'object_refs': [amplicon_set_ref]})['data'][0]['data']
-
-        amplicon_matrix_ref = am_set_data.get('amplicon_matrix_ref')
-        matrix_data = self.dfu.get_objects({'object_refs': [amplicon_matrix_ref]})['data'][0]['data']
-        matrix_value_data = matrix_data.get('data')
-
-        index = matrix_value_data.get('row_ids')
-        columns = matrix_value_data.get('col_ids')
-        values = matrix_value_data.get('values')
-
-        df = pd.DataFrame(values, index=index, columns=columns)
-
-        amplicons = am_set_data.get('amplicons')
-
-        meta_index = list()
-
-        meta_columns = ['taxonomy', 'taxon_id', 'taxon_ref', 'taxon_level', 'score',
-                        'taxonomy_source', 'species_name', 'consensus_sequence']
-        meta_values = list()
-        for otu_id, amplicon in amplicons.items():
-            meta_index.append(otu_id)
-
-            taxonomy_data = amplicon.get('taxonomy')
-
-            taxonomy = taxonomy_data.get('lineage')
-            taxon_id = taxonomy_data.get('taxon_id')
-            taxon_ref = taxonomy_data.get('taxon_ref')
-            taxon_level = taxonomy_data.get('taxon_level')
-            score = taxonomy_data.get('score')
-            taxonomy_source = taxonomy_data.get('taxonomy_source')
-            species_name = taxonomy_data.get('species_name')
-
-            consensus_sequence = amplicon.get('consensus_sequence')
-
-            meta_values.append([taxonomy, taxon_id, taxon_ref, taxon_level, score, taxonomy_source,
-                                species_name, consensus_sequence])
-
-        meta_df = pd.DataFrame(meta_values, index=meta_index, columns=meta_columns)
-
-        merged_df = df.merge(meta_df, left_index=True, right_index=True, how='left',
-                             validate='one_to_one')
-
-        return merged_df
-
     def __init__(self, config):
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
@@ -776,24 +661,3 @@ class BiomUtil:
         returnVal.update(report_output)
 
         return returnVal
-
-    def export_amplicon_set_tsv(self, params):
-        """
-        export AmpliconSet as TSV
-        """
-        logging.info('start exporting amplicon set object')
-        amplicon_set_ref = params.get('input_ref')
-
-        amplicon_set_df = self._amplicon_set_to_df(amplicon_set_ref)
-
-        result_dir = os.path.join(self.scratch, str(uuid.uuid4()))
-        self._mkdir_p(result_dir)
-
-        self._df_to_tsv(amplicon_set_df, result_dir, amplicon_set_ref)
-
-        package_details = self.dfu.package_for_download({
-            'file_path': result_dir,
-            'ws_refs': [amplicon_set_ref]
-        })
-
-        return {'shock_id': package_details['shock_id']}

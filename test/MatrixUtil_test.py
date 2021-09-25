@@ -8,6 +8,7 @@ from configparser import ConfigParser
 from os import environ
 import shutil
 import requests
+import inspect
 
 import pandas as pd
 import numpy as np
@@ -149,7 +150,6 @@ class MatrixUtilTest(unittest.TestCase):
                         },
                   'scale': 'raw',
                   'description': "OTU data",
-                  'amplicon_set_name': 'test_AmpliconSet',
                   'amplicon_type': '16S',
                   'target_gene_region': 'V1',
                   'forward_primer_sequence': 'forward_primer_sequence',
@@ -164,6 +164,44 @@ class MatrixUtilTest(unittest.TestCase):
         cls.amplicon_matrix_ref = returnVal['matrix_obj_ref']
 
         print('Loaded AmpliconMatrix: ' + cls.amplicon_matrix_ref)
+
+    @classmethod
+    @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
+    def loadAmpliconMatrix2(cls, download_staging_file):
+        if hasattr(cls, 'amplicon_matrix_ref2'):
+            return
+
+        print('Executing loadAmpliconMatrix')
+
+        biom_file_biom_fasta = os.path.join(cls.scratch, 'phyloseq_test.biom')
+        shutil.copy(os.path.join('data', 'phyloseq_test.biom'), biom_file_biom_fasta)
+
+        fasta_file_biom_fasta = os.path.join(cls.scratch, 'phyloseq_test.fa')
+        shutil.copy(os.path.join('data', 'phyloseq_test.fa'), fasta_file_biom_fasta)
+
+        params = {'obj_type': 'AmpliconMatrix',
+                  'matrix_name': 'test_AmpliconMatrix2',
+                  'workspace_id': cls.wsId,
+                  "biom_fasta": {
+                        "biom_file_biom_fasta": biom_file_biom_fasta,
+                        "fasta_file_biom_fasta": fasta_file_biom_fasta
+                        },
+                  'scale': 'raw',
+                  'description': "OTU data",
+                  'amplicon_type': '16S',
+                  'target_gene_region': 'V1',
+                  'forward_primer_sequence': 'forward_primer_sequence',
+                  'reverse_primer_sequence': 'reverse_primer_sequence',
+                  'sequencing_platform': 'Illumina',
+                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
+                  'clustering_cutoff': 0.3,
+                  'clustering_method': 'clustering_method'
+                  }
+        returnVal = cls.serviceImpl.import_matrix_from_biom(cls.ctx, params)[0]
+
+        cls.amplicon_matrix_ref2 = returnVal['matrix_obj_ref']
+
+        print('Loaded AmpliconMatrix: ' + cls.amplicon_matrix_ref2)
 
     @classmethod
     def prepare_data(cls):
@@ -210,6 +248,10 @@ class MatrixUtilTest(unittest.TestCase):
             [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
         ]
+
+    def start_test(self):
+        testname = inspect.stack()[1][3]
+        print('\n*** starting test: ' + testname + ' **')
 
     def get_out_data(self, ret, matrix_out=True, attri_out=False):
         report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
@@ -952,3 +994,33 @@ class MatrixUtilTest(unittest.TestCase):
                 'update': 1,
             })
         ])
+
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_simper(self, file_to_shock):
+        self.start_test()
+
+        params = {'input_matrix_ref': self.amplicon_matrix_ref,
+                  'grouping': 'BODY_SITE',
+                  'workspace_id': self.getWsId()}
+
+        _ = self.getImpl().perform_simper(self.ctx, params)[0]
+
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_perform_mantel_test(self, file_to_shock):
+        self.start_test()
+        self.loadAmpliconMatrix2()
+
+        params = {'input_matrix_refs': [self.amplicon_matrix_ref, self.amplicon_matrix_ref2],
+                  'workspace_id': self.getWsId()}
+
+        _ = self.getImpl().perform_mantel_test(self.ctx, params)[0]
+
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_perform_variable_stats_matrix(self, file_to_shock):
+        self.start_test()
+
+        params = {'input_matrix_ref': self.amplicon_matrix_ref,
+                  'grouping': 'BODY_SITE',
+                  'workspace_id': self.getWsId()}
+
+        _ = self.getImpl().perform_variable_stats_matrix(self.ctx, params)[0]
