@@ -187,7 +187,7 @@ class BioMultiTest(unittest.TestCase):
         return sample_set_ref
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def loadAmpliconMatrix(self, download_staging_file, file_to_shock):
+    def loadAmpliconMatrix(self, download_staging_file):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
 
@@ -302,7 +302,6 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file, file_to_shock):
@@ -329,7 +328,6 @@ class BioMultiTest(unittest.TestCase):
                   }
         returnVal = self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
         self.assertIn('matrix_obj_ref', returnVal)
-        self.assertIn('amplicon_set_obj_ref', returnVal)
         self.assertIn('report_name', returnVal)
         self.assertIn('report_ref', returnVal)
         obj = self.dfu.get_objects(
