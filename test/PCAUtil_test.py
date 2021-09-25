@@ -46,6 +46,7 @@ class PCAUtilTest(unittest.TestCase):
                         'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL)
+        cls.shockURL = cls.cfg['shock-url']
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']

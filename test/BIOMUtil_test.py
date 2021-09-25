@@ -54,6 +54,7 @@ class BioMultiTest(unittest.TestCase):
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
+        cls.shockURL = cls.cfg['shock-url']
 
         cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
@@ -186,7 +187,6 @@ class BioMultiTest(unittest.TestCase):
         return sample_set_ref
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def loadAmpliconMatrix(self, download_staging_file, file_to_shock):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
@@ -224,7 +224,7 @@ class BioMultiTest(unittest.TestCase):
         print('Loaded AmpliconMatrix: ' + amplicon_matrix_ref)
         return amplicon_matrix_ref
 
-    # @unittest.skip("narrative UI no longer support this option")
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file, file_to_shock):
@@ -263,7 +263,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    # @unittest.skip("narrative UI no longer support this option")
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def test_import_matrix_from_biom_1_0_biom_fasta(self, download_staging_file, file_to_shock):
@@ -302,7 +302,7 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    # @unittest.skip("narrative UI no longer support this option")
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file, file_to_shock):
@@ -498,7 +498,7 @@ class BioMultiTest(unittest.TestCase):
         assert sorted_dicts(links_data) == sorted_dicts(links_sample), '%s vs %s' % (links_data, links_sample)
         assert len(links_data) == len(sample_set_obj['samples'])
 
-    # @unittest.skip("narrative UI no longer support this option")
+    @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
     def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file, file_to_shock):

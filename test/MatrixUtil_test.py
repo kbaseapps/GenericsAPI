@@ -50,6 +50,7 @@ class MatrixUtilTest(unittest.TestCase):
                              }],
                         'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
+        cls.shockURL = cls.cfg['shock-url']
         cls.wsClient = workspaceService(cls.wsURL)
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']

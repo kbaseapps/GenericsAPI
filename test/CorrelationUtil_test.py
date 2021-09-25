@@ -60,6 +60,7 @@ class CorrUtilTest(unittest.TestCase):
         cls.wsName = "test_corr_util_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
+        cls.shockURL = cls.cfg['shock-url']
 
         small_file = os.path.join(cls.scratch, 'test.txt')
         with open(small_file, "w") as f:
