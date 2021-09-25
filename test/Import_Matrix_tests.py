@@ -10,7 +10,6 @@ from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
-from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
@@ -45,8 +44,6 @@ class ImportMatrixTest(unittest.TestCase):
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
-
-        cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
 
         suffix = int(time.time() * 1000)
@@ -62,18 +59,6 @@ class ImportMatrixTest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-
-        # upload genome object
-        # genbank_file_name = 'minimal.gbff'
-        # genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
-        # shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
-
-        # genome_object_name = 'test_Genome'
-        # cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
-        #                                             'workspace_name': cls.wsName,
-        #                                             'genome_name': genome_object_name,
-        #                                             'generate_ids_if_needed': 1
-        #                                             })['genome_ref']
 
         # upload AttributeMapping object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)

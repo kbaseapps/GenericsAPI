@@ -2,7 +2,6 @@
 import inspect
 import json  # noqa: F401
 import os  # noqa: F401
-import shutil
 import time
 import unittest
 from os import environ
@@ -14,7 +13,6 @@ from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.DataFileUtilClient import DataFileUtil
-from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
 
 
@@ -50,7 +48,7 @@ class GenericsAPITest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
-        cls.gfu = GenomeFileUtil(cls.callback_url)
+        # cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
 
         suffix = int(time.time() * 1000)
@@ -66,19 +64,6 @@ class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-
-        # upload genome object
-        genbank_file_name = 'minimal.gbff'
-        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
-        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
-
-        genome_object_name = 'test_Genome'
-        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
-                                                    'workspace_name': cls.wsName,
-                                                    'genome_name': genome_object_name,
-                                                    'generate_ids_if_needed': 1
-                                                    })['genome_ref']
-
         # upload AttributeMapping object
         workspace_id = cls.dfu.ws_name_to_id(cls.wsName)
         object_type = 'KBaseExperiments.AttributeMapping'
@@ -132,8 +117,7 @@ class GenericsAPITest(unittest.TestCase):
                                   'data': {'row_ids': cls.row_ids,
                                            'col_ids': cls.col_ids,
                                            'values': cls.values
-                                           },
-                                  'genome_ref': cls.genome_ref}
+                                           }}
         save_object_params = {
             'id': workspace_id,
             'objects': [{'type': object_type,
@@ -339,8 +323,7 @@ class GenericsAPITest(unittest.TestCase):
                 'row_mapping': {'same_row_id': 'instance_1'},
                 'col_mapping': {'same_col_id': 'instance_1'},
                 'row_attributemapping_ref': self.attribute_mapping_ref,
-                'col_attributemapping_ref': self.attribute_mapping_ref,
-                'genome_ref': self.genome_ref}
+                'col_attributemapping_ref': self.attribute_mapping_ref}
 
         params = {'obj_type': obj_type,
                   'data': data}
@@ -350,8 +333,7 @@ class GenericsAPITest(unittest.TestCase):
         expected_failed_constraints = ['data.row_ids row_mapping',
                                        'data.col_ids col_mapping',
                                        'values(row_mapping) row_attributemapping_ref:instances',
-                                       'values(col_mapping) col_attributemapping_ref:instances',
-                                       'data.row_ids genome_ref:features.[*].id genome_ref:mrnas.[*].id genome_ref:cdss.[*].id genome_ref:non_codeing_features.[*].id']
+                                       'values(col_mapping) col_attributemapping_ref:instances']
         self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('contains'))
 
@@ -359,8 +341,7 @@ class GenericsAPITest(unittest.TestCase):
         data = {'data': {'row_ids': ['same_row_id'],
                          'col_ids': ['same_col_id']},
                 'row_attributemapping_ref': self.attribute_mapping_ref,
-                'col_attributemapping_ref': self.attribute_mapping_ref,
-                'genome_ref': self.genome_ref}
+                'col_attributemapping_ref': self.attribute_mapping_ref}
 
         params = {'obj_type': obj_type,
                   'data': data}
@@ -371,27 +352,6 @@ class GenericsAPITest(unittest.TestCase):
                                        ('col_attributemapping_ref', ['col_mapping'], ['col_mapping'])]
         self.assertCountEqual(expected_failed_constraints,
                               returnVal.get('failed_constraints').get('conditionally_required'))
-
-    @unittest.skip("old validation constraint")
-    def test_validate_biochem(self):
-        self.start_test()
-
-        obj_type = 'KBaseMatrices.MetaboliteMatrix'
-
-        # testing unique
-        data = {'data': {'row_ids': ['same_row_id']},
-                'row_mapping': {'same_row_id': 'test_instance_1'},
-                'row_attributemapping_ref': self.attribute_mapping_ref
-                }
-        params = {'obj_type': obj_type,
-                  'data': data}
-        returnVal = self.getImpl().validate_data(self.ctx, params)[0]
-        self.assertFalse(returnVal.get('validated'))
-
-        expected_failed_constraints = ['set(mass,formula,inchikey) row_attributemapping_ref:attributes.[*].attribute',
-                                      ]
-        self.assertCountEqual(expected_failed_constraints,
-                              returnVal.get('failed_constraints').get('contains'))
 
     def test_search_matrix(self):
         self.start_test()
