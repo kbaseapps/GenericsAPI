@@ -6,7 +6,7 @@ import time
 import uuid
 from mock import patch
 import shutil
-
+import requests
 import pandas as pd
 import numpy as np
 from configparser import ConfigParser
@@ -17,13 +17,14 @@ from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class CorrUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = os.environ.get('KB_AUTH_TOKEN', None)
+        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
         config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -33,11 +34,11 @@ class CorrUtilTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -52,17 +53,42 @@ class CorrUtilTest(unittest.TestCase):
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.corr_util = CorrelationUtil(cls.cfg)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_corr_util_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
+        cls.shockURL = cls.cfg['shock-url']
+
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
 
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -84,6 +110,12 @@ class CorrUtilTest(unittest.TestCase):
         print('Mocking CorrelationUtil._generate_corr_report')
 
         return {'report_name': 'fake_report_name', 'report_ref': 'fake_report_ref'}
+
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return CorrUtilTest().test_shock
 
     def loadDF(self):
 
@@ -162,7 +194,8 @@ class CorrUtilTest(unittest.TestCase):
         return {'copy_file_path': file_path}
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def loadAmpliconMatrix(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def loadAmpliconMatrix(self, download_staging_file, file_to_shock):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
 
@@ -379,8 +412,8 @@ class CorrUtilTest(unittest.TestCase):
         self.assertCountEqual(obj_data.get('significance_data').get('row_ids'), expected_index)
         self.assertCountEqual(obj_data.get('significance_data').get('col_ids'), expected_index)
 
-    @patch.object(CorrelationUtil, "_generate_corr_report", side_effect=mock_generate_corr_report)
-    def test_compute_correlation_across_matrices_ok(self, _generate_corr_report):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_compute_correlation_across_matrices_ok(self, file_to_shock):
         self.start_test()
         expr_matrix_ref = self.loadExpressionMatrix()
         expr_matrix_ref_2 = self.loadExpressionMatrix2()
@@ -423,8 +456,8 @@ class CorrUtilTest(unittest.TestCase):
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_compute_correlation_matrix(invalidate_params, error_msg)
 
-    @patch.object(CorrelationUtil, "_generate_corr_report", side_effect=mock_generate_corr_report)
-    def test_comp_corr_matrix_ok(self, _generate_corr_report):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_comp_corr_matrix_ok(self, file_to_shock):
         self.start_test()
         expr_matrix_ref = self.loadExpressionMatrix()
 
