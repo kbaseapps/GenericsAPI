@@ -7,6 +7,7 @@ from configparser import ConfigParser
 import uuid
 import pandas as pd
 from mock import patch
+import requests
 
 from GenericsAPI.Utils.PCAUtil import PCAUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -14,13 +15,14 @@ from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class PCAUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = os.environ.get('KB_AUTH_TOKEN', None)
+        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
         config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -30,11 +32,11 @@ class PCAUtilTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -49,17 +51,41 @@ class PCAUtilTest(unittest.TestCase):
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.pca_util = PCAUtil(cls.cfg)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_pca_util_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
 
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -80,9 +106,13 @@ class PCAUtilTest(unittest.TestCase):
                                  workspace_name, n_components):
         print('Mocking PCAUtil._generate_pca_report')
 
-        # shock_id = 'fake shock id'
-
         return {'report_name': 'fake_report_name', 'report_ref': 'fake_report_ref'}
+
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return PCAUtilTest().test_shock
 
     def loadExpressionMatrix(self):
         if hasattr(self.__class__, 'expr_matrix_ref'):
@@ -248,8 +278,8 @@ class PCAUtilTest(unittest.TestCase):
         error_msg = '"workspace_name" parameter is required, but missing'
         self.fail_run_pca(invalidate_params, error_msg)
 
-    @patch.object(PCAUtil, "_generate_pca_report", side_effect=mock_generate_pca_report)
-    def test_run_pca_ok(self, _generate_pca_report):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_run_pca_ok(self, file_to_shock):
         self.start_test()
 
         expr_matrix_ref = self.loadExpressionMatrix()

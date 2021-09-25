@@ -9,6 +9,7 @@ from os import environ
 from mock import patch
 import shutil
 from Bio import SeqIO
+import requests
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.GenericsAPIImpl import GenericsAPI
@@ -19,13 +20,14 @@ from installed_clients.WorkspaceClient import Workspace as workspaceService
 from installed_clients.sample_uploaderClient import sample_uploader
 from installed_clients.FakeObjectsForTestsClient import FakeObjectsForTests
 from installed_clients.SampleServiceClient import SampleService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class BioMultiTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = environ.get('KB_AUTH_TOKEN', None)
+        cls.token = environ.get('KB_AUTH_TOKEN', None)
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -35,11 +37,11 @@ class BioMultiTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -58,11 +60,23 @@ class BioMultiTest(unittest.TestCase):
         cls.sample_uploader = sample_uploader(cls.callback_url, service_ver="dev")
         cls.sample_url = cls.cfg.get('kbase-endpoint') + '/sampleservice'
         cls.sample_ser = SampleService(cls.sample_url)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
+
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
+
         cls.prepare_data()
 
     @classmethod
@@ -70,6 +84,19 @@ class BioMultiTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     def createAnObject(self):
         if hasattr(self.__class__, 'fake_object_ref'):
@@ -125,6 +152,12 @@ class BioMultiTest(unittest.TestCase):
 
         return {'copy_file_path': file_path}
 
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return BioMultiTest().test_shock
+
     def loadSampleSet(self):
         if hasattr(self.__class__, 'sample_set_ref'):
             return self.__class__.sample_set_ref
@@ -153,7 +186,8 @@ class BioMultiTest(unittest.TestCase):
         return sample_set_ref
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def loadAmpliconMatrix(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def loadAmpliconMatrix(self, download_staging_file, file_to_shock):
         if hasattr(self.__class__, 'amplicon_matrix_ref'):
             return self.__class__.amplicon_matrix_ref
 
@@ -190,9 +224,10 @@ class BioMultiTest(unittest.TestCase):
         print('Loaded AmpliconMatrix: ' + amplicon_matrix_ref)
         return amplicon_matrix_ref
 
-    @unittest.skip("narrative UI no longer support this option")
+    # @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_biom_1_0_biom_tsv(self, download_staging_file, file_to_shock):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
@@ -228,9 +263,10 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    @unittest.skip("narrative UI no longer support this option")
+    # @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_matrix_from_biom_1_0_biom_fasta(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_biom_1_0_biom_fasta(self, download_staging_file, file_to_shock):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
@@ -266,9 +302,10 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-    @unittest.skip("narrative UI no longer support this option")
+    # @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_biom_1_0_tsv_fasta(self, download_staging_file, file_to_shock):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
@@ -303,7 +340,8 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
 
-    def test_import_matrix_from_tsv_fasta(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_tsv_fasta(self, file_to_shock):
         self.start_test()
 
         taxonomic_abundance_tsv = os.path.join(self.scratch, 'amplicon_test.tsv')
@@ -342,9 +380,11 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertNotIn('col_attributemapping_ref', obj)
 
-    @unittest.skip("narrative UI no longer support this option")
+    # @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_matrix_from_biom_1_0_tsv_fasta_with_sample_set(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_biom_1_0_tsv_fasta_with_sample_set(self, download_staging_file,
+                                                                   file_to_shock):
         self.start_test()
 
         sample_set_ref = self.loadSampleSet()
@@ -381,8 +421,8 @@ class BioMultiTest(unittest.TestCase):
         self.assertIn('row_attributemapping_ref', obj)
         self.assertIn('col_attributemapping_ref', obj)
 
-
-    def test_import_chemical_abundance_matrix_with_sample_set(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_chemical_abundance_matrix_with_sample_set(self, file_to_shock):
         self.start_test()
 
         sample_set_ref = self.loadSampleSet()
@@ -402,9 +442,9 @@ class BioMultiTest(unittest.TestCase):
 
         self._check_matrix_to_sample_links(matrix_obj_ref, sample_set_ref)
 
-
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_amplicon_matrix_with_sample_set(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_amplicon_matrix_with_sample_set(self, download_staging_file, file_to_shock):
         self.start_test()
 
         sample_set_ref = self.loadSampleSet()
@@ -458,9 +498,10 @@ class BioMultiTest(unittest.TestCase):
         assert sorted_dicts(links_data) == sorted_dicts(links_sample), '%s vs %s' % (links_data, links_sample)
         assert len(links_data) == len(sample_set_obj['samples'])
 
-    @unittest.skip("narrative UI no longer support this option")
+    # @unittest.skip("narrative UI no longer support this option")
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_matrix_from_biom_1_0_tsv(self, download_staging_file, file_to_shock):
         self.start_test()
 
         params = {'obj_type': 'AmpliconMatrix',
@@ -495,7 +536,8 @@ class BioMultiTest(unittest.TestCase):
         self.assertNotIn('col_attributemapping_ref', obj)
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_import_with_external_am(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_import_with_external_am(self, download_staging_file, file_to_shock):
         self.start_test()
 
         biom_file_biom_fasta = os.path.join(self.scratch, 'phyloseq_test.biom')
@@ -540,7 +582,8 @@ class BioMultiTest(unittest.TestCase):
         self.assertEqual(obj['col_attributemapping_ref'], self.attribute_mapping_ref)
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_bad_import_matrix_params(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_bad_import_matrix_params(self, download_staging_file, file_to_shock):
         self.start_test()
 
         with self.assertRaisesRegex(ValueError, "parameter is required, but missing"):

@@ -7,6 +7,7 @@ from unittest.mock import patch, create_autospec, call
 from configparser import ConfigParser
 from os import environ
 import shutil
+import requests
 
 import pandas as pd
 import numpy as np
@@ -19,13 +20,14 @@ from GenericsAPI.Utils.MatrixValidation import MatrixValidationException
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class MatrixUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = environ.get('KB_AUTH_TOKEN', None)
+        cls.token = environ.get('KB_AUTH_TOKEN', None)
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -35,11 +37,11 @@ class MatrixUtilTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -53,14 +55,23 @@ class MatrixUtilTest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
-        #cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
         ret = cls.wsClient.create_workspace({'workspace': cls.wsName})
         cls.wsId = ret[0]
 
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
         cls.prepare_data()
 
     @classmethod
@@ -68,6 +79,19 @@ class MatrixUtilTest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     def shortDescription(self):
         return None
@@ -95,10 +119,17 @@ class MatrixUtilTest(unittest.TestCase):
 
         return {'copy_file_path': file_path}
 
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return MatrixUtilTest().test_shock
+
     @classmethod
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
     def loadAmpliconMatrix(cls, download_staging_file):
-        if hasattr(cls, 'amplicon_matrix_ref'): return
+        if hasattr(cls, 'amplicon_matrix_ref'):
+            return
 
         print('Executing loadAmpliconMatrix')
 
@@ -132,7 +163,6 @@ class MatrixUtilTest(unittest.TestCase):
         cls.amplicon_matrix_ref = returnVal['matrix_obj_ref']
 
         print('Loaded AmpliconMatrix: ' + cls.amplicon_matrix_ref)
-
 
     @classmethod
     def prepare_data(cls):
@@ -179,7 +209,6 @@ class MatrixUtilTest(unittest.TestCase):
             [1.2222222222222223, 1.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
         ]
-
 
     def get_out_data(self, ret, matrix_out=True, attri_out=False):
         report_obj = self.dfu.get_objects({'object_refs': [ret[0]['report_ref']]})['data'][0]['data']
@@ -258,8 +287,8 @@ class MatrixUtilTest(unittest.TestCase):
         "new_matrix_name": "test_amplicon_transformed_matrix"
     }
     '''
-
-    def test_transform_pipeline(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_transform_pipeline(self, file_to_shock):
 
         with self.subTest(): # TODO subTest not catching?
             '''
@@ -331,7 +360,6 @@ class MatrixUtilTest(unittest.TestCase):
             self.assertEqual(row_attri_size, 3)
             self.assertEqual(col_attri_size, 6)
 
-
         with self.subTest():
             '''
             Ratio transform
@@ -358,7 +386,6 @@ class MatrixUtilTest(unittest.TestCase):
                 })
 
             # nan/inf
-
 
         with self.subTest():
             '''
@@ -446,7 +473,6 @@ class MatrixUtilTest(unittest.TestCase):
 
             self.assert_matrices_equal(out1, out2)
 
-
         with self.subTest():
             '''
             Random
@@ -470,8 +496,8 @@ class MatrixUtilTest(unittest.TestCase):
 
             # numericized inf
 
-
-    def test_transform_pipeline_throws(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_transform_pipeline_throws(self, file_to_shock):
 
         with self.assertRaises(MatrixValidationException) as cm:
             '''
@@ -548,14 +574,12 @@ class MatrixUtilTest(unittest.TestCase):
                     },
                 })
 
-
     def test_transform_unit_op(self):
         '''
         '''
         mu = MatrixUtil
         m = np.array(self.matrix)
         df = pd.DataFrame(m)
-
 
         ## Logit ##
 
@@ -569,7 +593,6 @@ class MatrixUtilTest(unittest.TestCase):
         out2 = mu._logit((df+1) / 10)
 
         self.assert_matrices_equal(out1, out2)
-
 
         ## Sqrt ##
 
@@ -607,7 +630,6 @@ class MatrixUtilTest(unittest.TestCase):
         out2 = mu._log(df, base=2.718281828459045, a=1e-10)
 
         self.assert_matrices_equal(out1, out2)
-
 
     def test_transform_op_validation(self):
         mu = MatrixUtil
@@ -657,8 +679,8 @@ class MatrixUtilTest(unittest.TestCase):
                     mu._sqrt(DF(m_inv))
                 print(cm.exception)
 
-
-    def test_transform_identity(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_transform_identity(self, file_to_shock):
         '''
         Test identity operations
         '''
@@ -690,8 +712,8 @@ class MatrixUtilTest(unittest.TestCase):
 
         self.assert_matrices_equal(matrix_out, self.matrix)
 
-
-    def test_rarefy_defaultSubsample(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_rarefy_defaultSubsample(self, file_to_shock):
         '''
         All samples should be rarefied to least sample size, 2
         No warnings about anything too big to rarefy
@@ -713,8 +735,8 @@ class MatrixUtilTest(unittest.TestCase):
         self.assertTrue(len(warnings) == 0, 'length is %d' % len(warnings))
         self.assert_matrices_equal(matrix_out, self.matrix_subsample2)
 
-
-    def test_rarefy_medSubsample(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_rarefy_medSubsample(self, file_to_shock):
         '''
         Some samples should and should not be rarefied
         That means warnings for the ones too big to rarefy
@@ -741,8 +763,8 @@ class MatrixUtilTest(unittest.TestCase):
 
         self.assert_matrices_equal(matrix_out, self.matrix_subsample5)
 
-
-    def test_rarefy_medSubsample_bootstrap9Reps(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_rarefy_medSubsample_bootstrap9Reps(self, file_to_shock):
         '''
         At subsample 5 and 9 bootstrap reps
         Check output matrices against test data matrices
@@ -782,8 +804,8 @@ class MatrixUtilTest(unittest.TestCase):
         self.assert_matrices_equal(matrix_out_median, self.matrix_bootstrap9Reps_median)
         self.assert_matrices_equal(matrix_out_mean, self.matrix_bootstrap9Reps_mean)
 
-
-    def test_rarefy_largeSubsample(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_rarefy_largeSubsample(self, file_to_shock):
         '''
         All samples, bootstrapped or not, should not be rarefied and should be returned as is
         All resulting matrices in this test should be same
@@ -843,13 +865,11 @@ class MatrixUtilTest(unittest.TestCase):
 
         _, matrix_out_mean = self.get_out_data(ret)
 
-
         # these resulting 3 matrices should match
         # since seeded same
         # and ran just 1nce
         self.assertTrue(matrix_out_noBootstrap, matrix_out_median)
         self.assertTrue(matrix_out_median, matrix_out_mean)
-
 
     def test_link_matrix_to_samples(self):
         matrix_obj = {
@@ -893,7 +913,7 @@ class MatrixUtilTest(unittest.TestCase):
         mock_dfu.get_objects.return_value = {'data': [{'data': sample_set_obj}]}
         mock_ss = create_autospec(SampleService, instance=True, spec_set=True)
         mock_ss.get_sample.side_effect = get_sample_rets
-        
+
         serviceImpl = GenericsAPI(self.cfg)
 
         serviceImpl.matrix_util.dfu = mock_dfu
@@ -931,4 +951,3 @@ class MatrixUtilTest(unittest.TestCase):
                 'update': 1,
             })
         ])
-
