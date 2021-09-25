@@ -2,6 +2,7 @@ import errno
 import logging
 import os
 import uuid
+import biom
 import pandas as pd
 from Bio import SeqIO
 import shutil
@@ -84,6 +85,21 @@ class BiomUtil:
             if metadata_keys_str:
                 metadata_keys += [x.strip() for x in metadata_keys_str.split(',')]
             mode = 'tsv_fasta'
+        elif params.get('biom_fasta'):
+            biom_fasta = params.get('biom_fasta')
+            biom_file = biom_fasta.get('biom_file_biom_fasta')
+            fasta_file = biom_fasta.get('fasta_file_biom_fasta')
+
+            if not (biom_file and fasta_file):
+                raise ValueError('missing BIOM or FASTA file')
+
+            if not input_local_file:
+                biom_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': biom_file}).get('copy_file_path')
+
+                fasta_file = self.dfu.download_staging_file(
+                                    {'staging_file_subdir_path': fasta_file}).get('copy_file_path')
+            mode = 'biom_fasta'
         elif params.get('tsv_fasta'):
             tsv_fasta = params.get('tsv_fasta')
             tsv_file = tsv_fasta.get('tsv_file_tsv_fasta')
@@ -128,7 +144,34 @@ class BiomUtil:
 
         amplicon_data = refs
 
-        if mode.startswith('tsv'):
+        if mode.startswith('biom'):
+            logging.info('start parsing BIOM file for matrix data')
+            table = biom.load_table(biom_file)
+            observation_metadata = table._observation_metadata
+            sample_metadata = table._sample_metadata
+
+            matrix_data = {'row_ids': table._observation_ids.tolist(),
+                           'col_ids': table._sample_ids.tolist(),
+                           'values': table.matrix_data.toarray().tolist()}
+
+            logging.info('start building attribute mapping object')
+            amplicon_data.update(self.get_attribute_mapping("row", observation_metadata,
+                                                            matrix_data, matrix_name, refs,
+                                                            workspace_id))
+            amplicon_data.update(self.get_attribute_mapping("col", sample_metadata,
+                                                            matrix_data, matrix_name, refs,
+                                                            workspace_id))
+
+            amplicon_data['attributes'] = {}
+            for k in ('create_date', 'generated_by'):
+                val = getattr(table, k)
+                if not val:
+                    continue
+                if isinstance(val, bytes):
+                    amplicon_data['attributes'][k] = val.decode('utf-8')
+                else:
+                    amplicon_data['attributes'][k] = str(val)
+        elif mode.startswith('tsv'):
             observation_metadata = None
             sample_metadata = None
             try:
