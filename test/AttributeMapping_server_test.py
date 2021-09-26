@@ -7,7 +7,7 @@ import unittest
 import uuid
 from configparser import ConfigParser
 from mock import patch
-
+import requests
 import pandas as pd
 
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil
@@ -16,6 +16,7 @@ from GenericsAPI.GenericsAPIImpl import GenericsAPI
 from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class AttributeUtilsTest(unittest.TestCase):
@@ -23,7 +24,7 @@ class AttributeUtilsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.maxDiff = 70000
-        token = os.environ.get('KB_AUTH_TOKEN', None)
+        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
         config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -33,11 +34,11 @@ class AttributeUtilsTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -49,9 +50,12 @@ class AttributeUtilsTest(unittest.TestCase):
         cls.wsClient = workspaceService(cls.wsURL)
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.serviceUtils = AttributesUtil(cls.cfg)
+        cls.shockURL = cls.cfg['shock-url']
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
         cls.dfu = DataFileUtil(cls.callback_url)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_CompoundSetUtils_" + str(suffix)
@@ -69,11 +73,33 @@ class AttributeUtilsTest(unittest.TestCase):
         cls.attribute_mapping_ref = "%s/%s/%s" % (info[6], info[0], info[4])
         cls.attribute_mapping_2 = json.load(open('data/AM2.json'))
 
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     def loadExpressionMatrix(self):
         if hasattr(self.__class__, 'expr_matrix_ref'):
@@ -182,6 +208,12 @@ class AttributeUtilsTest(unittest.TestCase):
         filename = params.get('staging_file_subdir_path')
 
         return {'copy_file_path': os.path.join("data", filename)}
+
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return AttributeUtilsTest().test_shock
 
     @unittest.skip("Only passes on CI")
     def test_add_ontology_info(self):
@@ -318,7 +350,8 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertIn('AT1G01070', data['instances'])
 
     @patch.object(DataFileUtil, "download_staging_file", side_effect=mock_download_staging_file)
-    def test_append_file_to_attribute_mapping(self, download_staging_file):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_append_file_to_attribute_mapping(self, download_staging_file, file_to_shock):
 
         with self.assertRaises(ValueError) as context:
             self.serviceUtils.append_file_to_attribute_mapping('AM2.tsv',
@@ -350,22 +383,26 @@ class AttributeUtilsTest(unittest.TestCase):
                           'append Time series design', 'append Treatment with Sirolimus']
         self.assertCountEqual([x.get('attribute') for x in new_attributes], expected_attrs)
 
-    def test_make_tsv(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_make_tsv(self, file_to_shock):
         params = {'input_ref': self.attribute_mapping_ref, 'destination_dir': self.scratch}
         ret = self.getImpl().attribute_mapping_to_tsv_file(self.getContext(), params)[0]
         assert ret and ('file_path' in ret)
 
-    def test_export_attribute_mapping_tsv(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_export_attribute_mapping_tsv(self, file_to_shock):
         params = {'input_ref': self.attribute_mapping_ref}
         ret = self.getImpl().export_attribute_mapping_tsv(self.getContext(), params)[0]
         assert ret and ('shock_id' in ret)
 
-    def test_export_attribute_mapping_excel(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_export_attribute_mapping_excel(self, file_to_shock):
         params = {'input_ref': self.attribute_mapping_ref}
         ret = self.getImpl().export_attribute_mapping_excel(self.getContext(), params)[0]
         assert ret and ('shock_id' in ret)
 
-    def test_export_cluster_set_excel(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_export_cluster_set_excel(self, file_to_shock):
         self.loadClusterSet()
 
         params = {'input_ref': self.cluster_set_ref}
@@ -393,7 +430,8 @@ class AttributeUtilsTest(unittest.TestCase):
         self.assertCountEqual(df.index.tolist(), expected_index)
         self.assertCountEqual(df.columns.tolist(), expected_col)
 
-    def test_export_condition_cluster_set_excel(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_export_condition_cluster_set_excel(self, file_to_shock):
         self.loadConditionClusterSet()
 
         params = {'input_ref': self.condition_cluster_set_ref}
