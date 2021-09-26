@@ -50,6 +50,7 @@ class AttributeUtilsTest(unittest.TestCase):
         cls.wsClient = workspaceService(cls.wsURL)
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.serviceUtils = AttributesUtil(cls.cfg)
+        cls.shockURL = cls.cfg['shock-url']
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
         cls.dfu = DataFileUtil(cls.callback_url)
