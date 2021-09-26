@@ -6,8 +6,6 @@ import biom
 import pandas as pd
 from Bio import SeqIO
 import shutil
-from plotly.offline import plot
-import plotly.express as px
 
 from installed_clients.DataFileUtilClient import DataFileUtil
 from GenericsAPI.Utils.AttributeUtils import AttributesUtil

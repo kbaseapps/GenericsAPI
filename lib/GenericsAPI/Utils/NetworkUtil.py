@@ -3,7 +3,6 @@ import json
 import logging
 import math
 import os
-import shutil
 import uuid
 from random import randint
 from random import seed
