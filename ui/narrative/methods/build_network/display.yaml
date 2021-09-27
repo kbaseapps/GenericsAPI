@@ -1,6 +1,6 @@
 name     : Build Correlation Network
-subtitle : Create a Network with filtered CorrelationMatrix object
-tooltip  : Create a Network with filtered CorrelationMatrix object
+subtitle : Create a Network with a filtered CorrelationMatrix object
+tooltip  : Create a Network with a filtered CorrelationMatrix object
 
 icon: analysis.png
 
@@ -32,17 +32,17 @@ parameters :
         ui-name: |
             Coefficient Threshold
         short-hint : |
-            Keep only correlation (absolute value) over the threshold
+            Keep only correlations (absolute value) over the threshold
         long-hint  : |
-            Keep only correlation (absolute value) over the threshold
+            Keep only correlations (absolute value) over the threshold
 
     significance_threshold:
         ui-name: |
             Significance Threshold
         short-hint : |
-            Keep only correlation over the threshold
+            Keep only correlations over the threshold
         long-hint  : |
-            Keep only correlation over the threshold
+            Keep only correlations over the threshold
 
     network_obj_name:
         ui-name: |
@@ -55,7 +55,7 @@ parameters :
 parameter-groups :
     filter_on_threshold :
         ui-name : Filter On Threshold
-        short-hint : Keep only correlation over the threshold
+        short-hint : Keep only correlations over the threshold
 
 description : |
-    <p> Create a Network with filtered CorrelationMatrix object </p>
+    <p> Create a Network with a filtered CorrelationMatrix object </p>

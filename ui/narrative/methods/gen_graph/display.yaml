@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            none
+            Matrix Object used as input
         long-hint  : |
-            none
+            Matrix Object used as input
 
     output_type :
         ui-name: |

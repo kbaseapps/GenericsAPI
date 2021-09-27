@@ -96,9 +96,9 @@ parameters :
         ui-name: |
             Center The Data Before Scaling
         short-hint : |
-            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+            Check box to calculate standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
         long-hint  : |
-            calculated standard score (z = (x - u) / s) where u is the mean of the training samples or zero if this option is turned off
+            Check box to calculate standard score (z = (x - u) / s) where u is the mean of the training samples. Uncheck box to turn off and use zero.
 
     standardization_with_std:
         ui-name: |
@@ -112,9 +112,9 @@ parameters :
         ui-name: |
             Ratio Transformation Method
         short-hint : |
-            Please select centre (clr) or isometric (ilr) log ratio transformation
+            Select centre (clr) or isometric (ilr) log ratio transformation
         long-hint  : |
-            Please select centre (clr) or isometric (ilr) log ratio transformation
+            Select centre (clr) or isometric (ilr) log ratio transformation
 
     log_base:
         ui-name: |
@@ -136,9 +136,9 @@ parameters :
         ui-name:
             Operations
         short-hint: |
-            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
+            Operation on input matrix. Currently at most one specification of parameters per operation is supported
         long-hint: |
-            Apply a series of operations to input matrix. Currently at most one specification of parameters per operation is supported
+            Operation on input matrix. Currently at most one specification of parameters per operation is supported
 
 parameter-groups :
     abundance_filtering_params:

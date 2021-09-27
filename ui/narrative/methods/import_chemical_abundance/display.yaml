@@ -25,9 +25,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
 
     scale:
       ui-name : |
@@ -65,25 +65,25 @@ parameters :
         ui-name : |
             SamplesSet Reference
         short-hint : |
-            Provide a SampleSet object associated with columns in matrix
+            SampleSet object associated with columns in matrix
         long-hint : |
-            Provide a SampleSet object associated with columns in matrix
+            SampleSet object associated with columns in matrix
 
     col_attributemapping_ref :
         ui-name : |
             Samples (Column) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping with data about the samples
+            AttributeMapping with data about the samples
         long-hint : |
-            Provide a AttributeMapping with data about the samples
+            Select an AttributeMapping with data about the samples
 
     row_attributemapping_ref :
         ui-name : |
             Compounds (Row) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping with data about the compounds
+            AttributeMapping with data about the compounds
         long-hint : |
-            Provide a AttributeMapping with data about the compounds including mass, formula and inchikey
+            Select an AttributeMapping with data about the compounds including mass, formula and inchikey
 
 
 description : |

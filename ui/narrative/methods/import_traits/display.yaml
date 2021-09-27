@@ -25,9 +25,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
 
     scale:
       ui-name : |

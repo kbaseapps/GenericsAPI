@@ -1,6 +1,6 @@
 name     : Perform Categorical Variable Statistics Analysis
-subtitle : Perform Categorical Variable Stats analysis on Matrix object
-tooltip  : Perform Categorical Variable Stats analysis on Matrix object
+subtitle : Perform Categorical Variable Statistics Analysis on a Matrix object
+tooltip  : Perform Categorical Variable Statistics Analysis on a Matrix object
 
 icon: analysis.png
 
@@ -24,17 +24,17 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            KBaseMatrices object
 
     attribute_mapping_obj_ref:
         ui-name: |
             AttributeMapping Object
         short-hint : |
-            Select associated KBaseExperiments.AttributeMapping object
+            Associated KBaseExperiments.AttributeMapping object
         long-hint  : |
-            Select associated KBaseExperiments.AttributeMapping object
+            Associated KBaseExperiments.AttributeMapping object
 
     dist_metric :
         ui-name : |
@@ -93,4 +93,4 @@ parameters :
             Test for Homogeneity of Multivariate Groups Disperisons using Marti
 
 description : |
-    <p>  Perform Categorical Variable Stats analysis on Matrix object</p>
+    <p>  Perform Categorical Variable Statisticss Analysis on a Matrix object</p>

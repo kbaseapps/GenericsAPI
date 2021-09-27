@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+            ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
         long-hint  : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
+            ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix Object
 
 description : |
     <p> Search a Matrix object with condition set info. </p>

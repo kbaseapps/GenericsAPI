@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Objects
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            KBaseMatrices object
 
     dimension:
         ui-name: |
@@ -40,7 +40,7 @@ parameters :
         ui-name : |
             Distance Metric To Use For Calculating Distance Matrix
         short-hint : |
-            Distancse Metric To Use For Calculating Distance Matrix
+            Distance Metric To Use For Calculating Distance Matrix
         long-hint  : |
             Distance Metric To Use For Calculating Distance Matrix
 

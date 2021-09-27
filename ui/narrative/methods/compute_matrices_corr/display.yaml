@@ -24,17 +24,17 @@ parameters :
         ui-name: |
             Matrix Object One
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            Select a KBaseMatrices object
 
     matrix_ref_2 :
         ui-name: |
             Matrix Object Two
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            Select a KBaseMatrices object
 
     method:
         ui-name: |
@@ -56,17 +56,17 @@ parameters :
         ui-name: |
             Compute Significance
         short-hint : |
-            Also compute Significance in addition to correlation matrix
+            Check box to compute Significance in addition to correlation matrix (default)
         long-hint  : |
-            Also compute Significance in addition to correlation matrix
+            Check box to compute Significance in addition to correlation matrix (default)
 
     corr_threshold:
         ui-name: |
             Correlation Coefficient Threshold
         short-hint : |
-            Remove columns having all coefficient below this threshold or anti-coefficient above negative of the threshold
+            Threshold for removing columns 
         long-hint  : |
-            Remove columns having all coefficient below this threshold or anti-coefficient above negative of the threshold
+            Threshold for removing columns where all coefficients are below this threshold or where all anti-coefficients are above the negative of the threshold
 
     corr_matrix_name:
         ui-name: |

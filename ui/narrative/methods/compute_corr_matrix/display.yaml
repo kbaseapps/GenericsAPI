@@ -1,6 +1,6 @@
 name     : Compute Correlation Matrix
-subtitle : Create a KBaseExperiments.CorrelationMatrix with KBaseMatrices object
-tooltip  : Create a KBaseExperiments.CorrelationMatrix with KBaseMatrices object
+subtitle : Create a KBaseExperiments. CorrelationMatrix with KBaseMatrices object
+tooltip  : Create a KBaseExperiments. CorrelationMatrix with KBaseMatrices object
 
 icon: analysis.png
 
@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            KBaseMatrices object
 
     method:
         ui-name: |
@@ -48,9 +48,9 @@ parameters :
         ui-name: |
             Compute Significance
         short-hint : |
-            Also compute Significance in addition to correlation matrix
+            Check box to compute Significance in addition to correlation matrix (default)
         long-hint  : |
-            Also compute Significance in addition to correlation matrix
+            Check box to compute Significance in addition to correlation matrix (default)
 
     corr_matrix_name:
         ui-name: |

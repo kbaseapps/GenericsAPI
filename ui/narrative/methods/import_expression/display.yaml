@@ -25,9 +25,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
 
     scale:
       ui-name : |
@@ -57,33 +57,33 @@ parameters :
         ui-name : |
             Column AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with column in data set
+            AttributeMapping associated with column in data set
         long-hint : |
-            Provide a AttributeMapping associated with column in data set
+            AttributeMapping associated with column in data set
 
     row_attributemapping_ref :
         ui-name : |
             Row AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with row in data set
+            AttributeMapping associated with row in data set
         long-hint : |
-            Provide a AttributeMapping associated with row in data set
+            AttributeMapping associated with row in data set
 
     genome_ref :
         ui-name : |
             Genome Reference
         short-hint : |
-            Provide a Genome associated with Matrix
+            Genome associated with Matrix
         long-hint : |
-            Provide a Genome associated with Matrix
+            Genome associated with Matrix
 
     diff_expr_matrix_ref :
         ui-name : |
             DifferentialExpressionMatrix Reference
         short-hint : |
-            Provide a DifferentialExpressionMatrix associated with Matrix
+            DifferentialExpressionMatrix associated with Matrix
         long-hint : |
-            Provide a DifferentialExpressionMatrix associated with Matrix
+            DifferentialExpressionMatrix associated with Matrix
 
 
 description : |

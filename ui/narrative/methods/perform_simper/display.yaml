@@ -24,17 +24,17 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of KBaseMatrices object
+            KBaseMatrices object
         long-hint  : |
-            One of KBaseMatrices object
+            KBaseMatrices object
 
     attribute_mapping_obj_ref:
         ui-name: |
             AttributeMapping Object
         short-hint : |
-            Select associated KBaseExperiments.AttributeMapping object
+            Associated KBaseExperiments.AttributeMapping object
         long-hint  : |
-            Select associated KBaseExperiments.AttributeMapping object
+            Associated KBaseExperiments.AttributeMapping object
 
     dimension:
         ui-name: |

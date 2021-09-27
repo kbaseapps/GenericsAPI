@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Object
         short-hint : |
-            One of KBaseMatrices Object
+            KBaseMatrices Object
         long-hint  : |
-            One of KBaseMatrices Object
+            KBaseMatrices Object
 
     dimension :
         ui-name: |
