@@ -24,9 +24,9 @@ parameters :
         ui-name : |
             SamplesSet Reference
         short-hint : |
-            Provide a SampleSet object associated with columns in Chemical Abundance matrix
+            SampleSet object associated with columns in Chemical Abundance matrix
         long-hint : |
-            Provide a SampleSet object associated with columns in Chemical Abundance matrix
+            SampleSet object associated with columns in Chemical Abundance matrix
 
     aggregate_mz:
         ui-name: |

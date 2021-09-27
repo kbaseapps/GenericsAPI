@@ -1,6 +1,6 @@
 name     : Rarefy Matrix
-subtitle : Generating randomly rarefied matrix from input matrix
-tooltip  : Generating randomly rarefied matrix from input matrix
+subtitle : Generate randomly rarefied matrix from input matrix
+tooltip  : Generate randomly rarefied matrix from input matrix
 
 icon: upload.png
 
@@ -56,7 +56,7 @@ parameters :
         ui-name: |
             Subsample Size
         short-hint: |
-            Number of times to subsample each vector without replacement. Default behavior (leaving field blank) is to use smallest vector sum. If any vector sum is less than the subsample size, that vector will not be rarefied and will be returned as is.
+            Number of times to subsample each vector without replacement. 
         long-hint : |
             Number of times to subsample each vector without replacement. Default behavior (leaving field blank) is to use smallest vector sum. If any vector sum is less than the subsample size, that vector will not be rarefied and will be returned as is.
 

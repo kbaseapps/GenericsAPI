@@ -33,33 +33,33 @@ parameters :
         ui-name : |
             FASTA File Path
         short-hint : |
-            FASTA file contains consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
+            FASTA file containing consensus sequence.
         long-hint  : |
-            FASTA file contains consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
+            FASTA file containing consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
 
     sample_set_ref :
         ui-name : |
             SamplesSet Reference
         short-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            SampleSet object associated with columns in amplicon matrix
         long-hint : |
-            Provide a SampleSet object associated with columns in amplicon matrix
+            SampleSet object associated with columns in amplicon matrix
 
     col_attributemapping_ref :
         ui-name : |
             Samples (Column) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping with data about the samples
+            AttributeMapping with data about the samples
         long-hint : |
-            Provide a AttributeMapping with data about the samples
+            AttributeMapping with data about the samples
 
     row_attributemapping_ref :
         ui-name : |
             Amplicon (Row) AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with rows in amplicon matrix
+            AttributeMapping associated with rows in amplicon matrix
         long-hint : |
-            Provide a AttributeMapping associated with rows in amplicon matrix
+            AttributeMapping associated with rows in amplicon matrix
 
     metadata_keys :
         ui-name : |
@@ -159,21 +159,21 @@ parameters :
 
     matrix_name :
         ui-name : |
-            Amplicon Matrix Object Name
+          Amplicon Matrix Object Name
         short-hint : |
-            Provide a name for the Matrix that will be created by this importer
+          Provide a name for the Matrix that will be created by this importer
         long-hint : |
-            Provide a name for the Matrix that will be created by this importer
+          Provide a name for the Matrix that will be created by this importer
 
     reads_set_ref:
         ui-name : |
-            Reads Set Reference
+          Reads Set Reference
         short-hint : |
-            Raw data in FASTQ format
+          Raw reads data in FASTQ format
         long-hint : |
-            Raw data in FASTQ format
+          Raw reads data in FASTQ format
 
 
 description : |
-    <p> Import an TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.
+    <p> Import a TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.
     Please see the <a href="http://kbase.us/data-upload-download-guide/">Data Upload/Download Guide</a> for more information. </p>

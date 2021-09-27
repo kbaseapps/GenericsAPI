@@ -24,9 +24,9 @@ parameters :
         ui-name: |
             Matrix Type
         short-hint : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+            ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
         long-hint  : |
-            One of ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
+            ExpressionMatrix, FitnessMatrix, DifferentialExpressionMatrix
 
     input_staging_file_path :
         ui-name : |

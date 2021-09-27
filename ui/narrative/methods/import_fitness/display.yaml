@@ -25,9 +25,9 @@ parameters :
         ui-name : |
             File Path
         short-hint : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
         long-hint  : |
-            Recognized extensions for the input file is .xlsx or .csv
+            Recognized extensions for the input file is .xlsx, .tsv, or .csv
 
     scale:
       ui-name : |
@@ -57,17 +57,17 @@ parameters :
         ui-name : |
             Column AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated for every column in data set
         long-hint : |
-            Provide a AttributeMapping associated with column in data set
+            Provide a AttributeMapping associated for every column in data set
 
     row_attributemapping_ref :
         ui-name : |
             Row AttributeMapping Reference
         short-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated for every row in data set
         long-hint : |
-            Provide a AttributeMapping associated with row in data set
+            Provide a AttributeMapping associated for every row in data set
 
     genome_ref :
         ui-name : |
