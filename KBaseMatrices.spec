@@ -437,7 +437,7 @@ module KBaseMatrices{
       @metadata ws clustering_cutoff
       @metadata ws clustering_method
       @metadata ws target_gene
-      @metadata ws target_subfragment
+      @metadata ws length(target_subfragment) as target_subfragment_count
 
 
     */
