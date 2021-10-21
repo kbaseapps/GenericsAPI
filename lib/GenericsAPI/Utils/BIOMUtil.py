@@ -43,10 +43,10 @@ class BiomUtil:
         logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale',
-                  'amplicon_type', 'target_gene_region', 'forward_primer_sequence',
-                  'reverse_primer_sequence', 'sequencing_platform',
-                  'sequencing_quality_filter_cutoff', 'clustering_cutoff', 'clustering_method']:
+        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale', 'amplicon_type',
+                  'clustering_cutoff', 'clustering_method',
+                  'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                  'target_gene', 'target_subfragment']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
@@ -262,6 +262,7 @@ class BiomUtil:
 
     def _meta_df_to_attribute_mapping(self, axis_ids, metadata_df, obj_name, ws_id):
         data = {'ontology_mapping_method': "TSV file", 'instances': {}}
+        metadata_df = metadata_df.astype(str)
         attribute_keys = metadata_df.columns.tolist()
         data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
@@ -619,10 +620,13 @@ class BiomUtil:
                                                     refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        for key in ['extraction_kit', 'amplicon_type', 'target_gene_region',
-                    'forward_primer_sequence', 'reverse_primer_sequence', 'sequencing_platform',
-                    'sequencing_run', 'sequencing_kit', 'sequencing_quality_filter_cutoff',
-                    'clustering_cutoff', 'clustering_method', 'sample_set_ref']:
+        for key in ['amplicon_type', 'amplification', 'clustering_cutoff', 'clustering_method',
+                    'extraction',
+                    'library_kit', 'library_layout', 'library_screening_strategy',
+                    'pcr_primers',
+                    'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                    'target_gene', 'target_subfragment',
+                    'sample_set_ref', 'reads_set_ref']:
             if params.get(key):
                 amplicon_data[key] = params[key]
 

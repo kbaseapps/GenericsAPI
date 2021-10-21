@@ -384,7 +384,7 @@ module KBaseMatrices{
              (ie data.values[amplicons][condition])
 
       Additional Fields:
-      reads_set_ref - a reference to the set of reads libraries that produced this table
+      reads_set_ref - a list of reference to the set of reads libraries that produced this table
       sequence_mapping - map from row_id to the representative sequence for that row
 
       Validation:
@@ -400,9 +400,12 @@ module KBaseMatrices{
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref sample_set_ref
       @optional attributes search_attributes sequence_mapping reads_set_ref
-      @optional extraction_kit amplicon_type target_gene_region forward_primer_sequence
-      @optional reverse_primer_sequence sequencing_platform sequencing_run sequencing_kit
-      @optional sequencing_quality_filter_cutoff clustering_cutoff clustering_method
+      @optional amplicon_type amplification extraction
+      @optional library_kit library_layout library_screening_strategy
+      @optional clustering_cutoff clustering_method
+      @optional pcr_primers
+      @optional sequencing_instrument sequencing_quality_filter_cutoff
+      @optional target_gene target_subfragment
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -412,17 +415,19 @@ module KBaseMatrices{
       @metadata ws length(data.row_ids) as amplicon_count
       @metadata ws length(data.col_ids) as condition_count
       @metadata ws description
-      @metadata ws extraction_kit
       @metadata ws amplicon_type
-      @metadata ws target_gene_region
-      @metadata ws forward_primer_sequence
-      @metadata ws reverse_primer_sequence
-      @metadata ws sequencing_platform
-      @metadata ws sequencing_run
-      @metadata ws sequencing_kit
-      @metadata ws sequencing_quality_filter_cutoff
+      @metadata ws amplification
+      @metadata ws extraction
+      @metadata ws library_kit
+      @metadata ws library_layout
+      @metadata ws library_screening_strategy
       @metadata ws clustering_cutoff
       @metadata ws clustering_method
+      @metadata ws pcr_primers
+      @metadata ws sequencing_instrument
+      @metadata ws sequencing_quality_filter_cutoff
+      @metadata ws target_gene
+
 
     */
     typedef structure {
@@ -436,21 +441,23 @@ module KBaseMatrices{
       ws_attributemapping_id row_attributemapping_ref;
       mapping<string, string> attributes;
       list<string> search_attributes;
-      ws_ref reads_set_ref;
+      ws_ref sample_set_ref;
+      list<ws_ref> reads_set_ref;
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
-      ws_ref sample_set_ref;
-      string extraction_kit;
       string amplicon_type;
-      string target_gene_region;
-      string forward_primer_sequence;
-      string reverse_primer_sequence;
-      string sequencing_platform;
-      string sequencing_run;
-      string sequencing_kit;
-      string sequencing_quality_filter_cutoff;
       float clustering_cutoff;
       string clustering_method;
+      string amplification;
+      string extraction;
+      string library_kit;
+      int library_layout;
+      string library_screening_strategy;
+      string pcr_primers;
+      string sequencing_instrument;
+      string sequencing_quality_filter_cutoff;
+      string target_gene;
+      string target_subfragment;
       handle_ref sequencing_file_handle;
     } AmpliconMatrix;
     /*

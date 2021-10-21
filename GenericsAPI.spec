@@ -102,7 +102,7 @@ module GenericsAPI {
     genome_ref: genome reference
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
     biochemistry_ref: (for ChemicalAbundanceMatrix)
-    reads_set_ref: (raw data for AmpliconMatrix)
+    reads_set_ref: list of reads_set associated with amplicon matrix
     sample_set_ref: SampleSet object reference
 
   */
@@ -121,7 +121,7 @@ module GenericsAPI {
       obj_ref row_attributemapping_ref;
       obj_ref diff_expr_matrix_ref;
       obj_ref biochemistry_ref;
-      obj_ref reads_set_ref;
+      list<obj_ref> reads_set_ref;
       obj_ref sample_set_ref;
 
       string unit;
@@ -155,18 +155,21 @@ module GenericsAPI {
       obj_ref reads_set_ref;
       obj_ref sample_set_ref;
 
-      list<string> metadata_keys;
-      string extraction_kit;
       string amplicon_type;
-      string target_gene_region;
-      string forward_primer_sequence;
-      string reverse_primer_sequence;
-      string sequencing_platform;
-      string sequencing_run;
-      string sequencing_kit;
-      string sequencing_quality_filter_cutoff;
       float clustering_cutoff;
       string clustering_method;
+      string amplification;
+      string extraction;
+      string library_kit;
+      boolean library_layout;
+      string library_screening_strategy;
+      string pcr_primers;
+      list<string> metadata_keys;
+      string sequencing_instrument;
+      string sequencing_quality_filter_cutoff;
+      string target_gene;
+      string target_subfragment;
+
   } ImportOTUParams;
 
   /* import_matrix_from_biom: import matrix object from BIOM file format*/

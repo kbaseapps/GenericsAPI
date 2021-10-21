@@ -35,7 +35,7 @@ parameters :
         short-hint : |
             FASTA file containing consensus sequence.
         long-hint  : |
-            FASTA file containing consensus sequence. Sequence name/identifier must match amplicon(row) names in associated TSV file
+            FASTA file containing representative or consensus sequences. Sequence names in the FASTA description lines (“>”) must match taxon (row) names in the associated TSV file.
 
     sample_set_ref :
         ui-name : |
@@ -61,85 +61,14 @@ parameters :
         long-hint : |
             AttributeMapping associated with rows in amplicon matrix
 
-    metadata_keys :
+    reads_set_ref:
         ui-name : |
-            Amplicon Attribute Keys From Taxonomic Abundance TSV File
+          Reads Set Reference
         short-hint : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-        long-hint  : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+          Raw reads data in FASTQ format
+        long-hint : |
+          Raw reads data in FASTQ format
 
-    description:
-      ui-name : |
-          Description
-      short-hint : |
-          Describe the matrix
-      long-hint  : |
-          Describe the matrix
-
-    extraction_kit:
-      ui-name : |
-          Extraction Kit
-      short-hint : |
-          Extraction Kit
-      long-hint  : |
-          Extraction Kit
-
-    target_gene_region:
-      ui-name : |
-          Target Gene/Region
-      short-hint : |
-          Target Gene/Region
-      long-hint  : |
-          Target Gene/Region
-
-    forward_primer_sequence:
-      ui-name : |
-          Forward Primer Sequence
-      short-hint : |
-          Forward Primer Sequence
-      long-hint  : |
-          Forward Primer Sequence
-
-    reverse_primer_sequence:
-      ui-name : |
-          Reverse Primer Sequence
-      short-hint : |
-          Reverse Primer Sequence
-      long-hint  : |
-          Reverse Primer Sequence
-
-    sequencing_platform:
-      ui-name : |
-          Sequencing Platform
-      short-hint : |
-          Sequencing Platform
-      long-hint  : |
-          Sequencing Platform
-
-    sequencing_run:
-      ui-name : |
-          Sequencing Run
-      short-hint : |
-          Sequencing Run
-      long-hint  : |
-          Sequencing Run
-
-    sequencing_kit:
-      ui-name : |
-          Sequencing Kit
-      short-hint : |
-          Sequencing Kit
-      long-hint  : |
-          Sequencing Kit
-
-    sequencing_quality_filter_cutoff:
-      ui-name : |
-          Sequencing Quality Filtering Cutoff
-      short-hint : |
-          Sequencing Quality Filtering Cutoff
-      long-hint  : |
-          Sequencing Quality Filtering Cutoff
 
     clustering_cutoff:
       ui-name : |
@@ -157,6 +86,102 @@ parameters :
       long-hint  : |
           Clustering Method
 
+    description:
+      ui-name : |
+          Description
+      short-hint : |
+          Describe the matrix
+      long-hint  : |
+          Describe the matrix
+
+    amplification:
+      ui-name : |
+          Amplification
+      short-hint : |
+          nucleic acid amplification
+      long-hint  : |
+          Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the enzymatic amplification of nucleic acids.
+
+    extraction:
+      ui-name : |
+          Extraction
+      short-hint : |
+          Follows MIxS v5 checklist.
+      long-hint  : |
+          Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the recovery of nucleic acids from the sample.
+
+    library_kit:
+      ui-name : |
+          Library Kit
+      short-hint : |
+          Name, version, and applicable cell or cycle numbers for the kit used to prepare libraries and load cells or chips for sequencing. If possible, include a part number.
+      long-hint  : |
+          Name, version, and applicable cell or cycle numbers for the kit used to prepare libraries and load cells or chips for sequencing. If possible, include a part number.
+
+    library_layout:
+      ui-name : |
+          Library Layout
+      short-hint : |
+          Specify the configuration of reads (single or paired-end) when applicable.
+      long-hint  : |
+          Specify the configuration of reads (single or paired-end) when applicable.
+
+    library_screening_strategy:
+      ui-name : |
+          Library Screening Strategy
+      short-hint : |
+          Follows MIxS v5 checklist. Describe enrichment, screening, or normalization methods applied during amplification or library preparation.
+      long-hint  : |
+          Follows MIxS v5 checklist. Describe enrichment, screening, or normalization methods applied during amplification or library preparation.
+
+    metadata_keys :
+        ui-name : |
+            Amplicon Attribute Keys From Taxonomic Abundance TSV File
+        short-hint : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+        long-hint  : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+
+    pcr_primers:
+      ui-name : |
+          PCR Primers
+      short-hint : |
+          Follows MIxS v5 checklist. Sequence of PCR primers used to amplify the targeted gene or subfragment.
+      long-hint  : |
+          Sequence of PCR primers. Format: Uppercase letters. FWD:forward primer sequence;REV:reverse primer sequence
+
+    sequencing_instrument:
+      ui-name : |
+          Sequencing Instrument
+      short-hint : |
+          Name the sequencing technology and instrument model used to sequence amplicon libraries.
+      long-hint  : |
+          Name the sequencing technology and instrument model used to sequence amplicon libraries.
+
+    sequencing_quality_filter_cutoff:
+      ui-name : |
+          Sequencing Quality Filtering Cutoff
+      short-hint : |
+          Sequencing Quality Filtering Cutoff
+      long-hint  : |
+          Sequencing Quality Filtering Cutoff
+
+    target_gene:
+      ui-name : |
+          Target Gene
+      short-hint : |
+          Follows MIxS v5 checklist. Name of the gene targeted for sequencing.
+      long-hint  : |
+          Follows MIxS v5 checklist. Name of the gene targeted for sequencing. One of [16S, 18S, ITS]
+
+    target_subfragment:
+      ui-name : |
+          Target Subfragment
+      short-hint : |
+          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
+      long-hint  : |
+          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
+
     matrix_name :
         ui-name : |
           Amplicon Matrix Object Name
@@ -164,15 +189,6 @@ parameters :
           Provide a name for the Matrix that will be created by this importer
         long-hint : |
           Provide a name for the Matrix that will be created by this importer
-
-    reads_set_ref:
-        ui-name : |
-          Reads Set Reference
-        short-hint : |
-          Raw reads data in FASTQ format
-        long-hint : |
-          Raw reads data in FASTQ format
-
 
 description : |
     <p> Import a TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.
