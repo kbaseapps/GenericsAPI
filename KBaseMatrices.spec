@@ -472,7 +472,7 @@ module KBaseMatrices{
       string sequencing_center;
       string sequencing_date;
       string sequencing_instrument;
-      string sequencing_quality_filter_cutoff;
+      int sequencing_quality_filter_cutoff;
       list<string> taxon_calling_method;
       string denoise_method;
       float sequence_error_cutoff;

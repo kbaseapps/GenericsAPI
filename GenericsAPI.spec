@@ -178,7 +178,7 @@ module GenericsAPI {
       string sequencing_center;
       string sequencing_date;
       string sequencing_instrument;
-      string sequencing_quality_filter_cutoff;
+      int sequencing_quality_filter_cutoff;
       TaxonCalling taxon_calling;
       string target_gene;
       list<string> target_subfragment;
