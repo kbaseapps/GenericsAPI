@@ -437,6 +437,7 @@ module KBaseMatrices{
       @metadata ws clustering_cutoff
       @metadata ws clustering_method
       @metadata ws target_gene
+      @metadata ws target_subfragment
 
 
     */
@@ -476,7 +477,7 @@ module KBaseMatrices{
       string clustering_method;
       float clustering_cutoff;
       string target_gene;
-      string target_subfragment;
+      list<string> target_subfragment;
       handle_ref sequencing_file_handle;
     } AmpliconMatrix;
     /*

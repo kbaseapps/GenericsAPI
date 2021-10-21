@@ -215,7 +215,7 @@ class CorrUtilTest(unittest.TestCase):
                   'description': "OTU data",
                   'amplicon_type': '16S',
                   'target_gene': '16S',
-                  'target_subfragment': 'V1',
+                  'target_subfragment': ['V1'],
                   'sequencing_instrument': 'Illumina',
                   'taxon_calling': {'taxon_calling_method': ['clustering'],
                                     'clustering_cutoff': 0.3,

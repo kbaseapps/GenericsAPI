@@ -50,7 +50,7 @@ class BiomUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-        taxon_calling = p.get('taxon_calling')
+        taxon_calling = params.get('taxon_calling')
         taxon_calling_method = taxon_calling.get('taxon_calling_method')
         params['taxon_calling_method'] = taxon_calling_method
 

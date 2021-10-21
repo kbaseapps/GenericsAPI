@@ -181,7 +181,7 @@ module GenericsAPI {
       string sequencing_quality_filter_cutoff;
       TaxonCalling taxon_calling;
       string target_gene;
-      string target_subfragment;
+      list<string> target_subfragment;
 
   } ImportOTUParams;
 
