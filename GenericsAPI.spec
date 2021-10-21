@@ -156,6 +156,7 @@ module GenericsAPI {
       obj_ref sample_set_ref;
 
       string amplicon_type;
+      float barcode_error_rate;
       float clustering_cutoff;
       string clustering_method;
       string amplification;
@@ -165,6 +166,9 @@ module GenericsAPI {
       string library_screening_strategy;
       string pcr_primers;
       list<string> metadata_keys;
+      string read_pairing;
+      string sequencing_center;
+      string sequencing_date;
       string sequencing_instrument;
       string sequencing_quality_filter_cutoff;
       string target_gene;

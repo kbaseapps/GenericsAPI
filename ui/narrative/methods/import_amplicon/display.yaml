@@ -69,6 +69,13 @@ parameters :
         long-hint : |
           Raw reads data in FASTQ format
 
+    barcode_error_rate:
+      ui-name : |
+          Barcode Error Rate
+      short-hint : |
+          Maximum error rate in the barcodes used to match reads with samples during dereplication.
+      long-hint  : |
+          Maximum error rate in the barcodes used to match reads with samples during dereplication. Number of mismatched bases divided by the length of the matching barcode.
 
     clustering_cutoff:
       ui-name : |
@@ -149,6 +156,30 @@ parameters :
           Follows MIxS v5 checklist. Sequence of PCR primers used to amplify the targeted gene or subfragment.
       long-hint  : |
           Sequence of PCR primers. Format: Uppercase letters. FWD:forward primer sequence;REV:reverse primer sequence
+
+    read_pairing:
+      ui-name : |
+          Read Pairing
+      short-hint : |
+          Method (platform, software, commands) uses to pair forward and reverse reads if applicable.
+      long-hint  : |
+          Method (platform, software, commands) uses to pair forward and reverse reads if applicable.
+
+    sequencing_center:
+      ui-name : |
+          Sequencing Center
+      short-hint : |
+          Name of facility where sequencing was performed (lab, core facility, or company).
+      long-hint  : |
+          Name of facility where sequencing was performed (lab, core facility, or company).
+
+    sequencing_date:
+      ui-name : |
+          Sequencing Date
+      short-hint : |
+          Date on which sequencing was performed.
+      long-hint  : |
+          Date on which sequencing was performed.
 
     sequencing_instrument:
       ui-name : |

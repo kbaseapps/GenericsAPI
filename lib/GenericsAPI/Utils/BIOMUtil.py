@@ -620,10 +620,12 @@ class BiomUtil:
                                                     refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        for key in ['amplicon_type', 'amplification', 'clustering_cutoff', 'clustering_method',
+        for key in ['amplicon_type', 'amplification', 'barcode_error_rate',
+                    'clustering_cutoff', 'clustering_method',
                     'extraction',
                     'library_kit', 'library_layout', 'library_screening_strategy',
-                    'pcr_primers',
+                    'pcr_primers', 'read_pairing',
+                    'sequencing_center', 'sequencing_date',
                     'sequencing_instrument', 'sequencing_quality_filter_cutoff',
                     'target_gene', 'target_subfragment',
                     'sample_set_ref', 'reads_set_ref']:

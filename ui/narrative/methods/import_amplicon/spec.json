@@ -72,6 +72,19 @@
       }
     },
     {
+      "id": "barcode_error_rate",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float",
+          "min_float": "0",
+          "max_float": "1"
+      }
+    },
+    {
       "id": "clustering_cutoff",
       "optional":false,
       "advanced":false,
@@ -170,6 +183,30 @@
     },
     {
       "id" : "pcr_primers",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "read_pairing",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_center",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_date",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -358,6 +395,10 @@
           "target_property": "amplicon_type"
         },
         {
+          "input_parameter": "barcode_error_rate",
+          "target_property": "barcode_error_rate"
+        },
+        {
           "input_parameter": "clustering_cutoff",
           "target_property": "clustering_cutoff"
         },
@@ -396,6 +437,18 @@
         {
           "input_parameter": "pcr_primers",
           "target_property": "pcr_primers"
+        },
+        {
+          "input_parameter": "read_pairing",
+          "target_property": "read_pairing"
+        },
+        {
+          "input_parameter": "sequencing_center",
+          "target_property": "sequencing_center"
+        },
+        {
+          "input_parameter": "sequencing_date",
+          "target_property": "sequencing_date"
         },
         {
           "input_parameter": "sequencing_instrument",

@@ -402,9 +402,9 @@ module KBaseMatrices{
       @optional attributes search_attributes sequence_mapping reads_set_ref
       @optional amplicon_type amplification extraction
       @optional library_kit library_layout library_screening_strategy
-      @optional clustering_cutoff clustering_method
-      @optional pcr_primers
-      @optional sequencing_instrument sequencing_quality_filter_cutoff
+      @optional barcode_error_rate clustering_cutoff clustering_method
+      @optional pcr_primers read_pairing
+      @optional sequencing_center sequencing_date sequencing_instrument sequencing_quality_filter_cutoff
       @optional target_gene target_subfragment
 
       @metadata ws scale
@@ -421,9 +421,13 @@ module KBaseMatrices{
       @metadata ws library_kit
       @metadata ws library_layout
       @metadata ws library_screening_strategy
+      @metadata ws barcode_error_rate
       @metadata ws clustering_cutoff
       @metadata ws clustering_method
       @metadata ws pcr_primers
+      @metadata ws read_pairing
+      @metadata ws sequencing_center
+      @metadata ws sequencing_date
       @metadata ws sequencing_instrument
       @metadata ws sequencing_quality_filter_cutoff
       @metadata ws target_gene
@@ -446,6 +450,7 @@ module KBaseMatrices{
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
       string amplicon_type;
+      float barcode_error_rate;
       float clustering_cutoff;
       string clustering_method;
       string amplification;
@@ -454,6 +459,9 @@ module KBaseMatrices{
       int library_layout;
       string library_screening_strategy;
       string pcr_primers;
+      string read_pairing;
+      string sequencing_center;
+      string sequencing_date;
       string sequencing_instrument;
       string sequencing_quality_filter_cutoff;
       string target_gene;
