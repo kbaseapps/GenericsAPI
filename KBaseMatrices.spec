@@ -407,7 +407,7 @@ module KBaseMatrices{
       @optional sequencing_center sequencing_date sequencing_instrument
       @optional sequencing_quality_filter_cutoff
       @optional taxon_calling_method
-      @optional clustering_cutoff clustering_method
+      @optional denoise_method sequence_error_cutoff clustering_method clustering_cutoff
       @optional target_gene target_subfragment
 
       @metadata ws scale
@@ -434,8 +434,10 @@ module KBaseMatrices{
       @metadata ws sequencing_instrument
       @metadata ws sequencing_quality_filter_cutoff
       @metadata ws length(taxon_calling_method) as taxon_calling_method_count
-      @metadata ws clustering_cutoff
+      @metadata ws denoise_method
+      @metadata ws sequence_error_cutoff
       @metadata ws clustering_method
+      @metadata ws clustering_cutoff
       @metadata ws target_gene
       @metadata ws length(target_subfragment) as target_subfragment_count
 
