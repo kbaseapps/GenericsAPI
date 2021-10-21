@@ -402,9 +402,12 @@ module KBaseMatrices{
       @optional attributes search_attributes sequence_mapping reads_set_ref
       @optional amplicon_type amplification extraction
       @optional library_kit library_layout library_screening_strategy
-      @optional barcode_error_rate clustering_cutoff clustering_method
-      @optional pcr_primers read_pairing
-      @optional sequencing_center sequencing_date sequencing_instrument sequencing_quality_filter_cutoff
+      @optional barcode_error_rate chimera_detection_and_removal
+      @optional pcr_primers read_length_cutoff read_pairing
+      @optional sequencing_center sequencing_date sequencing_instrument
+      @optional sequencing_quality_filter_cutoff
+      @optional taxon_calling_method
+      @optional clustering_cutoff clustering_method
       @optional target_gene target_subfragment
 
       @metadata ws scale
@@ -414,7 +417,7 @@ module KBaseMatrices{
       @metadata ws row_attributemapping_ref as row_attribute_mapping
       @metadata ws length(data.row_ids) as amplicon_count
       @metadata ws length(data.col_ids) as condition_count
-      @metadata ws description
+      @metadata ws description as additional_information
       @metadata ws amplicon_type
       @metadata ws amplification
       @metadata ws extraction
@@ -422,14 +425,17 @@ module KBaseMatrices{
       @metadata ws library_layout
       @metadata ws library_screening_strategy
       @metadata ws barcode_error_rate
-      @metadata ws clustering_cutoff
-      @metadata ws clustering_method
+      @metadata ws chimera_detection_and_removal
       @metadata ws pcr_primers
+      @metadata ws read_length_cutoff
       @metadata ws read_pairing
       @metadata ws sequencing_center
       @metadata ws sequencing_date
       @metadata ws sequencing_instrument
       @metadata ws sequencing_quality_filter_cutoff
+      @metadata ws taxon_calling_method
+      @metadata ws clustering_cutoff
+      @metadata ws clustering_method
       @metadata ws target_gene
 
 
@@ -451,19 +457,24 @@ module KBaseMatrices{
       FloatMatrix2D data;
       string amplicon_type;
       float barcode_error_rate;
-      float clustering_cutoff;
-      string clustering_method;
+      string chimera_detection_and_removal;
       string amplification;
       string extraction;
       string library_kit;
       int library_layout;
       string library_screening_strategy;
       string pcr_primers;
+      int read_length_cutoff;
       string read_pairing;
       string sequencing_center;
       string sequencing_date;
       string sequencing_instrument;
       string sequencing_quality_filter_cutoff;
+      list<string> taxon_calling_method;
+      string denoise_method;
+      float sequence_error_cutoff;
+      string clustering_method;
+      float clustering_cutoff;
       string target_gene;
       string target_subfragment;
       handle_ref sequencing_file_handle;

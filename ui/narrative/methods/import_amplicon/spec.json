@@ -85,46 +85,9 @@
       }
     },
     {
-      "id": "clustering_cutoff",
-      "optional":false,
-      "advanced":false,
-      "allow_multiple":false,
-      "default_values":[""],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "float"
-      }
-    },
-    {
-      "id" : "clustering_method",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : ["reference"],
-      "field_type" : "dropdown",
-      "dropdown_options":
-      {
-        "options":
-        [
-          {
-              "display": "Reference",
-              "value": "reference"
-          },
-          {
-              "display": "De Novo",
-              "value": "de_novo"
-          },
-          {
-              "display": "Combined",
-              "value": "combined"
-          }
-        ]
-      }
-    },
-    {
-      "id" : "description",
+      "id" : "chimera_detection_and_removal",
       "optional" : true,
-      "advanced" : false,
+      "advanced" : true,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text"
@@ -188,6 +151,17 @@
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text"
+    },
+    {
+      "id" : "read_length_cutoff",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int"
+      }
     },
     {
       "id" : "read_pairing",
@@ -261,11 +235,74 @@
     },
     {
       "id" : "sequencing_quality_filter_cutoff",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int"
+      }
+    },
+    {
+      "id" : "taxon_calling_method",
       "optional" : false,
       "advanced" : false,
+      "allow_multiple" : true,
+      "default_values" : ["Denoising"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Denoising",
+              "value": "denoising"
+          },
+          {
+              "display": "Clustering",
+              "value": "clustering"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "denoise_method",
+      "optional" : true,
+      "advanced" : true,
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text"
+    },
+    {
+      "id": "sequence_error_cutoff",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id" : "clustering_method",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "clustering_cutoff",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
     },
     {
       "id" : "target_gene",
@@ -352,6 +389,14 @@
       }
     },
     {
+      "id" : "description",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
       "id" : "matrix_name",
       "optional" : false,
       "advanced" : false,
@@ -362,6 +407,22 @@
         "valid_ws_types" : ["KBaseMatrices.AmpliconMatrix"],
         "is_output_name" : true
       }
+    }
+  ],
+  "parameter-groups": [
+    {
+      "id": "taxon_calling",
+      "parameters": [
+        "taxon_calling_method",
+        "denoise_method",
+        "sequence_error_cutoff",
+        "clustering_method",
+        "clustering_cutoff"
+      ],
+      "optional": false,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : false
     }
   ],
   "behavior" : {
@@ -399,12 +460,8 @@
           "target_property": "barcode_error_rate"
         },
         {
-          "input_parameter": "clustering_cutoff",
-          "target_property": "clustering_cutoff"
-        },
-        {
-          "input_parameter": "clustering_method",
-          "target_property": "clustering_method"
+          "input_parameter": "chimera_detection_and_removal",
+          "target_property": "chimera_detection_and_removal"
         },
         {
           "input_parameter": "description",
@@ -439,6 +496,10 @@
           "target_property": "pcr_primers"
         },
         {
+          "input_parameter": "read_length_cutoff",
+          "target_property": "read_length_cutoff"
+        },
+        {
           "input_parameter": "read_pairing",
           "target_property": "read_pairing"
         },
@@ -457,6 +518,10 @@
         {
           "input_parameter": "sequencing_quality_filter_cutoff",
           "target_property": "sequencing_quality_filter_cutoff"
+        },
+        {
+          "input_parameter": "taxon_calling",
+          "target_property": "taxon_calling"
         },
         {
           "input_parameter": "target_gene",

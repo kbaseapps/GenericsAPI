@@ -77,29 +77,13 @@ parameters :
       long-hint  : |
           Maximum error rate in the barcodes used to match reads with samples during dereplication. Number of mismatched bases divided by the length of the matching barcode.
 
-    clustering_cutoff:
+    chimera_detection_and_removal:
       ui-name : |
-          Clustering Cutoff
+          Chimera Detection and Removal
       short-hint : |
-          Clustering Cutoff
+          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
       long-hint  : |
-          Clustering Cutoff
-
-    clustering_method:
-      ui-name : |
-          Clustering Method
-      short-hint : |
-          Clustering Method
-      long-hint  : |
-          Clustering Method
-
-    description:
-      ui-name : |
-          Description
-      short-hint : |
-          Describe the matrix
-      long-hint  : |
-          Describe the matrix
+          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
 
     amplification:
       ui-name : |
@@ -157,6 +141,14 @@ parameters :
       long-hint  : |
           Sequence of PCR primers. Format: Uppercase letters. FWD:forward primer sequence;REV:reverse primer sequence
 
+    read_length_cutoff:
+      ui-name : |
+          Read Length Cutoff
+      short-hint : |
+          Read length in base pairs below which the read is excluded from sequence-by-sample table.
+      long-hint  : |
+          Read length in base pairs below which the read is excluded from sequence-by-sample table.
+
     read_pairing:
       ui-name : |
           Read Pairing
@@ -193,9 +185,49 @@ parameters :
       ui-name : |
           Sequencing Quality Filtering Cutoff
       short-hint : |
-          Sequencing Quality Filtering Cutoff
+          The minimum PHRED quality score accepted for base calls in the reads.
       long-hint  : |
-          Sequencing Quality Filtering Cutoff
+          The minimum PHRED quality score accepted for base calls in the reads.
+
+    taxon_calling_method:
+      ui-name : |
+          Method
+      short-hint : |
+          Please choose one or both of Denoising and Clustering
+      long-hint  : |
+          Please choose one or both of Denoising and Clustering
+
+    denoise_method:
+      ui-name : |
+          Denoise Method
+      short-hint : |
+          Method (platform, software, commands) used to reconstruct true sequence variants and recover their frequencies from reads with sequencing errors.
+      long-hint  : |
+          Method (platform, software, commands) used to reconstruct true sequence variants and recover their frequencies from reads with sequencing errors.
+
+    sequence_error_cutoff:
+      ui-name : |
+          Sequence Error Cutoff
+      short-hint : |
+          Per nucleotide or per read error estimate used as input for a denoising method.
+      long-hint  : |
+          Per nucleotide or per read error estimate used as input for a denoising method.
+
+    clustering_method:
+      ui-name : |
+          Clustering Method
+      short-hint : |
+          Method (platform, software, commands) used to collapse similar sequences into single operational taxonomic units.
+      long-hint  : |
+          Method (platform, software, commands) used to collapse similar sequences into single operational taxonomic units.
+
+    clustering_cutoff:
+      ui-name : |
+          Clustering Cutoff
+      short-hint : |
+          Percent sequence similarity threshold used to cluster sequences into operational taxonomic units.
+      long-hint  : |
+          Percent sequence similarity threshold used to cluster sequences into operational taxonomic units.
 
     target_gene:
       ui-name : |
@@ -213,6 +245,14 @@ parameters :
       long-hint  : |
           Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
 
+    description:
+      ui-name : |
+          Additional Information
+      short-hint : |
+          Additional details on amplicon sequencing or bioinformatic tools used to generate the Amplicon Matrix.
+      long-hint  : |
+          Additional details on amplicon sequencing or bioinformatic tools used to generate the Amplicon Matrix.
+
     matrix_name :
         ui-name : |
           Amplicon Matrix Object Name
@@ -220,6 +260,11 @@ parameters :
           Provide a name for the Matrix that will be created by this importer
         long-hint : |
           Provide a name for the Matrix that will be created by this importer
+
+parameter-groups :
+    taxon_calling:
+        ui-name : Taxon Calling
+        short-hint :  Taxon Calling
 
 description : |
     <p> Import a TSV/FASTA file from your staging area into your Narrative as an AmpliconMatrix data object.

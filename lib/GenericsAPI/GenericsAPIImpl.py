@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.27"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "d9d257d264f719972da85f4dc4e9be9aa2a568a3"
+    GIT_COMMIT_HASH = "cd9c9ef736d99b2e9b627ad551144fd3edc3573b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -215,18 +215,23 @@ class GenericsAPI:
            "obj_ref" (An X/Y/Z style reference), parameter "sample_set_ref"
            of type "obj_ref" (An X/Y/Z style reference), parameter
            "amplicon_type" of String, parameter "barcode_error_rate" of
-           Double, parameter "clustering_cutoff" of Double, parameter
-           "clustering_method" of String, parameter "amplification" of
-           String, parameter "extraction" of String, parameter "library_kit"
-           of String, parameter "library_layout" of type "boolean" (A boolean
-           - 0 for false, 1 for true.), parameter
-           "library_screening_strategy" of String, parameter "pcr_primers" of
-           String, parameter "metadata_keys" of list of String, parameter
+           Double, parameter "chimera_detection_and_removal" of String,
+           parameter "amplification" of String, parameter "extraction" of
+           String, parameter "library_kit" of String, parameter
+           "library_layout" of type "boolean" (A boolean - 0 for false, 1 for
+           true.), parameter "library_screening_strategy" of String,
+           parameter "pcr_primers" of String, parameter "metadata_keys" of
+           list of String, parameter "read_length_cutoff" of Long, parameter
            "read_pairing" of String, parameter "sequencing_center" of String,
            parameter "sequencing_date" of String, parameter
            "sequencing_instrument" of String, parameter
            "sequencing_quality_filter_cutoff" of String, parameter
-           "target_gene" of String, parameter "target_subfragment" of String
+           "taxon_calling" of type "TaxonCalling" -> structure: parameter
+           "taxon_calling_method" of list of String, parameter
+           "denoise_method" of String, parameter "sequence_error_cutoff" of
+           Double, parameter "clustering_method" of String, parameter
+           "clustering_cutoff" of Double, parameter "target_gene" of String,
+           parameter "target_subfragment" of String
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z

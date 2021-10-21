@@ -159,7 +159,6 @@ class DataTableTest(unittest.TestCase):
     #                    'scale': 'raw',
     #                    'search_attributes': ['generated_by|QIIME revision XYZ'],
     #                    'sequencing_instrument': 'Illumina',
-    #                    'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
     #                    'target_gene': '16S'}
 
     #     info = self.dfu.save_objects({
@@ -200,9 +199,9 @@ class DataTableTest(unittest.TestCase):
                   'target_gene': '16S',
                   'target_subfragment': 'V1',
                   'sequencing_instrument': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-                  'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method',
+                  'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                    'clustering_cutoff': 0.3,
+                                    'clustering_method': 'clustering_method'},
                   'input_local_file': True
                   }
 

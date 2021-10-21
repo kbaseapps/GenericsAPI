@@ -138,6 +138,14 @@ module GenericsAPI {
   funcdef import_matrix_from_excel (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
 
   typedef structure {
+    list<string> taxon_calling_method;
+    string denoise_method;
+    float sequence_error_cutoff;
+    string clustering_method;
+    float clustering_cutoff;
+  } TaxonCalling;
+
+  typedef structure {
       string obj_type;
       string taxonomic_abundance_tsv;
       string taxonomic_fasta;
@@ -157,8 +165,7 @@ module GenericsAPI {
 
       string amplicon_type;
       float barcode_error_rate;
-      float clustering_cutoff;
-      string clustering_method;
+      string chimera_detection_and_removal;
       string amplification;
       string extraction;
       string library_kit;
@@ -166,11 +173,13 @@ module GenericsAPI {
       string library_screening_strategy;
       string pcr_primers;
       list<string> metadata_keys;
+      int read_length_cutoff;
       string read_pairing;
       string sequencing_center;
       string sequencing_date;
       string sequencing_instrument;
       string sequencing_quality_filter_cutoff;
+      TaxonCalling taxon_calling;
       string target_gene;
       string target_subfragment;
 

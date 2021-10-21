@@ -44,11 +44,35 @@ class BiomUtil:
 
         # check for required parameters
         for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale', 'amplicon_type',
-                  'clustering_cutoff', 'clustering_method',
-                  'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                  'taxon_calling',
+                  'sequencing_instrument',
                   'target_gene', 'target_subfragment']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+        taxon_calling = p.get('taxon_calling')
+        taxon_calling_method = taxon_calling.get('taxon_calling_method')
+        params['taxon_calling_method'] = taxon_calling_method
+
+        if 'denoising' in taxon_calling_method:
+            denoise_method = taxon_calling.get('denoise_method')
+            sequence_error_cutoff = taxon_calling.get('sequence_error_cutoff')
+
+            if not (denoise_method and sequence_error_cutoff):
+                raise ValueError('Please provide denoise_method and sequence_error_cutoff')
+
+            params['denoise_method'] = denoise_method
+            params['sequence_error_cutoff'] = sequence_error_cutoff
+
+        if 'clustering' in taxon_calling_method:
+            clustering_method = taxon_calling.get('clustering_method')
+            clustering_cutoff = taxon_calling.get('clustering_cutoff')
+
+            if not (clustering_method and clustering_cutoff):
+                raise ValueError('Please provide clustering_method and clustering_cutoff')
+
+            params['clustering_method'] = clustering_method
+            params['clustering_cutoff'] = clustering_cutoff
 
         obj_type = params.get('obj_type')
         if obj_type not in self.matrix_types:
@@ -621,12 +645,15 @@ class BiomUtil:
                                                     workspace_id, scale, description, metadata_keys)
 
         for key in ['amplicon_type', 'amplification', 'barcode_error_rate',
-                    'clustering_cutoff', 'clustering_method',
+                    'chimera_detection_and_removal',
                     'extraction',
                     'library_kit', 'library_layout', 'library_screening_strategy',
-                    'pcr_primers', 'read_pairing',
+                    'pcr_primers', 'read_length_cutoff', 'read_pairing',
                     'sequencing_center', 'sequencing_date',
                     'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                    'taxon_calling_method',
+                    'denoise_method', 'sequence_error_cutoff',
+                    'clustering_method', 'clustering_cutoff',
                     'target_gene', 'target_subfragment',
                     'sample_set_ref', 'reads_set_ref']:
             if params.get(key):
