@@ -5,6 +5,8 @@ import os  # noqa: F401
 import time
 import unittest
 from os import environ
+from mock import patch
+import requests
 
 import pandas as pd
 from configparser import ConfigParser  # py2
@@ -14,13 +16,14 @@ from GenericsAPI.GenericsAPIServer import MethodContext
 from GenericsAPI.authclient import KBaseAuth as _KBaseAuth
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.AbstractHandleClient import AbstractHandle as HandleService
 
 
 class GenericsAPITest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = environ.get('KB_AUTH_TOKEN', None)
+        cls.token = environ.get('KB_AUTH_TOKEN', None)
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -30,11 +33,11 @@ class GenericsAPITest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'GenericsAPI',
@@ -48,12 +51,23 @@ class GenericsAPITest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
-        # cls.gfu = GenomeFileUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
+        cls.hs = HandleService(url=cls.cfg['handle-service-url'],
+                               token=cls.token)
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_GenericsAPI_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
+
+        small_file = os.path.join(cls.scratch, 'test.txt')
+        with open(small_file, "w") as f:
+            f.write("empty content")
+        cls.test_shock = cls.dfu.file_to_shock({'file_path': small_file, 'make_handle': True})
+        cls.handles_to_delete = []
+        cls.nodes_to_delete = []
+        cls.handles_to_delete.append(cls.test_shock['handle']['hid'])
+        cls.nodes_to_delete.append(cls.test_shock['shock_id'])
+
         cls.prepare_data()
 
     @classmethod
@@ -61,6 +75,19 @@ class GenericsAPITest(unittest.TestCase):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
+        if hasattr(cls, 'nodes_to_delete'):
+            for node in cls.nodes_to_delete:
+                cls.delete_shock_node(node)
+        if hasattr(cls, 'handles_to_delete'):
+            cls.hs.delete_handles(cls.hs.hids_to_handles(cls.handles_to_delete))
+            print('Deleted handles ' + str(cls.handles_to_delete))
+
+    @classmethod
+    def delete_shock_node(cls, node_id):
+        header = {'Authorization': 'Oauth {0}'.format(cls.token)}
+        requests.delete(cls.shockURL + '/node/' + node_id, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + node_id)
 
     @classmethod
     def prepare_data(cls):
@@ -202,6 +229,12 @@ class GenericsAPITest(unittest.TestCase):
     def start_test(self):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
+
+    def mock_file_to_shock(params):
+        print('Mocking DataFileUtilClient.file_to_shock')
+        print(params)
+
+        return GenericsAPITest().test_shock
 
     def fail_fetch_data(self, params, error, exception=ValueError,
                         contains=False):
@@ -362,7 +395,8 @@ class GenericsAPITest(unittest.TestCase):
         self.assertTrue('report_name' in returnVal)
         self.assertTrue('report_ref' in returnVal)
 
-    def test_filter_matrix_rows(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_filter_matrix_rows(self, file_to_shock):
         self.start_test()
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
@@ -386,7 +420,8 @@ class GenericsAPITest(unittest.TestCase):
         self.assertCountEqual(list(matrix_data['feature_mapping'].keys()), expected_ids)
         self.assertEqual(len(matrix_data['data']['values']), len(expected_ids))
 
-    def test_filter_matrix_cols(self):
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_filter_matrix_cols(self, file_to_shock):
         self.start_test()
 
         params = {'matrix_obj_ref': self.expression_matrix_ref,
