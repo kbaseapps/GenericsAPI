@@ -198,6 +198,7 @@ class DataTableTest(unittest.TestCase):
                   'description': "OTU data",
                   'amplicon_type': '16S',
                   'target_gene': '16S',
+                  'target_subfragment': 'V1',
                   'sequencing_instrument': 'Illumina',
                   'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
                   'clustering_cutoff': 0.3,
