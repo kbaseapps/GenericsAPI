@@ -433,7 +433,7 @@ module KBaseMatrices{
       @metadata ws sequencing_date
       @metadata ws sequencing_instrument
       @metadata ws sequencing_quality_filter_cutoff
-      @metadata ws taxon_calling_method
+      @metadata ws length(taxon_calling_method) as taxon_calling_method_count
       @metadata ws clustering_cutoff
       @metadata ws clustering_method
       @metadata ws target_gene

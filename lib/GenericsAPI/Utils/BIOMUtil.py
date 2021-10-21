@@ -51,7 +51,7 @@ class BiomUtil:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
         taxon_calling = params.get('taxon_calling')
-        taxon_calling_method = taxon_calling.get('taxon_calling_method')
+        taxon_calling_method = list(set(taxon_calling.get('taxon_calling_method')))
         params['taxon_calling_method'] = taxon_calling_method
 
         if 'denoising' in taxon_calling_method:
