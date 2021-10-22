@@ -43,12 +43,36 @@ class BiomUtil:
         logging.info('start validating import_matrix_from_biom params')
 
         # check for required parameters
-        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale',
-                  'amplicon_type', 'target_gene_region', 'forward_primer_sequence',
-                  'reverse_primer_sequence', 'sequencing_platform',
-                  'sequencing_quality_filter_cutoff', 'clustering_cutoff', 'clustering_method']:
+        for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale', 'amplicon_type',
+                  'taxon_calling',
+                  'sequencing_instrument',
+                  'target_gene', 'target_subfragment']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
+
+        taxon_calling = params.get('taxon_calling')
+        taxon_calling_method = list(set(taxon_calling.get('taxon_calling_method')))
+        params['taxon_calling_method'] = taxon_calling_method
+
+        if 'denoising' in taxon_calling_method:
+            denoise_method = taxon_calling.get('denoise_method')
+            sequence_error_cutoff = taxon_calling.get('sequence_error_cutoff')
+
+            if not (denoise_method and sequence_error_cutoff):
+                raise ValueError('Please provide denoise_method and sequence_error_cutoff')
+
+            params['denoise_method'] = denoise_method
+            params['sequence_error_cutoff'] = sequence_error_cutoff
+
+        if 'clustering' in taxon_calling_method:
+            clustering_method = taxon_calling.get('clustering_method')
+            clustering_cutoff = taxon_calling.get('clustering_cutoff')
+
+            if not (clustering_method and clustering_cutoff):
+                raise ValueError('Please provide clustering_method and clustering_cutoff')
+
+            params['clustering_method'] = clustering_method
+            params['clustering_cutoff'] = clustering_cutoff
 
         obj_type = params.get('obj_type')
         if obj_type not in self.matrix_types:
@@ -262,6 +286,7 @@ class BiomUtil:
 
     def _meta_df_to_attribute_mapping(self, axis_ids, metadata_df, obj_name, ws_id):
         data = {'ontology_mapping_method': "TSV file", 'instances': {}}
+        metadata_df = metadata_df.astype(str)
         attribute_keys = metadata_df.columns.tolist()
         data['attributes'] = [{'attribute': key, 'source': 'upload'} for key in attribute_keys]
 
@@ -619,10 +644,18 @@ class BiomUtil:
                                                     refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        for key in ['extraction_kit', 'amplicon_type', 'target_gene_region',
-                    'forward_primer_sequence', 'reverse_primer_sequence', 'sequencing_platform',
-                    'sequencing_run', 'sequencing_kit', 'sequencing_quality_filter_cutoff',
-                    'clustering_cutoff', 'clustering_method', 'sample_set_ref']:
+        for key in ['amplicon_type', 'amplification', 'barcode_error_rate',
+                    'chimera_detection_and_removal',
+                    'extraction',
+                    'library_kit', 'library_layout', 'library_screening_strategy',
+                    'pcr_primers', 'read_length_cutoff', 'read_pairing',
+                    'sequencing_center', 'sequencing_date',
+                    'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                    'taxon_calling_method',
+                    'denoise_method', 'sequence_error_cutoff',
+                    'clustering_method', 'clustering_cutoff',
+                    'target_gene', 'target_subfragment',
+                    'sample_set_ref', 'reads_set_ref']:
             if params.get(key):
                 amplicon_data[key] = params[key]
 

@@ -151,13 +151,12 @@ class MatrixUtilTest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_type': '16S',
-                  'target_gene_region': 'V1',
-                  'forward_primer_sequence': 'forward_primer_sequence',
-                  'reverse_primer_sequence': 'reverse_primer_sequence',
-                  'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-                  'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method'
+                  'target_gene': '16S',
+                  'target_subfragment': ['V1'],
+                  'sequencing_instrument': 'Illumina',
+                  'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                    'clustering_cutoff': 0.3,
+                                    'clustering_method': 'clustering_method'},
                   }
         returnVal = cls.serviceImpl.import_matrix_from_biom(cls.ctx, params)[0]
 
@@ -189,13 +188,12 @@ class MatrixUtilTest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_type': '16S',
-                  'target_gene_region': 'V1',
-                  'forward_primer_sequence': 'forward_primer_sequence',
-                  'reverse_primer_sequence': 'reverse_primer_sequence',
-                  'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-                  'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method'
+                  'target_gene': '16S',
+                  'target_subfragment': ['V1'],
+                  'sequencing_instrument': 'Illumina',
+                  'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                    'clustering_cutoff': 0.3,
+                                    'clustering_method': 'clustering_method'},
                   }
         returnVal = cls.serviceImpl.import_matrix_from_biom(cls.ctx, params)[0]
 

@@ -31,9 +31,9 @@ class GenericsAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.26"
+    VERSION = "1.0.27"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "3094bf8d2ec35e5dcd52364a3848dee2eb6652b8"
+    GIT_COMMIT_HASH = "cd9c9ef736d99b2e9b627ad551144fd3edc3573b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -161,20 +161,20 @@ class GenericsAPI:
            AttributeMapping reference genome_ref: genome reference
            diff_expr_matrix_ref: DifferentialExpressionMatrix reference
            biochemistry_ref: (for ChemicalAbundanceMatrix) reads_set_ref:
-           (raw data for AmpliconMatrix) sample_set_ref: SampleSet object
-           reference) -> structure: parameter "obj_type" of String, parameter
-           "input_shock_id" of String, parameter "input_file_path" of String,
-           parameter "input_staging_file_path" of String, parameter
-           "matrix_name" of String, parameter "scale" of String, parameter
-           "description" of String, parameter "workspace_name" of type
-           "workspace_name" (workspace name of the object), parameter
-           "genome_ref" of type "obj_ref" (An X/Y/Z style reference),
-           parameter "col_attributemapping_ref" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "row_attributemapping_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter
+           list of reads_set associated with amplicon matrix sample_set_ref:
+           SampleSet object reference) -> structure: parameter "obj_type" of
+           String, parameter "input_shock_id" of String, parameter
+           "input_file_path" of String, parameter "input_staging_file_path"
+           of String, parameter "matrix_name" of String, parameter "scale" of
+           String, parameter "description" of String, parameter
+           "workspace_name" of type "workspace_name" (workspace name of the
+           object), parameter "genome_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "col_attributemapping_ref" of type "obj_ref"
+           (An X/Y/Z style reference), parameter "row_attributemapping_ref"
+           of type "obj_ref" (An X/Y/Z style reference), parameter
            "diff_expr_matrix_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "biochemistry_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "reads_set_ref" of type
+           X/Y/Z style reference), parameter "reads_set_ref" of list of type
            "obj_ref" (An X/Y/Z style reference), parameter "sample_set_ref"
            of type "obj_ref" (An X/Y/Z style reference), parameter "unit" of
            String, parameter "type" of String
@@ -214,16 +214,24 @@ class GenericsAPI:
            X/Y/Z style reference), parameter "reads_set_ref" of type
            "obj_ref" (An X/Y/Z style reference), parameter "sample_set_ref"
            of type "obj_ref" (An X/Y/Z style reference), parameter
-           "metadata_keys" of list of String, parameter "extraction_kit" of
-           String, parameter "amplicon_type" of String, parameter
-           "target_gene_region" of String, parameter
-           "forward_primer_sequence" of String, parameter
-           "reverse_primer_sequence" of String, parameter
-           "sequencing_platform" of String, parameter "sequencing_run" of
-           String, parameter "sequencing_kit" of String, parameter
+           "amplicon_type" of String, parameter "barcode_error_rate" of
+           Double, parameter "chimera_detection_and_removal" of String,
+           parameter "amplification" of String, parameter "extraction" of
+           String, parameter "library_kit" of String, parameter
+           "library_layout" of type "boolean" (A boolean - 0 for false, 1 for
+           true.), parameter "library_screening_strategy" of String,
+           parameter "pcr_primers" of String, parameter "metadata_keys" of
+           list of String, parameter "read_length_cutoff" of Long, parameter
+           "read_pairing" of String, parameter "sequencing_center" of String,
+           parameter "sequencing_date" of String, parameter
+           "sequencing_instrument" of String, parameter
            "sequencing_quality_filter_cutoff" of String, parameter
-           "clustering_cutoff" of Double, parameter "clustering_method" of
-           String
+           "taxon_calling" of type "TaxonCalling" -> structure: parameter
+           "taxon_calling_method" of list of String, parameter
+           "denoise_method" of String, parameter "sequence_error_cutoff" of
+           Double, parameter "clustering_method" of String, parameter
+           "clustering_cutoff" of Double, parameter "target_gene" of String,
+           parameter "target_subfragment" of String
         :returns: instance of type "ImportMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "matrix_obj_ref" of type "obj_ref" (An X/Y/Z

@@ -102,7 +102,7 @@ module GenericsAPI {
     genome_ref: genome reference
     diff_expr_matrix_ref: DifferentialExpressionMatrix reference
     biochemistry_ref: (for ChemicalAbundanceMatrix)
-    reads_set_ref: (raw data for AmpliconMatrix)
+    reads_set_ref: list of reads_set associated with amplicon matrix
     sample_set_ref: SampleSet object reference
 
   */
@@ -121,7 +121,7 @@ module GenericsAPI {
       obj_ref row_attributemapping_ref;
       obj_ref diff_expr_matrix_ref;
       obj_ref biochemistry_ref;
-      obj_ref reads_set_ref;
+      list<obj_ref> reads_set_ref;
       obj_ref sample_set_ref;
 
       string unit;
@@ -136,6 +136,14 @@ module GenericsAPI {
 
   /* import_matrix_from_excel: import matrix object from excel*/
   funcdef import_matrix_from_excel (ImportMatrixParams params) returns (ImportMatrixOutput returnVal) authentication required;
+
+  typedef structure {
+    list<string> taxon_calling_method;
+    string denoise_method;
+    float sequence_error_cutoff;
+    string clustering_method;
+    float clustering_cutoff;
+  } TaxonCalling;
 
   typedef structure {
       string obj_type;
@@ -155,18 +163,26 @@ module GenericsAPI {
       obj_ref reads_set_ref;
       obj_ref sample_set_ref;
 
-      list<string> metadata_keys;
-      string extraction_kit;
       string amplicon_type;
-      string target_gene_region;
-      string forward_primer_sequence;
-      string reverse_primer_sequence;
-      string sequencing_platform;
-      string sequencing_run;
-      string sequencing_kit;
-      string sequencing_quality_filter_cutoff;
-      float clustering_cutoff;
-      string clustering_method;
+      float barcode_error_rate;
+      string chimera_detection_and_removal;
+      string amplification;
+      string extraction;
+      string library_kit;
+      boolean library_layout;
+      string library_screening_strategy;
+      string pcr_primers;
+      list<string> metadata_keys;
+      int read_length_cutoff;
+      string read_pairing;
+      string sequencing_center;
+      string sequencing_date;
+      string sequencing_instrument;
+      int sequencing_quality_filter_cutoff;
+      TaxonCalling taxon_calling;
+      string target_gene;
+      list<string> target_subfragment;
+
   } ImportOTUParams;
 
   /* import_matrix_from_biom: import matrix object from BIOM file format*/

@@ -150,8 +150,6 @@ class DataTableTest(unittest.TestCase):
     #                                        [2.0, 1.0, 1.0, 0.0, 0.0, 1.0],
     #                                        [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]},
     #                    'description': 'OTU data',
-    #                    'forward_primer_sequence': 'forward_primer_sequence',
-    #                    'reverse_primer_sequence': 'reverse_primer_sequence',
     #                    'row_attributemapping_ref': row_attributemapping_ref,
     #                    'row_mapping': {'GG_OTU_1': 'GG_OTU_1',
     #                                    'GG_OTU_2': 'GG_OTU_2',
@@ -160,9 +158,8 @@ class DataTableTest(unittest.TestCase):
     #                                    'GG_OTU_5': 'GG_OTU_5'},
     #                    'scale': 'raw',
     #                    'search_attributes': ['generated_by|QIIME revision XYZ'],
-    #                    'sequencing_platform': 'Illumina',
-    #                    'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-    #                    'target_gene_region': 'V1'}
+    #                    'sequencing_instrument': 'Illumina',
+    #                    'target_gene': '16S'}
 
     #     info = self.dfu.save_objects({
     #                         'id': self.wsId,
@@ -199,13 +196,12 @@ class DataTableTest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_type': '16S',
-                  'target_gene_region': 'V1',
-                  'forward_primer_sequence': 'forward_primer_sequence',
-                  'reverse_primer_sequence': 'reverse_primer_sequence',
-                  'sequencing_platform': 'Illumina',
-                  'sequencing_quality_filter_cutoff': 'sequencing_quality_filter_cutoff',
-                  'clustering_cutoff': 0.3,
-                  'clustering_method': 'clustering_method',
+                  'target_gene': '16S',
+                  'target_subfragment': ['V1'],
+                  'sequencing_instrument': 'Illumina',
+                  'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                    'clustering_cutoff': 0.3,
+                                    'clustering_method': 'clustering_method'},
                   'input_local_file': True
                   }
 

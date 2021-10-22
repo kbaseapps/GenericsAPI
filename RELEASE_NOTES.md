@@ -1,5 +1,9 @@
 # GenericsAPI release notes
 =========================================
+
+1.0.27
+address community feedback for amplicon matrix uploader (update metadata for the data type)
+
 1.0.26
 Remove requirment of sample set for build_chemical_abundance_template method
 moving endpoint for SampleService from dynamic to core service
