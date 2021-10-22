@@ -50,7 +50,7 @@ class GenericsAPITest(unittest.TestCase):
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
-
+        cls.shockURL = cls.cfg['shock-url']
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.hs = HandleService(url=cls.cfg['handle-service-url'],
                                token=cls.token)
