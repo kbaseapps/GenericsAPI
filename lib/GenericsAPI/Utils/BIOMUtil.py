@@ -44,9 +44,8 @@ class BiomUtil:
 
         # check for required parameters
         for p in ['obj_type', 'matrix_name', 'workspace_id', 'scale', 'amplicon_type',
-                  'taxon_calling',
-                  'sequencing_instrument',
-                  'target_gene', 'target_subfragment']:
+                  'sequencing_technology', 'sequencing_instrument',
+                  'target_gene', 'target_subfragment', 'taxon_calling']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
@@ -644,17 +643,17 @@ class BiomUtil:
                                                     refs, matrix_name,
                                                     workspace_id, scale, description, metadata_keys)
 
-        for key in ['amplicon_type', 'amplification', 'barcode_error_rate',
-                    'chimera_detection_and_removal',
-                    'extraction',
+        for key in ['amplicon_type', 'amplification', 'extraction',
+                    'target_gene', 'target_subfragment', 'pcr_primers',
                     'library_kit', 'library_layout', 'library_screening_strategy',
-                    'pcr_primers', 'read_length_cutoff', 'read_pairing',
                     'sequencing_center', 'sequencing_date',
-                    'sequencing_instrument', 'sequencing_quality_filter_cutoff',
+                    'sequencing_technology', 'sequencing_instrument',
+                    'sequencing_quality_filter_cutoff',
+                    'read_length_cutoff', 'read_pairing',
+                    'barcode_error_rate', 'chimera_detection_and_removal',
                     'taxon_calling_method',
                     'denoise_method', 'sequence_error_cutoff',
                     'clustering_method', 'clustering_cutoff',
-                    'target_gene', 'target_subfragment',
                     'sample_set_ref', 'reads_set_ref']:
             if params.get(key):
                 amplicon_data[key] = params[key]

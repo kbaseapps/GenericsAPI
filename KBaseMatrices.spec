@@ -401,14 +401,14 @@ module KBaseMatrices{
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref sample_set_ref
       @optional attributes search_attributes sequence_mapping reads_set_ref
       @optional amplicon_type amplification extraction
+      @optional target_gene target_subfragment pcr_primers
       @optional library_kit library_layout library_screening_strategy
-      @optional barcode_error_rate chimera_detection_and_removal
-      @optional pcr_primers read_length_cutoff read_pairing
-      @optional sequencing_center sequencing_date sequencing_instrument
+      @optional sequencing_center sequencing_date sequencing_technology sequencing_instrument
       @optional sequencing_quality_filter_cutoff
+      @optional read_length_cutoff read_pairing
+      @optional barcode_error_rate chimera_detection_and_removal
       @optional taxon_calling_method
       @optional denoise_method sequence_error_cutoff clustering_method clustering_cutoff
-      @optional target_gene target_subfragment
 
       @metadata ws scale
       @metadata ws row_normalization
@@ -421,27 +421,26 @@ module KBaseMatrices{
       @metadata ws amplicon_type
       @metadata ws amplification
       @metadata ws extraction
+      @metadata ws target_gene
+      @metadata ws length(target_subfragment) as target_subfragment_count
+      @metadata ws pcr_primers
       @metadata ws library_kit
       @metadata ws library_layout
       @metadata ws library_screening_strategy
-      @metadata ws barcode_error_rate
-      @metadata ws chimera_detection_and_removal
-      @metadata ws pcr_primers
-      @metadata ws read_length_cutoff
-      @metadata ws read_pairing
       @metadata ws sequencing_center
       @metadata ws sequencing_date
+      @metadata ws sequencing_technology
       @metadata ws sequencing_instrument
       @metadata ws sequencing_quality_filter_cutoff
+      @metadata ws read_length_cutoff
+      @metadata ws read_pairing
+      @metadata ws barcode_error_rate
+      @metadata ws chimera_detection_and_removal
       @metadata ws length(taxon_calling_method) as taxon_calling_method_count
       @metadata ws denoise_method
       @metadata ws sequence_error_cutoff
       @metadata ws clustering_method
       @metadata ws clustering_cutoff
-      @metadata ws target_gene
-      @metadata ws length(target_subfragment) as target_subfragment_count
-
-
     */
     typedef structure {
       string description;
@@ -459,27 +458,28 @@ module KBaseMatrices{
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
       string amplicon_type;
-      float barcode_error_rate;
-      string chimera_detection_and_removal;
       string amplification;
       string extraction;
+      string target_gene;
+      list<string> target_subfragment;
+      string pcr_primers;
       string library_kit;
       int library_layout;
       string library_screening_strategy;
-      string pcr_primers;
-      int read_length_cutoff;
-      string read_pairing;
       string sequencing_center;
       string sequencing_date;
+      string sequencing_technology;
       string sequencing_instrument;
       int sequencing_quality_filter_cutoff;
+      int read_length_cutoff;
+      string read_pairing;
+      float barcode_error_rate;
+      string chimera_detection_and_removal;
       list<string> taxon_calling_method;
       string denoise_method;
       float sequence_error_cutoff;
       string clustering_method;
       float clustering_cutoff;
-      string target_gene;
-      list<string> target_subfragment;
       handle_ref sequencing_file_handle;
     } AmpliconMatrix;
     /*

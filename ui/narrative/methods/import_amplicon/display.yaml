@@ -29,6 +29,14 @@ parameters :
         long-hint  : |
             TSV file contains metadata as well as amplicon matrix values. Headers specified in Metadata Keys field will be used to build AttributeMapping while rest of headers will be used as sample names to build AmpliconMatrix.
 
+    metadata_keys :
+        ui-name : |
+            Amplicon Attribute Keys From Taxonomic Abundance TSV File
+        short-hint : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+        long-hint  : |
+            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
+
     taxonomic_fasta :
         ui-name : |
             FASTA File Path
@@ -69,22 +77,6 @@ parameters :
         long-hint : |
           Raw reads data in FASTQ format
 
-    barcode_error_rate:
-      ui-name : |
-          Barcode Error Rate
-      short-hint : |
-          Maximum error rate in the barcodes used to match reads with samples during dereplication.
-      long-hint  : |
-          Maximum error rate in the barcodes used to match reads with samples during dereplication. Number of mismatched bases divided by the length of the matching barcode.
-
-    chimera_detection_and_removal:
-      ui-name : |
-          Chimera Detection and Removal
-      short-hint : |
-          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
-      long-hint  : |
-          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
-
     amplification:
       ui-name : |
           Amplification
@@ -100,6 +92,30 @@ parameters :
           Follows MIxS v5 checklist.
       long-hint  : |
           Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the recovery of nucleic acids from the sample.
+
+    target_gene:
+      ui-name : |
+          Target Gene
+      short-hint : |
+          Follows MIxS v5 checklist. Name of the gene targeted for sequencing.
+      long-hint  : |
+          Follows MIxS v5 checklist. Name of the gene targeted for sequencing. One of [16S, 18S, ITS]
+
+    target_subfragment:
+      ui-name : |
+          Target Subfragment
+      short-hint : |
+          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
+      long-hint  : |
+          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
+
+    pcr_primers:
+      ui-name : |
+          PCR Primers
+      short-hint : |
+          Follows MIxS v5 checklist. Sequence of PCR primers used to amplify the targeted gene or subfragment.
+      long-hint  : |
+          Sequence of PCR primers. Format: Uppercase letters. FWD:forward primer sequence;REV:reverse primer sequence
 
     library_kit:
       ui-name : |
@@ -125,38 +141,6 @@ parameters :
       long-hint  : |
           Follows MIxS v5 checklist. Describe enrichment, screening, or normalization methods applied during amplification or library preparation.
 
-    metadata_keys :
-        ui-name : |
-            Amplicon Attribute Keys From Taxonomic Abundance TSV File
-        short-hint : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-        long-hint  : |
-            Column headers (e.g taxonomy_id, BarcodeSequence) identified as metadata in TSV file. The rest of headers will be used as sample names to build AmpliconMatrix.
-
-    pcr_primers:
-      ui-name : |
-          PCR Primers
-      short-hint : |
-          Follows MIxS v5 checklist. Sequence of PCR primers used to amplify the targeted gene or subfragment.
-      long-hint  : |
-          Sequence of PCR primers. Format: Uppercase letters. FWD:forward primer sequence;REV:reverse primer sequence
-
-    read_length_cutoff:
-      ui-name : |
-          Read Length Cutoff
-      short-hint : |
-          Read length in base pairs below which the read is excluded from sequence-by-sample table.
-      long-hint  : |
-          Read length in base pairs below which the read is excluded from sequence-by-sample table.
-
-    read_pairing:
-      ui-name : |
-          Read Pairing
-      short-hint : |
-          Method (platform, software, commands) uses to pair forward and reverse reads if applicable.
-      long-hint  : |
-          Method (platform, software, commands) uses to pair forward and reverse reads if applicable.
-
     sequencing_center:
       ui-name : |
           Sequencing Center
@@ -173,13 +157,21 @@ parameters :
       long-hint  : |
           Date on which sequencing was performed.
 
+    sequencing_technology:
+      ui-name : |
+          Sequencing Technology
+      short-hint : |
+          Name the sequencing technology used to sequence amplicon libraries.
+      long-hint  : |
+          Name the sequencing technology used to sequence amplicon libraries.
+
     sequencing_instrument:
       ui-name : |
           Sequencing Instrument
       short-hint : |
-          Name the sequencing technology and instrument model used to sequence amplicon libraries.
+          Name the sequencing instrument model used to sequence amplicon libraries.
       long-hint  : |
-          Name the sequencing technology and instrument model used to sequence amplicon libraries.
+          Name the sequencing instrument model used to sequence amplicon libraries.
 
     sequencing_quality_filter_cutoff:
       ui-name : |
@@ -188,6 +180,38 @@ parameters :
           The minimum PHRED quality score accepted for base calls in the reads.
       long-hint  : |
           The minimum PHRED quality score accepted for base calls in the reads.
+
+    read_length_cutoff:
+      ui-name : |
+          Read Length Cutoff
+      short-hint : |
+          Read length in base pairs below which the read is excluded from sequence-by-sample table.
+      long-hint  : |
+          Read length in base pairs below which the read is excluded from sequence-by-sample table.
+
+    read_pairing:
+      ui-name : |
+          Read Pairing
+      short-hint : |
+          Method (platform, software, commands) used to pair forward and reverse reads if applicable.
+      long-hint  : |
+          Method (platform, software, commands) used to pair forward and reverse reads if applicable.
+
+    barcode_error_rate:
+      ui-name : |
+          Barcode Error Rate
+      short-hint : |
+          Maximum error rate in the barcodes used to match reads with samples during dereplication.
+      long-hint  : |
+          Maximum error rate in the barcodes used to match reads with samples during dereplication. Number of mismatched bases divided by the length of the matching barcode.
+
+    chimera_detection_and_removal:
+      ui-name : |
+          Chimera Detection and Removal
+      short-hint : |
+          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
+      long-hint  : |
+          Method (platform, software, commands) used to detect and remove chimeric sequences formed during PCR amplification.
 
     taxon_calling_method:
       ui-name : |
@@ -228,22 +252,6 @@ parameters :
           Percent sequence similarity threshold used to cluster sequences into operational taxonomic units.
       long-hint  : |
           Percent sequence similarity threshold used to cluster sequences into operational taxonomic units.
-
-    target_gene:
-      ui-name : |
-          Target Gene
-      short-hint : |
-          Follows MIxS v5 checklist. Name of the gene targeted for sequencing.
-      long-hint  : |
-          Follows MIxS v5 checklist. Name of the gene targeted for sequencing. One of [16S, 18S, ITS]
-
-    target_subfragment:
-      ui-name : |
-          Target Subfragment
-      short-hint : |
-          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
-      long-hint  : |
-          Follows MIxS v5 checklist. Name of the subfragment or region of a gene targeted for sequencing.
 
     description:
       ui-name : |
