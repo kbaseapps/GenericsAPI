@@ -100,8 +100,14 @@ class BiomUtil:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
         # check sequencing_technology and sequencing_instrument matching
-        # sequencing_technology = params.get('sequencing_technology')
-        # sequencing_instrument = params.get('sequencing_instrument')
+        sequencing_technology = params.get('sequencing_technology')
+        sequencing_instrument = params.get('sequencing_instrument')
+        if sequencing_technology not in SEQ_INSTRUMENTS_MAP:
+            raise ValueError('Unexpected sequencing technology: {}'.format(sequencing_technology))
+        expected_instruments = SEQ_INSTRUMENTS_MAP.get(sequencing_technology)
+        if sequencing_instrument not in expected_instruments:
+            raise ValueError('Please select sequencing instrument among {} for {}'.format(
+                expected_instruments, sequencing_technology))
 
         # check target_gene and target_subfragment matching
         target_gene = params.get('target_gene')
