@@ -21,6 +21,9 @@ TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalizati
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
 DEFAULT_META_KEYS = ["lineage", "score", "taxonomy_source", "species_name",
                      "consensus_sequence"]
+TARGET_GENE_SUBFRAGMENT_MAP = {'16S': ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'],
+                               '18S': ['V1', 'V2', 'V3', 'V4', 'V9'],
+                               'ITS': ['ITS1', 'ITS2']}
 
 
 class BiomUtil:
@@ -49,6 +52,18 @@ class BiomUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
+        # check target_gene and target_subfragment
+        target_gene = params.get('target_gene')
+        target_subfragment = params.get('target_subfragment')
+
+        if target_gene not in TARGET_GENE_SUBFRAGMENT_MAP:
+            raise ValueError('Unexpected target gene: {}'.format(target_gene))
+        expected_subfragments = TARGET_GENE_SUBFRAGMENT_MAP.get(target_gene)
+        if not set(target_subfragment) <= set(expected_subfragments):
+            raise ValueError('Please select target subfragments among {} for {}'.format(
+                expected_subfragments, target_gene))
+
+        # check taxon_calling
         taxon_calling = params.get('taxon_calling')
         taxon_calling_method = list(set(taxon_calling.get('taxon_calling_method')))
         params['taxon_calling_method'] = taxon_calling_method
