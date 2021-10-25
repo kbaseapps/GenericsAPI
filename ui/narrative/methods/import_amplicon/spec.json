@@ -19,6 +19,14 @@
       "text_options" : {}
     },
     {
+      "id" : "metadata_keys",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [""],
+      "field_type" : "text"
+    },
+    {
       "id" : "taxonomic_fasta",
       "optional" : false,
       "advanced" : false,
@@ -72,27 +80,6 @@
       }
     },
     {
-      "id": "barcode_error_rate",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[""],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "float",
-          "min_float": "0",
-          "max_float": "1"
-      }
-    },
-    {
-      "id" : "chimera_detection_and_removal",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
       "id" : "amplification",
       "optional" : true,
       "advanced" : true,
@@ -107,202 +94,6 @@
       "allow_multiple" : false,
       "default_values" : [ "" ],
       "field_type" : "text"
-    },
-    {
-      "id" : "library_kit",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id": "library_layout",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":["0"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
-      }
-    },
-    {
-      "id" : "library_screening_strategy",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id" : "metadata_keys",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [""],
-      "field_type" : "text"
-    },
-    {
-      "id" : "pcr_primers",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id" : "read_length_cutoff",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "int"
-      }
-    },
-    {
-      "id" : "read_pairing",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id" : "sequencing_center",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id" : "sequencing_date",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id" : "sequencing_instrument",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : false,
-      "default_values" : ["Applied Biosystems"],
-      "field_type" : "dropdown",
-      "dropdown_options":
-      {
-        "options":
-        [
-          {
-              "display": "Applied Biosystems",
-              "value": "Applied Biosystems"
-          },
-          {
-              "display": "Roche 454",
-              "value": "Roche 454"
-          },
-          {
-              "display": "Life Sciences",
-              "value": "Life Sciences"
-          },
-          {
-              "display": "Illumina",
-              "value": "Illumina"
-          },
-          {
-              "display": "ThermoFisher",
-              "value": "ThermoFisher"
-          },
-          {
-              "display": "Pacific Biosciences",
-              "value": "Pacific Biosciences"
-          },
-          {
-              "display": "Oxford Nanopore",
-              "value": "Oxford Nanopore"
-          },
-          {
-              "display": "BGI Group",
-              "value": "BGI Group"
-          }
-        ]
-      }
-    },
-    {
-      "id" : "sequencing_quality_filter_cutoff",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "int"
-      }
-    },
-    {
-      "id" : "taxon_calling_method",
-      "optional" : false,
-      "advanced" : false,
-      "allow_multiple" : true,
-      "default_values" : ["Denoising"],
-      "field_type" : "dropdown",
-      "dropdown_options":
-      {
-        "options":
-        [
-          {
-              "display": "Denoising",
-              "value": "denoising"
-          },
-          {
-              "display": "Clustering",
-              "value": "clustering"
-          }
-        ]
-      }
-    },
-    {
-      "id" : "denoise_method",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id": "sequence_error_cutoff",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[""],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "float"
-      }
-    },
-    {
-      "id" : "clustering_method",
-      "optional" : true,
-      "advanced" : true,
-      "allow_multiple" : false,
-      "default_values" : [ "" ],
-      "field_type" : "text"
-    },
-    {
-      "id": "clustering_cutoff",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":[""],
-      "field_type" : "text",
-      "text_options": {
-          "validate_as": "float"
-      }
     },
     {
       "id" : "target_gene",
@@ -389,6 +180,469 @@
       }
     },
     {
+      "id" : "pcr_primers",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "library_kit",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "library_layout",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["0"],
+      "field_type" : "checkbox",
+      "checkbox_options":{
+        "checked_value": 1,
+        "unchecked_value": 0
+      }
+    },
+    {
+      "id" : "library_screening_strategy",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_center",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_date",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "sequencing_technology",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["Applied Biosystems"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Applied Biosystems",
+              "value": "Applied Biosystems"
+          },
+          {
+              "display": "Roche 454",
+              "value": "Roche 454"
+          },
+          {
+              "display": "Life Sciences",
+              "value": "Life Sciences"
+          },
+          {
+              "display": "Illumina",
+              "value": "Illumina"
+          },
+          {
+              "display": "ThermoFisher",
+              "value": "ThermoFisher"
+          },
+          {
+              "display": "Pacific Biosciences",
+              "value": "Pacific Biosciences"
+          },
+          {
+              "display": "Oxford Nanopore",
+              "value": "Oxford Nanopore"
+          },
+          {
+              "display": "BGI Group",
+              "value": "BGI Group"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "sequencing_instrument",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["Applied Biosystems"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "AB 310 Genetic Analyzer",
+              "value": "AB 310 Genetic Analyzer"
+          },
+          {
+              "display": "AB 3130 Genetic Analyzer",
+              "value": "AB 3130 Genetic Analyzer"
+          },
+          {
+              "display": "AB 3130xL Genetic Analyzer",
+              "value": "AB 3130xL Genetic Analyzer"
+          },
+          {
+              "display": "AB 3500 Genetic Analyzer",
+              "value": "AB 3500 Genetic Analyzer"
+          },
+          {
+              "display": "AB 3500xL Genetic Analyzer",
+              "value": "AB 3500xL Genetic Analyzer"
+          },
+          {
+              "display": "AB 3730 Genetic Analyzer",
+              "value": "AB 3730 Genetic Analyzer"
+          },
+          {
+              "display": "AB 3730xL Genetic Analyzer",
+              "value": "AB 3730xL Genetic Analyzer"
+          },
+          {
+              "display": "454 GS",
+              "value": "454 GS"
+          },
+          {
+              "display": "454 GS 20",
+              "value": "454 GS 20"
+          },
+          {
+              "display": "454 GS FLX",
+              "value": "454 GS FLX"
+          },
+          {
+              "display": "454 GS FLX+",
+              "value": "454 GS FLX+"
+          },
+          {
+              "display": "454 GS FLX Titanium",
+              "value": "454 GS FLX Titanium"
+          },
+          {
+              "display": "454 GS Junior",
+              "value": "454 GS Junior"
+          },
+          {
+              "display": "Illumina Genome Analyzer",
+              "value": "Illumina Genome Analyzer"
+          },
+          {
+              "display": "Illumina Genome Analyzer II",
+              "value": "Illumina Genome Analyzer II"
+          },
+          {
+              "display": "Illumina Genome Analyzer IIx",
+              "value": "Illumina Genome Analyzer IIx"
+          },
+          {
+              "display": "Illumina HiScanSQ",
+              "value": "Illumina HiScanSQ"
+          },
+          {
+              "display": "Illumina HiSeq 1000",
+              "value": "Illumina HiSeq 1000"
+          },
+          {
+              "display": "Illumina HiSeq 1500",
+              "value": "Illumina HiSeq 1500"
+          },
+          {
+              "display": "Illumina HiSeq 2000",
+              "value": "Illumina HiSeq 2000"
+          },
+          {
+              "display": "Illumina HiSeq 2500",
+              "value": "Illumina HiSeq 2500"
+          },
+          {
+              "display": "Illumina HiSeq 3000",
+              "value": "Illumina HiSeq 3000"
+          },
+          {
+              "display": "Illumina HiSeq 4000",
+              "value": "Illumina HiSeq 4000"
+          },
+          {
+              "display": "Illumina HiSeq X",
+              "value": "Illumina HiSeq X"
+          },
+          {
+              "display": "HiSeq X Five",
+              "value": "HiSeq X Five"
+          },
+          {
+              "display": "HiSeq X Ten",
+              "value": "HiSeq X Ten"
+          },
+          {
+              "display": "Illumina iSeq 100",
+              "value": "Illumina iSeq 100"
+          },
+          {
+              "display": "Illumina MiSeq",
+              "value": "Illumina MiSeq"
+          },
+          {
+              "display": "Illumina MiniSeq",
+              "value": "Illumina MiniSeq"
+          },
+          {
+              "display": "NextSeq 500",
+              "value": "NextSeq 500"
+          },
+          {
+              "display": "NextSeq 550",
+              "value": "NextSeq 550"
+          },
+          {
+              "display": "NextSeq 1000",
+              "value": "NextSeq 1000"
+          },
+          {
+              "display": "NextSeq 2000",
+              "value": "NextSeq 2000"
+          },
+          {
+              "display": "Illumina NovaSeq 6000",
+              "value": "Illumina NovaSeq 6000"
+          },
+          {
+              "display": "Ion Torrent PGM",
+              "value": "Ion Torrent PGM"
+          },
+          {
+              "display": "Ion Torrent Proton",
+              "value": "Ion Torrent Proton"
+          },
+          {
+              "display": "Ion Torrent S5 XL",
+              "value": "Ion Torrent S5 XL"
+          },
+          {
+              "display": "Ion Torrent S5",
+              "value": "Ion Torrent S5"
+          },
+          {
+              "display": "AB 5500 Genetic Analyzer",
+              "value": "AB 5500 Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500xl Genetic Analyzer",
+              "value": "AB 5500xl Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500x-Wl Genetic Analyzer",
+              "value": "AB 5500x-Wl Genetic Analyzer"
+          },
+          {
+              "display": "AB SOLiD System",
+              "value": "AB SOLiD System"
+          },
+          {
+              "display": "AB SOLiD System 2.0",
+              "value": "AB SOLiD System 2.0"
+          },
+          {
+              "display": "AB SOLiD System 3.0",
+              "value": "AB SOLiD System 3.0"
+          },
+          {
+              "display": "AB SOLiD 3 Plus System",
+              "value": "AB SOLiD 3 Plus System"
+          },
+          {
+              "display": "AB SOLiD 4 System",
+              "value": "AB SOLiD 4 System"
+          },
+          {
+              "display": "AB SOLiD 4hq System",
+              "value": "AB SOLiD 4hq System"
+          },
+          {
+              "display": "AB SOLiD PI System",
+              "value": "AB SOLiD PI System"
+          },
+          {
+              "display": "PacBio RS",
+              "value": "PacBio RS"
+          },
+          {
+              "display": "PacBio RS II",
+              "value": "PacBio RS II"
+          },
+          {
+              "display": "PacBio Sequel",
+              "value": "PacBio Sequel"
+          },
+          {
+              "display": "PacBio Sequel II",
+              "value": "PacBio Sequel II"
+          },
+          {
+              "display": "MinION",
+              "value": "MinION"
+          },
+          {
+              "display": "GridION",
+              "value": "GridION"
+          },
+          {
+              "display": "PromethION",
+              "value": "PromethION"
+          },
+          {
+              "display": "BGISEQ-500",
+              "value": "BGISEQ-500"
+          },
+          {
+              "display": "DNBSEQ-G400",
+              "value": "DNBSEQ-G400"
+          },
+          {
+              "display": "DNBSEQ-T7",
+              "value": "DNBSEQ-T7"
+          },
+          {
+              "display": "DNBSEQ-G50",
+              "value": "DNBSEQ-G50"
+          },
+          {
+              "display": "MGISEQ-2000RS",
+              "value": "MGISEQ-2000RS"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "sequencing_quality_filter_cutoff",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int"
+      }
+    },
+    {
+      "id" : "read_length_cutoff",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "int"
+      }
+    },
+    {
+      "id" : "read_pairing",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "barcode_error_rate",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float",
+          "min_float": "0",
+          "max_float": "1"
+      }
+    },
+    {
+      "id" : "chimera_detection_and_removal",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id" : "taxon_calling_method",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : true,
+      "default_values" : ["Denoising"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Denoising",
+              "value": "denoising"
+          },
+          {
+              "display": "Clustering",
+              "value": "clustering"
+          }
+        ]
+      }
+    },
+    {
+      "id" : "denoise_method",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "sequence_error_cutoff",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id" : "clustering_method",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [ "" ],
+      "field_type" : "text"
+    },
+    {
+      "id": "clustering_cutoff",
+      "optional":true,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":[""],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
       "id" : "description",
       "optional" : true,
       "advanced" : true,
@@ -444,6 +698,10 @@
           "target_property": "taxonomic_abundance_tsv"
         },
         {
+          "input_parameter": "metadata_keys",
+          "target_property": "metadata_keys"
+        },
+        {
           "input_parameter": "taxonomic_fasta",
           "target_property": "taxonomic_fasta"
         },
@@ -454,14 +712,6 @@
         {
           "constant_value": "16S",
           "target_property": "amplicon_type"
-        },
-        {
-          "input_parameter": "barcode_error_rate",
-          "target_property": "barcode_error_rate"
-        },
-        {
-          "input_parameter": "chimera_detection_and_removal",
-          "target_property": "chimera_detection_and_removal"
         },
         {
           "input_parameter": "description",
@@ -476,6 +726,18 @@
           "target_property": "extraction"
         },
         {
+          "input_parameter": "target_gene",
+          "target_property": "target_gene"
+        },
+        {
+          "input_parameter": "target_subfragment",
+          "target_property": "target_subfragment"
+        },
+        {
+          "input_parameter": "pcr_primers",
+          "target_property": "pcr_primers"
+        },
+        {
           "input_parameter": "library_kit",
           "target_property": "library_kit"
         },
@@ -488,28 +750,16 @@
           "target_property": "library_screening_strategy"
         },
         {
-          "input_parameter": "metadata_keys",
-          "target_property": "metadata_keys"
-        },
-        {
-          "input_parameter": "pcr_primers",
-          "target_property": "pcr_primers"
-        },
-        {
-          "input_parameter": "read_length_cutoff",
-          "target_property": "read_length_cutoff"
-        },
-        {
-          "input_parameter": "read_pairing",
-          "target_property": "read_pairing"
-        },
-        {
           "input_parameter": "sequencing_center",
           "target_property": "sequencing_center"
         },
         {
           "input_parameter": "sequencing_date",
           "target_property": "sequencing_date"
+        },
+        {
+          "input_parameter": "sequencing_technology",
+          "target_property": "sequencing_technology"
         },
         {
           "input_parameter": "sequencing_instrument",
@@ -520,16 +770,24 @@
           "target_property": "sequencing_quality_filter_cutoff"
         },
         {
+          "input_parameter": "read_length_cutoff",
+          "target_property": "read_length_cutoff"
+        },
+        {
+          "input_parameter": "read_pairing",
+          "target_property": "read_pairing"
+        },
+        {
+          "input_parameter": "barcode_error_rate",
+          "target_property": "barcode_error_rate"
+        },
+        {
+          "input_parameter": "chimera_detection_and_removal",
+          "target_property": "chimera_detection_and_removal"
+        },
+        {
           "input_parameter": "taxon_calling",
           "target_property": "taxon_calling"
-        },
-        {
-          "input_parameter": "target_gene",
-          "target_property": "target_gene"
-        },
-        {
-          "input_parameter": "target_subfragment",
-          "target_property": "target_subfragment"
         },
         {
           "input_parameter": "matrix_name",

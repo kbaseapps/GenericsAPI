@@ -164,25 +164,25 @@ module GenericsAPI {
       obj_ref sample_set_ref;
 
       string amplicon_type;
-      float barcode_error_rate;
-      string chimera_detection_and_removal;
       string amplification;
       string extraction;
+      string target_gene;
+      list<string> target_subfragment;
+      string pcr_primers;
       string library_kit;
       boolean library_layout;
       string library_screening_strategy;
-      string pcr_primers;
-      list<string> metadata_keys;
-      int read_length_cutoff;
-      string read_pairing;
       string sequencing_center;
       string sequencing_date;
+      string sequencing_technology;
       string sequencing_instrument;
       int sequencing_quality_filter_cutoff;
+      int read_length_cutoff;
+      string read_pairing;
+      float barcode_error_rate;
+      string chimera_detection_and_removal;
+      list<string> metadata_keys;
       TaxonCalling taxon_calling;
-      string target_gene;
-      list<string> target_subfragment;
-
   } ImportOTUParams;
 
   /* import_matrix_from_biom: import matrix object from BIOM file format*/
