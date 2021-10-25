@@ -24,6 +24,53 @@ DEFAULT_META_KEYS = ["lineage", "score", "taxonomy_source", "species_name",
 TARGET_GENE_SUBFRAGMENT_MAP = {'16S': ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9'],
                                '18S': ['V1', 'V2', 'V3', 'V4', 'V9'],
                                'ITS': ['ITS1', 'ITS2']}
+SEQ_INSTRUMENTS_MAP = {'Applied Biosystems': ['AB 310 Genetic Analyzer',
+                                              'AB 3130 Genetic Analyzer',
+                                              'AB 3130xL Genetic Analyzer',
+                                              'AB 3500 Genetic Analyzer',
+                                              'AB 3500xL Genetic Analyzer',
+                                              'AB 3730 Genetic Analyzer',
+                                              'AB 3730xL Genetic Analyzer',
+                                              'AB 5500xl Genetic Analyzer',
+                                              'AB 5500x-Wl Genetic Analyzer',
+                                              'AB SOLiD System',
+                                              'AB SOLiD System 2.0',
+                                              'AB SOLiD System 3.0',
+                                              'AB SOLiD 3 Plus System',
+                                              'AB SOLiD 4 System',
+                                              'AB SOLiD 4hq System',
+                                              'AB SOLiD PI System'],
+                       'Roche 454': ['454 GS', '454 GS 20', '454 GS FLX', '454 GS FLX+',
+                                     '454 GS FLX Titanium'],
+                       'Life Sciences': ['454 GS Junior'],
+                       'Illumina': ['Illumina Genome Analyzer',
+                                    'Illumina Genome Analyzer II',
+                                    'Illumina Genome Analyzer IIx',
+                                    'Illumina HiScanSQ',
+                                    'Illumina HiSeq 1000',
+                                    'Illumina HiSeq 1500',
+                                    'Illumina HiSeq 2000',
+                                    'Illumina HiSeq 2500',
+                                    'Illumina HiSeq 3000',
+                                    'Illumina HiSeq 4000',
+                                    'Illumina HiSeq X',
+                                    'HiSeq X Five',
+                                    'HiSeq X Ten',
+                                    'Illumina iSeq 100',
+                                    'Illumina MiSeq',
+                                    'Illumina MiniSeq',
+                                    'NextSeq 500',
+                                    'NextSeq 550',
+                                    'NextSeq 1000',
+                                    'NextSeq 2000',
+                                    'Illumina NovaSeq 6000'],
+                       'ThermoFisher': ['Ion Torrent PGM', 'Ion Torrent Proton',
+                                        'Ion Torrent S5 XL', 'Ion Torrent S5'],
+                       'Pacific Biosciences': ['PacBio RS', 'PacBio RS II', 'PacBio Sequel',
+                                               'PacBio Sequel II'],
+                       'Oxford Nanopore': ['MinION', 'GridION', 'PromethION'],
+                       'BGI Group': ['BGISEQ-500', 'DNBSEQ-G400', 'DNBSEQ-T7', 'DNBSEQ-G50',
+                                     'MGISEQ-2000RS']}
 
 
 class BiomUtil:
@@ -52,7 +99,11 @@ class BiomUtil:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
-        # check target_gene and target_subfragment
+        # check sequencing_technology and sequencing_instrument matching
+        # sequencing_technology = params.get('sequencing_technology')
+        # sequencing_instrument = params.get('sequencing_instrument')
+
+        # check target_gene and target_subfragment matching
         target_gene = params.get('target_gene')
         target_subfragment = params.get('target_subfragment')
 

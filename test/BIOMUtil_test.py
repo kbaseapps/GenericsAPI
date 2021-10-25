@@ -314,7 +314,7 @@ class BioMultiTest(unittest.TestCase):
                   'scale': 'raw',
                   'description': "OTU data",
                   'amplicon_type': '16S',
-                  'target_gene': '16s',
+                  'target_gene': '16S',
                   'target_subfragment': ['V1'],
                   'sequencing_technology': 'Illumina',
                   'sequencing_instrument': 'Illumina Genome Analyzer',
