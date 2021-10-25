@@ -80,7 +80,7 @@
       }
     },
     {
-      "id" : "amplification",
+      "id" : "extraction",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -88,7 +88,7 @@
       "field_type" : "text"
     },
     {
-      "id" : "extraction",
+      "id" : "amplification",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -196,15 +196,25 @@
       "field_type" : "text"
     },
     {
-      "id": "library_layout",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":["0"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
+      "id" : "library_layout",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [""],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Single End Library",
+              "value": "single_end"
+          },
+          {
+              "display": "Paired End Library",
+              "value": "paired_end"
+          }
+        ]
       }
     },
     {
@@ -718,12 +728,12 @@
           "target_property": "description"
         },
         {
-          "input_parameter": "amplification",
-          "target_property": "amplification"
-        },
-        {
           "input_parameter": "extraction",
           "target_property": "extraction"
+        },
+        {
+          "input_parameter": "amplification",
+          "target_property": "amplification"
         },
         {
           "input_parameter": "target_gene",

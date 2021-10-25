@@ -400,7 +400,7 @@ module KBaseMatrices{
       @optional description row_normalization col_normalization
       @optional col_mapping row_mapping col_attributemapping_ref row_attributemapping_ref sample_set_ref
       @optional attributes search_attributes sequence_mapping reads_set_ref
-      @optional amplicon_type amplification extraction
+      @optional amplicon_type extraction amplification
       @optional target_gene target_subfragment pcr_primers
       @optional library_kit library_layout library_screening_strategy
       @optional sequencing_center sequencing_date sequencing_technology sequencing_instrument
@@ -419,8 +419,8 @@ module KBaseMatrices{
       @metadata ws length(data.col_ids) as condition_count
       @metadata ws description as additional_information
       @metadata ws amplicon_type
-      @metadata ws amplification
       @metadata ws extraction
+      @metadata ws amplification
       @metadata ws target_gene
       @metadata ws length(target_subfragment) as target_subfragment_count
       @metadata ws pcr_primers
@@ -458,13 +458,13 @@ module KBaseMatrices{
       mapping<string, string> sequence_mapping;
       FloatMatrix2D data;
       string amplicon_type;
-      string amplification;
       string extraction;
+      string amplification;
       string target_gene;
       list<string> target_subfragment;
       string pcr_primers;
       string library_kit;
-      int library_layout;
+      string library_layout;
       string library_screening_strategy;
       string sequencing_center;
       string sequencing_date;

@@ -164,13 +164,13 @@ module GenericsAPI {
       obj_ref sample_set_ref;
 
       string amplicon_type;
-      string amplification;
       string extraction;
+      string amplification;
       string target_gene;
       list<string> target_subfragment;
       string pcr_primers;
       string library_kit;
-      boolean library_layout;
+      string library_layout;
       string library_screening_strategy;
       string sequencing_center;
       string sequencing_date;

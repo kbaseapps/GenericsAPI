@@ -77,14 +77,6 @@ parameters :
         long-hint : |
           Raw reads data in FASTQ format
 
-    amplification:
-      ui-name : |
-          Amplification
-      short-hint : |
-          nucleic acid amplification
-      long-hint  : |
-          Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the enzymatic amplification of nucleic acids.
-
     extraction:
       ui-name : |
           Extraction
@@ -92,6 +84,14 @@ parameters :
           Follows MIxS v5 checklist.
       long-hint  : |
           Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the recovery of nucleic acids from the sample.
+
+    amplification:
+      ui-name : |
+          Amplification
+      short-hint : |
+          nucleic acid amplification
+      long-hint  : |
+          Follows MIxS v5 checklist. PMID, URL, or DOI link to a reference or kit that describes the enzymatic amplification of nucleic acids.
 
     target_gene:
       ui-name : |
