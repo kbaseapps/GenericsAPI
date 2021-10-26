@@ -327,6 +327,46 @@
               "value": "AB 3730xL Genetic Analyzer"
           },
           {
+              "display": "AB 5500 Genetic Analyzer",
+              "value": "AB 5500 Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500xl Genetic Analyzer",
+              "value": "AB 5500xl Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500x-Wl Genetic Analyzer",
+              "value": "AB 5500x-Wl Genetic Analyzer"
+          },
+          {
+              "display": "AB SOLiD System",
+              "value": "AB SOLiD System"
+          },
+          {
+              "display": "AB SOLiD System 2.0",
+              "value": "AB SOLiD System 2.0"
+          },
+          {
+              "display": "AB SOLiD System 3.0",
+              "value": "AB SOLiD System 3.0"
+          },
+          {
+              "display": "AB SOLiD 3 Plus System",
+              "value": "AB SOLiD 3 Plus System"
+          },
+          {
+              "display": "AB SOLiD 4 System",
+              "value": "AB SOLiD 4 System"
+          },
+          {
+              "display": "AB SOLiD 4hq System",
+              "value": "AB SOLiD 4hq System"
+          },
+          {
+              "display": "AB SOLiD PI System",
+              "value": "AB SOLiD PI System"
+          },
+          {
               "display": "454 GS",
               "value": "454 GS"
           },
@@ -449,46 +489,6 @@
           {
               "display": "Ion Torrent S5",
               "value": "Ion Torrent S5"
-          },
-          {
-              "display": "AB 5500 Genetic Analyzer",
-              "value": "AB 5500 Genetic Analyzer"
-          },
-          {
-              "display": "AB 5500xl Genetic Analyzer",
-              "value": "AB 5500xl Genetic Analyzer"
-          },
-          {
-              "display": "AB 5500x-Wl Genetic Analyzer",
-              "value": "AB 5500x-Wl Genetic Analyzer"
-          },
-          {
-              "display": "AB SOLiD System",
-              "value": "AB SOLiD System"
-          },
-          {
-              "display": "AB SOLiD System 2.0",
-              "value": "AB SOLiD System 2.0"
-          },
-          {
-              "display": "AB SOLiD System 3.0",
-              "value": "AB SOLiD System 3.0"
-          },
-          {
-              "display": "AB SOLiD 3 Plus System",
-              "value": "AB SOLiD 3 Plus System"
-          },
-          {
-              "display": "AB SOLiD 4 System",
-              "value": "AB SOLiD 4 System"
-          },
-          {
-              "display": "AB SOLiD 4hq System",
-              "value": "AB SOLiD 4hq System"
-          },
-          {
-              "display": "AB SOLiD PI System",
-              "value": "AB SOLiD PI System"
           },
           {
               "display": "PacBio RS",
