@@ -321,6 +321,31 @@ class DataUtil:
                                                 'make_handle': True})['handle']['hid']
             data['sequencing_file_handle'] = handle_id
 
+        # cast data
+        int_data_names = ['sequencing_quality_filter_cutoff', 'read_length_cutoff']
+        for data_name in int_data_names:
+            if data_name in data:
+                try:
+                    data[data_name] = int(data[data_name])
+                except Exception as e:
+                    err_msg = 'Data type {} requests {} to be an integer value. '.format(
+                        obj_type, data_name)
+                    err_msg += 'Provided [{}] {} instead'.format(
+                        type(data[data_name]), data[data_name])
+                    raise ValueError(err_msg) from e
+
+        float_data_names = ['barcode_error_rate', 'sequence_error_cutoff', 'clustering_cutoff']
+        for data_name in float_data_names:
+            if data_name in data:
+                try:
+                    data[data_name] = float(data[data_name])
+                except Exception as e:
+                    err_msg = 'Data type {} requests {} to be a float value. '.format(
+                        obj_type, data_name)
+                    err_msg += 'Provided [{}] {} instead'.format(
+                        type(data[data_name]), data[data_name])
+                    raise ValueError(err_msg) from e
+
         ws_name_id = params.get('workspace_id')
         workspace_name = params.get('workspace_name')
         if not ws_name_id:
