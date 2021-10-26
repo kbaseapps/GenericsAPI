@@ -588,9 +588,8 @@ class BioMultiTest(unittest.TestCase):
                       'matrix_name': 'test_AmpliconMatrix',
                       'workspace_id': self.wsId,
                       "biom_fasta": {
-                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                            },
+                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')},
                       'scale': 'raw',
                       'description': "OTU data",
                       'row_attributemapping_ref': self.attribute_mapping_ref,
@@ -611,9 +610,8 @@ class BioMultiTest(unittest.TestCase):
                       'matrix_name': 'test_AmpliconMatrix',
                       'workspace_id': self.wsId,
                       "biom_fasta": {
-                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
-                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
-                            },
+                        "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                        "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')},
                       'scale': 'raw',
                       'description': "OTU data",
                       'row_attributemapping_ref': self.attribute_mapping_ref,
