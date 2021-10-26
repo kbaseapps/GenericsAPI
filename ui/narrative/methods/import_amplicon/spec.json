@@ -80,7 +80,7 @@
       }
     },
     {
-      "id" : "amplification",
+      "id" : "extraction",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -88,7 +88,7 @@
       "field_type" : "text"
     },
     {
-      "id" : "extraction",
+      "id" : "amplification",
       "optional" : true,
       "advanced" : true,
       "allow_multiple" : false,
@@ -196,15 +196,25 @@
       "field_type" : "text"
     },
     {
-      "id": "library_layout",
-      "optional":true,
-      "advanced":true,
-      "allow_multiple":false,
-      "default_values":["0"],
-      "field_type" : "checkbox",
-      "checkbox_options":{
-        "checked_value": 1,
-        "unchecked_value": 0
+      "id" : "library_layout",
+      "optional" : true,
+      "advanced" : true,
+      "allow_multiple" : false,
+      "default_values" : [""],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Single End Library",
+              "value": "single_end"
+          },
+          {
+              "display": "Paired End Library",
+              "value": "paired_end"
+          }
+        ]
       }
     },
     {
@@ -315,6 +325,46 @@
           {
               "display": "AB 3730xL Genetic Analyzer",
               "value": "AB 3730xL Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500 Genetic Analyzer",
+              "value": "AB 5500 Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500xl Genetic Analyzer",
+              "value": "AB 5500xl Genetic Analyzer"
+          },
+          {
+              "display": "AB 5500x-Wl Genetic Analyzer",
+              "value": "AB 5500x-Wl Genetic Analyzer"
+          },
+          {
+              "display": "AB SOLiD System",
+              "value": "AB SOLiD System"
+          },
+          {
+              "display": "AB SOLiD System 2.0",
+              "value": "AB SOLiD System 2.0"
+          },
+          {
+              "display": "AB SOLiD System 3.0",
+              "value": "AB SOLiD System 3.0"
+          },
+          {
+              "display": "AB SOLiD 3 Plus System",
+              "value": "AB SOLiD 3 Plus System"
+          },
+          {
+              "display": "AB SOLiD 4 System",
+              "value": "AB SOLiD 4 System"
+          },
+          {
+              "display": "AB SOLiD 4hq System",
+              "value": "AB SOLiD 4hq System"
+          },
+          {
+              "display": "AB SOLiD PI System",
+              "value": "AB SOLiD PI System"
           },
           {
               "display": "454 GS",
@@ -439,46 +489,6 @@
           {
               "display": "Ion Torrent S5",
               "value": "Ion Torrent S5"
-          },
-          {
-              "display": "AB 5500 Genetic Analyzer",
-              "value": "AB 5500 Genetic Analyzer"
-          },
-          {
-              "display": "AB 5500xl Genetic Analyzer",
-              "value": "AB 5500xl Genetic Analyzer"
-          },
-          {
-              "display": "AB 5500x-Wl Genetic Analyzer",
-              "value": "AB 5500x-Wl Genetic Analyzer"
-          },
-          {
-              "display": "AB SOLiD System",
-              "value": "AB SOLiD System"
-          },
-          {
-              "display": "AB SOLiD System 2.0",
-              "value": "AB SOLiD System 2.0"
-          },
-          {
-              "display": "AB SOLiD System 3.0",
-              "value": "AB SOLiD System 3.0"
-          },
-          {
-              "display": "AB SOLiD 3 Plus System",
-              "value": "AB SOLiD 3 Plus System"
-          },
-          {
-              "display": "AB SOLiD 4 System",
-              "value": "AB SOLiD 4 System"
-          },
-          {
-              "display": "AB SOLiD 4hq System",
-              "value": "AB SOLiD 4hq System"
-          },
-          {
-              "display": "AB SOLiD PI System",
-              "value": "AB SOLiD PI System"
           },
           {
               "display": "PacBio RS",
@@ -718,12 +728,12 @@
           "target_property": "description"
         },
         {
-          "input_parameter": "amplification",
-          "target_property": "amplification"
-        },
-        {
           "input_parameter": "extraction",
           "target_property": "extraction"
+        },
+        {
+          "input_parameter": "amplification",
+          "target_property": "amplification"
         },
         {
           "input_parameter": "target_gene",
