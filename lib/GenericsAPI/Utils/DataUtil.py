@@ -328,7 +328,8 @@ class DataUtil:
                 try:
                     data[data_name] = int(data[data_name])
                 except Exception as e:
-                    err_msg = 'Data type {} requests {} to be an integer value. '.format(
+                    err_msg = 'Unexpected data type {}. '.format(data_name)
+                    err_msg += 'Data type {} requests {} to be an integer value. '.format(
                         obj_type, data_name)
                     err_msg += 'Provided [{}] {} instead'.format(
                         type(data[data_name]), data[data_name])
@@ -340,7 +341,8 @@ class DataUtil:
                 try:
                     data[data_name] = float(data[data_name])
                 except Exception as e:
-                    err_msg = 'Data type {} requests {} to be a float value. '.format(
+                    err_msg = 'Unexpected data type {}. '.format(data_name)
+                    err_msg += 'Data type {} requests {} to be a float value. '.format(
                         obj_type, data_name)
                     err_msg += 'Provided [{}] {} instead'.format(
                         type(data[data_name]), data[data_name])

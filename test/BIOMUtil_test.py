@@ -583,6 +583,52 @@ class BioMultiTest(unittest.TestCase):
                       }
             self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
+        with self.assertRaisesRegex(ValueError, "Unexpected data type"):
+            params = {'obj_type': 'AmpliconMatrix',
+                      'matrix_name': 'test_AmpliconMatrix',
+                      'workspace_id': self.wsId,
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            },
+                      'scale': 'raw',
+                      'description': "OTU data",
+                      'row_attributemapping_ref': self.attribute_mapping_ref,
+                      'amplicon_type': '16S',
+                      'target_gene': '16S',
+                      'target_subfragment': ['V1'],
+                      'sequencing_technology': 'Illumina',
+                      'sequencing_instrument': 'Illumina Genome Analyzer',
+                      'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                        'clustering_cutoff': 0.3,
+                                        'clustering_method': 'clustering_method'},
+                      'sequencing_quality_filter_cutoff': 'a text'
+                      }
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
+        with self.assertRaisesRegex(ValueError, "Unexpected data type"):
+            params = {'obj_type': 'AmpliconMatrix',
+                      'matrix_name': 'test_AmpliconMatrix',
+                      'workspace_id': self.wsId,
+                      "biom_fasta": {
+                            "biom_file_biom_fasta": os.path.join('data', 'phyloseq_test.biom'),
+                            "fasta_file_biom_fasta": os.path.join('data', 'phyloseq_test.fa')
+                            },
+                      'scale': 'raw',
+                      'description': "OTU data",
+                      'row_attributemapping_ref': self.attribute_mapping_ref,
+                      'amplicon_type': '16S',
+                      'target_gene': '16S',
+                      'target_subfragment': ['V1'],
+                      'sequencing_technology': 'Illumina',
+                      'sequencing_instrument': 'Illumina Genome Analyzer',
+                      'taxon_calling': {'taxon_calling_method': ['clustering'],
+                                        'clustering_cutoff': 0.3,
+                                        'clustering_method': 'clustering_method'},
+                      'barcode_error_rate': 'a text'
+                      }
+            self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
+
     def test_fetch_sequence(self):
         self.start_test()
 
