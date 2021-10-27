@@ -111,7 +111,8 @@ class BiomUtil:
 
         # check target_gene and target_subfragment matching
         target_gene = params.get('target_gene')
-        target_subfragment = params.get('target_subfragment')
+        target_subfragment = list(set(params.get('target_subfragment')))
+        params['target_subfragment'] = target_subfragment
 
         if target_gene not in TARGET_GENE_SUBFRAGMENT_MAP:
             raise ValueError('Unexpected target gene: {}'.format(target_gene))
