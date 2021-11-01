@@ -68,13 +68,29 @@ parameters :
         long-hint  : |
             Remove all columns with sum below or equal the threshold
 
+    ubiquity_filtering_dimension:
+        ui-name: |
+            Perform Ubiquity Filtering On
+        short-hint : |
+            row or colum
+        long-hint  : |
+            row or colum
+
+    ubiquity_filtering_threshold:
+        ui-name: |
+            Threshold Percentage
+        short-hint : |
+            Remove observations having more than given percentage of zero values
+        long-hint  : |
+            Remove observations having more than given percentage of zero values
+
     relative_abundance_dimension:
         ui-name: |
             Perform Transform Relative Abundance Algorithm On
         short-hint : |
-            Standardize row or column
+            row or column
         long-hint  : |
-            Standardize row or column
+            row or column
 
     normalization_operation:
         ui-name: |
@@ -144,6 +160,9 @@ parameter-groups :
     abundance_filtering_params:
         ui-name : Perform Abundance Filtering
         short-hint :  Perform Abundance Filtering
+    ubiquity_filtering_params:
+        ui-name : Perform Ubiquity Filtering
+        short-hint :  Removing observations having more than given percent of zero values
     relative_abundance_params:
         ui-name : Perform Transform Relative Abundance
         short-hint :  Perform Transform Relative Abundance

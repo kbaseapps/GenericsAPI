@@ -1,6 +1,9 @@
 # GenericsAPI release notes
 =========================================
 
+1.0.28
+add ubiquity filtering operation to the transform matrix app
+
 1.0.27
 address community feedback for amplicon matrix uploader (update metadata for the data type)
 
