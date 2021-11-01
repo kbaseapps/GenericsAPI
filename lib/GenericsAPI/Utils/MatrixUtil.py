@@ -2910,11 +2910,10 @@ class MatrixUtil:
                                                 'abundance_filtering_columns_sum_threshold',
                                                 0))
             elif op == 'ubiquity_filtering':
-                df = self._ubiquity_filtering_matrix(df,
-                                                     dimension=ubiquity_filtering_params.get(
-                                                        'ubiquity_filtering_dimension', 'col'),
-                                                     threshold=ubiquity_filtering_params.get(
-                                                       'ubiquity_filtering_threshold', 100))
+                df = self._ubiquity_filtering_matrix(
+                    df,
+                    dimension=ubiquity_filtering_params.get('ubiquity_filtering_dimension', 'col'),
+                    threshold=ubiquity_filtering_params.get('ubiquity_filtering_threshold', 100))
             elif op == 'relative_abundance':
                 df = self._relative_abundance(df, dimension=relative_abundance_params.get(
                     'relative_abundance_dimension', 'col'))
