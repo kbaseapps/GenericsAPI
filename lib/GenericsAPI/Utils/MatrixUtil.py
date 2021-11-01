@@ -1918,9 +1918,9 @@ class MatrixUtil:
         for col_name in df:
             col_val = df[col_name]
             zero_counts = col_val.value_counts()[0]
-            zero_per = zero_counts/col_val.size
+            zero_per = zero_counts / col_val.size
 
-            if zero_per < threshold/100:
+            if zero_per < threshold / 100:
                 selected_cols.append(col_name)
 
         logging.info("selected {}".format(selected_cols))
