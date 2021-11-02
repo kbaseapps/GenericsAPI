@@ -56,6 +56,7 @@ class MatrixUtilTest(unittest.TestCase):
         cls.serviceImpl = GenericsAPI(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
+        cls.matrix_util = MatrixUtil(cls.cfg)
 
         cls.dfu = DataFileUtil(cls.callback_url)
         cls.hs = HandleService(url=cls.cfg['handle-service-url'],
@@ -205,43 +206,43 @@ class MatrixUtilTest(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-        cls.loadAmpliconMatrix() # TODO replace with mocking in tests
+        cls.loadAmpliconMatrix()  # TODO replace with mocking in tests
 
         # the toy matrix loaded with patched self.loadAmpliconMatrix
         # sample names are ['Sample1', 'Sample2', 'Sample3', 'Sample4', 'Sample5', 'Sample6']
         # sample sizes are [7, 3, 4, 6, 5, 2]
         cls.matrix = [
-            [0,0,1,0,0,0],
-            [5,1,0,2,3,1],
-            [0,0,1,4,2,0],
-            [2,1,1,0,0,1],
-            [0,1,1,0,0,0]
+            [0, 0, 1, 0, 0, 0],
+            [5, 1, 0, 2, 3, 1],
+            [0, 0, 1, 4, 2, 0],
+            [2, 1, 1, 0, 0, 1],
+            [0, 1, 1, 0, 0, 0]
         ]
 
-        cls.matrix_subsample5 = [ # rarefying with seed 7, subsample 5
-            [0,0,1,0,0,0],        # confirm with `set.seed(7); t(rrarefy(t(m), 5))
-            [4,1,0,2,3,1],
-            [0,0,1,3,2,0],
-            [1,1,1,0,0,1],
-            [0,1,1,0,0,0]
+        cls.matrix_subsample5 = [  # rarefying with seed 7, subsample 5
+            [0, 0, 1, 0, 0, 0],      # confirm with `set.seed(7); t(rrarefy(t(m), 5))
+            [4, 1, 0, 2, 3, 1],
+            [0, 0, 1, 3, 2, 0],
+            [1, 1, 1, 0, 0, 1],
+            [0, 1, 1, 0, 0, 0]
         ]
 
-        cls.matrix_subsample2 = [ # rarefying with seed 7, subsample 2
-            [0,0,0,0,0,0],        # confirm with `set.seed(7); t(rrarefy(t(m), 2))
-            [2,0,0,1,2,1],
-            [0,0,1,1,0,0],
-            [0,1,1,0,0,1],
-            [0,1,0,0,0,0]
+        cls.matrix_subsample2 = [  # rarefying with seed 7, subsample 2
+            [0, 0, 0, 0, 0, 0],      # confirm with `set.seed(7); t(rrarefy(t(m), 2))
+            [2, 0, 0, 1, 2, 1],
+            [0, 0, 1, 1, 0, 0],
+            [0, 1, 1, 0, 0, 1],
+            [0, 1, 0, 0, 0, 0]
         ]
 
-        cls.matrix_bootstrap9Reps_median = [ # rarefying with seed 7, subsample 5
+        cls.matrix_bootstrap9Reps_median = [  # rarefying with seed 7, subsample 5
             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
             [4.0, 1.0, 0.0, 2.0, 3.0, 1.0],
             [0.0, 0.0, 1.0, 3.0, 2.0, 0.0],
             [1.0, 1.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 1.0, 1.0, 0.0, 0.0, 0.0]]
 
-        cls.matrix_bootstrap9Reps_mean = [ # rarefying with seed 7, subsample 5
+        cls.matrix_bootstrap9Reps_mean = [  # rarefying with seed 7, subsample 5
             [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
             [3.7777777777777777, 1.0, 0.0, 1.5555555555555556, 3.0, 1.0],
             [0.0, 0.0, 1.0, 3.4444444444444446, 2.0, 0.0],
@@ -673,6 +674,30 @@ class MatrixUtilTest(unittest.TestCase):
         out2 = mu._log(df, base=2.718281828459045, a=1e-10)
 
         self.assert_matrices_equal(out1, out2)
+
+        # test _ubiquity_filtering_matrix
+        out2 = self.matrix_util._ubiquity_filtering_matrix(df, dimension='col', threshold=100)
+        self.assert_matrices_equal(self.matrix, out2)
+
+        out1 = [
+            [0, 1],
+            [1, 0],
+            [0, 1],
+            [1, 1],
+            [1, 1]
+        ]
+        out2 = self.matrix_util._ubiquity_filtering_matrix(df, dimension='col', threshold=50)
+        self.assert_matrices_equal(out1, out2)
+
+        out1 = [
+            [5, 1, 0, 2, 3, 1]
+        ]
+        out2 = self.matrix_util._ubiquity_filtering_matrix(df, dimension='row', threshold=20)
+        self.assert_matrices_equal(out1, out2)
+
+        with self.assertRaises(ValueError) as context:
+            self.matrix_util._ubiquity_filtering_matrix(df, dimension='row', threshold=0)
+            self.assertIn('Removed all', str(context.exception.args[0]))
 
     def test_transform_op_validation(self):
         mu = MatrixUtil

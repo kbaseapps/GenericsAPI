@@ -23,6 +23,10 @@
                     "value": "abundance_filtering"
                 },
                 {
+                    "display": "Perform Ubiquity Filtering",
+                    "value": "ubiquity_filtering"
+                },
+                {
                     "display": "Transform Matrix To Relative Abundance Matrix",
                     "value": "relative_abundance"
                 },
@@ -83,6 +87,39 @@
       "advanced":true,
       "allow_multiple":false,
       "default_values":["0"],
+      "field_type" : "text",
+      "text_options": {
+          "validate_as": "float"
+      }
+    },
+    {
+      "id" : "ubiquity_filtering_dimension",
+      "optional" : false,
+      "advanced" : false,
+      "allow_multiple" : false,
+      "default_values" : ["col"],
+      "field_type" : "dropdown",
+      "dropdown_options":
+      {
+        "options":
+        [
+          {
+              "display": "Column",
+              "value": "col"
+          },
+          {
+              "display": "Row",
+              "value": "row"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ubiquity_filtering_threshold",
+      "optional":false,
+      "advanced":true,
+      "allow_multiple":false,
+      "default_values":["100.0"],
       "field_type" : "text",
       "text_options": {
           "validate_as": "float"
@@ -257,6 +294,17 @@
       "advanced" : true
     },
     {
+      "id": "ubiquity_filtering_params",
+      "parameters": [
+        "ubiquity_filtering_dimension",
+        "ubiquity_filtering_threshold"
+      ],
+      "optional": false,
+      "allow_multiple": false,
+      "with_border": false,
+      "advanced" : true
+    },
+    {
       "id": "relative_abundance_params",
       "parameters": [
         "relative_abundance_dimension"
@@ -305,6 +353,10 @@
         {
           "input_parameter" : "abundance_filtering_params",
           "target_property" : "abundance_filtering_params"
+        },
+        {
+          "input_parameter" : "ubiquity_filtering_params",
+          "target_property" : "ubiquity_filtering_params"
         },
         {
           "input_parameter" : "relative_abundance_params",

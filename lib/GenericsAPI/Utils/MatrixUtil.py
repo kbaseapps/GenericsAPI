@@ -443,6 +443,7 @@ class MatrixUtil:
 
         op_2_name = {
             'abundance_filtering': 'Filtered',
+            'ubiquity_filtering': 'Filtered',
             'standardization': 'Standardized',
             'ratio_transformation': 'Log Ratio Transformed',
             'relative_abundance': 'Relative Abundance',
@@ -1906,6 +1907,40 @@ class MatrixUtil:
 
         return df
 
+    def _ubiquity_filtering_matrix(self, df, dimension='col', threshold=100):
+        logging.info("Removing {} having more than {} percentage of zero values".format(
+                                                                        dimension, threshold))
+
+        if dimension == 'row':
+            df = df.T
+
+        selected_cols = []
+
+        zero = 0.0
+        for col_name in df:
+            col_val = df[col_name]
+            col_val_counts = col_val.value_counts()
+            if zero in col_val_counts:
+                zero_counts = col_val_counts[zero]
+            else:
+                zero_counts = 0
+
+            zero_per = zero_counts / col_val.size
+
+            if zero_per <= threshold / 100 and zero_per < 1:
+                selected_cols.append(col_name)
+
+        if not selected_cols:
+            err_msg = 'Removed all {} observations. '.format(dimension)
+            err_msg += 'Please select a higher threshold percentage'
+            raise ValueError(err_msg)
+        logging.info("selected {}".format(selected_cols))
+        ubiquity_filtered_df = df[selected_cols]
+
+        if dimension == 'row':
+            ubiquity_filtered_df = ubiquity_filtered_df.T
+        return ubiquity_filtered_df
+
     def _relative_abundance(self, df, dimension='col'):
 
         logging.info("Creating relative abundance matrix")
@@ -2799,6 +2834,7 @@ class MatrixUtil:
 
         OPS = [
             'abundance_filtering',
+            'ubiquity_filtering',
             'relative_abundance',
             'standardization',
             'ratio_transformation',
@@ -2816,6 +2852,7 @@ class MatrixUtil:
 
         operations = params.get('operations', [])
         abundance_filtering_params = params.get('abundance_filtering_params', {})
+        ubiquity_filtering_params = params.get('ubiquity_filtering_params', {})
         relative_abundance_params = params.get('perform_relative_abundance', {})
         standardization_params = params.get('standardization_params', {})
         ratio_transformation_params = params.get('ratio_transformation_params', {})
@@ -2883,7 +2920,11 @@ class MatrixUtil:
                                             columns_sum_threshold=abundance_filtering_params.get(
                                                 'abundance_filtering_columns_sum_threshold',
                                                 0))
-
+            elif op == 'ubiquity_filtering':
+                df = self._ubiquity_filtering_matrix(
+                    df,
+                    dimension=ubiquity_filtering_params.get('ubiquity_filtering_dimension', 'col'),
+                    threshold=ubiquity_filtering_params.get('ubiquity_filtering_threshold', 100))
             elif op == 'relative_abundance':
                 df = self._relative_abundance(df, dimension=relative_abundance_params.get(
                     'relative_abundance_dimension', 'col'))
