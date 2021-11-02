@@ -1916,9 +1916,15 @@ class MatrixUtil:
 
         selected_cols = []
 
+        zero = 0.0
         for col_name in df:
             col_val = df[col_name]
-            zero_counts = col_val.value_counts()[0]
+            col_val_counts = col_val.value_counts()
+            if zero in col_val_counts:
+                zero_counts = col_val_counts[zero]
+            else:
+                zero_counts = 0
+
             zero_per = zero_counts / col_val.size
 
             if zero_per < threshold / 100:
