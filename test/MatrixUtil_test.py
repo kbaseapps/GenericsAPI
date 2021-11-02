@@ -689,6 +689,10 @@ class MatrixUtilTest(unittest.TestCase):
         out2 = self.matrix_util._ubiquity_filtering_matrix(df, dimension='col', threshold=50)
         self.assert_matrices_equal(out1, out2)
 
+        with self.assertRaises(ValueError) as context:
+            self.matrix_util._ubiquity_filtering_matrix(df, dimension='row', threshold=0)
+            self.assertIn('Removed all', str(context.exception.args[0]))
+
     def test_transform_op_validation(self):
         mu = MatrixUtil
         m = np.array(self.matrix)
