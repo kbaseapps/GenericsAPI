@@ -1908,7 +1908,7 @@ class MatrixUtil:
         return df
 
     def _ubiquity_filtering_matrix(self, df, dimension='col', threshold=100):
-        logging.info("Removing {} having more than or equal to {} percent of zero values".format(
+        logging.info("Removing {} having more than {} percentage of zero values".format(
                                                                         dimension, threshold))
 
         if dimension == 'row':
@@ -1930,6 +1930,10 @@ class MatrixUtil:
             if zero_per <= threshold / 100 and zero_per < 1:
                 selected_cols.append(col_name)
 
+        if not selected_cols:
+            err_msg = 'Removed all {} observations. '.format(dimension)
+            err_msg += 'Please select a higher threshold percentage'
+            raise ValueError(err_msg)
         logging.info("selected {}".format(selected_cols))
         ubiquity_filtered_df = df[selected_cols]
 
