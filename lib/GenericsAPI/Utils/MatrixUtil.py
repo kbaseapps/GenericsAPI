@@ -1927,7 +1927,7 @@ class MatrixUtil:
 
             zero_per = zero_counts / col_val.size
 
-            if zero_per < threshold / 100:
+            if zero_per <= threshold / 100 and zero_per < 1:
                 selected_cols.append(col_name)
 
         logging.info("selected {}".format(selected_cols))
