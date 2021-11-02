@@ -3034,6 +3034,82 @@ class MatrixUtil:
 
         return returnVal
 
+    def collapse_matrix(self, params):
+        logging.info('Start collapsing matrix with {}'.format(params))
+
+        input_matrix_ref = params.get('input_matrix_ref')
+        workspace_id = params.get('workspace_id')
+        new_matrix_name = params.get('new_matrix_name')
+        taxonomy_field = params.get('taxonomy_field')
+        taxonomy_level = params.get('taxonomy_level')
+
+        input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
+        input_matrix_info = input_matrix_obj['info']
+        input_matrix_name = input_matrix_info[1]
+        input_matrix_data = input_matrix_obj['data']
+
+        for key, obj_data in input_matrix_data.items():
+            if key.endswith('_ref'):
+                subobj_ref = input_matrix_data[key]
+                input_matrix_data[key] = '{};{}'.format(input_matrix_ref, subobj_ref)
+                logging.info('updated {} to {}'.format(key, input_matrix_data[key]))
+
+        for dim in ['row', 'col']:
+            attribute_mapping = input_matrix_data.get('{}_mapping'.format(dim))
+            attributemapping_ref = input_matrix_data.get('{}_attributemapping_ref'.format(dim))
+            if not attribute_mapping and attributemapping_ref:
+                am_data = self.dfu.get_objects({'object_refs': [attributemapping_ref]})[
+                    'data'][0]['data']
+                attribute_mapping = {x: x for x in am_data['instances'].keys()}
+                input_matrix_data['{}_mapping'.format(dim)] = attribute_mapping
+
+        if not new_matrix_name:
+            current_time = time.localtime()
+            new_matrix_name = input_matrix_name + time.strftime('_%H_%M_%S_%Y_%m_%d', current_time)
+
+        # fetch matrix data
+        data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
+        df = pd.read_json(data_matrix)
+        original_row_ids = df.index
+        original_col_ids = df.columns
+
+        # fetch row attribute mapping data
+        row_am_ref = input_matrix_data.get('row_attributemapping_ref')
+        row_am_data = self.dfu.get_objects({'object_refs': [row_am_ref]})['data'][0]['data']
+
+        attributes = pd.DataFrame(row_am_data['attributes'])
+        instances = pd.DataFrame(row_am_data['instances'])
+        am_df = attributes.join(instances)
+
+        # collapse matrix
+        df.index = df.index.astype('str')
+        df.columns = df.columns.astype('str')
+        new_matrix_data = {'row_ids': df.index.tolist(),
+                           'col_ids': df.columns.tolist(),
+                           'values': df.values.tolist()}
+
+        input_matrix_data['data'] = new_matrix_data
+
+        # remove row attribute mapping object from collapsed matrix
+        input_matrix_data.pop('row_attributemapping_ref', None)
+        input_matrix_data.pop('row_mapping', None)
+
+        # save collapsed matrix
+        logging.info("Saving new collapsed matrix object")
+        new_matrix_obj_ref = self.data_util.save_object({
+            'obj_type': input_matrix_info[2],
+            'obj_name': new_matrix_name,
+            'data': input_matrix_data,
+            'workspace_id': workspace_id})['obj_ref']
+
+        returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
+
+        report_output = self._generate_collapse_report(new_matrix_obj_ref, workspace_id)
+
+        returnVal.update(report_output)
+
+        return returnVal
+
     def filter_matrix(self, params):
         """
         filter_matrix: create sub-matrix based on input feature_ids

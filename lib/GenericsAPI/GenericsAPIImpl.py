@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.28"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "6d730aff7c90afbca00beb69eebc0d597d09ceaa"
+    GIT_COMMIT_HASH = "022d7e31b4d090b1b2634a3f5c2b44cbabe08416"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -421,6 +421,36 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method transform_matrix_variable_specific return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def collapse_matrix(self, ctx, params):
+        """
+        :param params: instance of type "CollapseMatrixParams"
+           (taxonomy_field: name of attribute in matrix row attribute mapping
+           object taxonomy_level: level of taxonomy used to group taxa (row))
+           -> structure: parameter "input_matrix_ref" of type "obj_ref" (An
+           X/Y/Z style reference), parameter "workspace_id" of Long,
+           parameter "workspace_name" of type "workspace_name" (workspace
+           name of the object), parameter "attri_mapping_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "taxonomy_field"
+           of String, parameter "taxonomy_level" of String, parameter
+           "new_matrix_name" of String
+        :returns: instance of type "TransformMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN collapse_matrix
+        returnVal = self.matrix_util.collapse_matrix(params)
+        #END collapse_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method collapse_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
