@@ -443,6 +443,7 @@ class MatrixUtil:
 
         op_2_name = {
             'abundance_filtering': 'Filtered',
+            'ubiquity_filtering': 'Filtered',
             'standardization': 'Standardized',
             'ratio_transformation': 'Log Ratio Transformed',
             'relative_abundance': 'Relative Abundance',
