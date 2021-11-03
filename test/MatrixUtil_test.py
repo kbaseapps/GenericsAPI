@@ -1049,3 +1049,27 @@ class MatrixUtilTest(unittest.TestCase):
                   'workspace_id': self.getWsId()}
 
         _ = self.getImpl().perform_variable_stats_matrix(self.ctx, params)[0]
+
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_collapse_matrix(self, file_to_shock):
+        self.start_test()
+
+        params = {'input_matrix_ref': self.amplicon_matrix_ref,
+                  'new_matrix_name': 'test_collapsed_matrix',
+                  'workspace_id': self.getWsId(),
+                  'workspace_name': self.getWsName(),
+                  'taxonomy_field': 'taxonomy',
+                  'taxonomy_rank': 'Family'}
+
+        returnVal = self.getImpl().collapse_matrix(self.ctx, params)[0]
+        new_obj_ref = returnVal['new_matrix_obj_ref']
+
+        matrix_obj_data = self.dfu.get_objects({'object_refs': [new_obj_ref]})['data'][0]['data']
+        matrix_data = matrix_obj_data['data']
+        expected_row_ids = ['Pseudomonadaceae', 'Burkholderiaceae', 'Comamonadaceae']
+        self.assertCountEqual(expected_row_ids, matrix_data['row_ids'])
+        expected_values = [[2, 1, 2, 0, 0, 1],
+                           [5, 2, 1, 2, 3, 1],
+                           [0, 0, 1, 4, 2, 0]]
+        self.assert_matrices_equal(expected_values, matrix_data['values'])
+        self.assertTrue('row_attributemapping_ref' not in matrix_obj_data)

@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.28"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "022d7e31b4d090b1b2634a3f5c2b44cbabe08416"
+    GIT_COMMIT_HASH = "ba989fbae9f314fd207a0dbfb182334f32c1d9d2"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -429,14 +429,15 @@ class GenericsAPI:
         """
         :param params: instance of type "CollapseMatrixParams"
            (taxonomy_field: name of attribute in matrix row attribute mapping
-           object taxonomy_level: level of taxonomy used to group taxa (row))
-           -> structure: parameter "input_matrix_ref" of type "obj_ref" (An
-           X/Y/Z style reference), parameter "workspace_id" of Long,
-           parameter "workspace_name" of type "workspace_name" (workspace
-           name of the object), parameter "attri_mapping_ref" of type
-           "obj_ref" (An X/Y/Z style reference), parameter "taxonomy_field"
-           of String, parameter "taxonomy_level" of String, parameter
-           "new_matrix_name" of String
+           object taxonomy_rank: rank of taxonomy used to group taxa (row)
+           (one of ['Domain', 'Phylum', 'Class', 'Order', 'Family',
+           'Genus'])) -> structure: parameter "input_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_id" of
+           Long, parameter "workspace_name" of type "workspace_name"
+           (workspace name of the object), parameter "attri_mapping_ref" of
+           type "obj_ref" (An X/Y/Z style reference), parameter
+           "taxonomy_field" of String, parameter "taxonomy_rank" of String,
+           parameter "new_matrix_name" of String
         :returns: instance of type "TransformMatrixOutput" -> structure:
            parameter "report_name" of String, parameter "report_ref" of
            String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z

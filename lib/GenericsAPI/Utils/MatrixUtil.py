@@ -6,6 +6,7 @@ import re
 import shutil
 import uuid
 import time
+import csv
 
 import pandas as pd
 import numpy as np
@@ -38,6 +39,7 @@ from installed_clients.SampleServiceClient import SampleService
 
 TYPE_ATTRIBUTES = {'description', 'scale', 'row_normalization', 'col_normalization'}
 SCALE_TYPES = {'raw', 'ln', 'log2', 'log10'}
+RANKS = ['Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus']
 
 
 class MatrixUtil:
@@ -1248,7 +1250,7 @@ class MatrixUtil:
         return report_output
 
     def _generate_report(self, matrix_obj_ref, workspace_name, new_row_attr_ref=None,
-                         new_col_attr_ref=None, data=None, metadata_df=None):
+                         new_col_attr_ref=None, data=None, metadata_df=None, message=''):
         """
         _generate_report: generate summary report
         """
@@ -1270,7 +1272,7 @@ class MatrixUtil:
             else:
                 output_html_files = self._generate_heatmap_html_report(data)
 
-            report_params = {'message': '',
+            report_params = {'message': message,
                              'objects_created': objects_created,
                              'workspace_name': workspace_name,
                              'html_links': output_html_files,
@@ -1278,7 +1280,7 @@ class MatrixUtil:
                              'html_window_height': 1400,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
         else:
-            report_params = {'message': '',
+            report_params = {'message': message,
                              'objects_created': objects_created,
                              'workspace_name': workspace_name,
                              'report_object_name': 'import_matrix_from_excel_' + str(uuid.uuid4())}
@@ -3039,9 +3041,10 @@ class MatrixUtil:
 
         input_matrix_ref = params.get('input_matrix_ref')
         workspace_id = params.get('workspace_id')
+        workspace_name = params.get('workspace_name')
         new_matrix_name = params.get('new_matrix_name')
         taxonomy_field = params.get('taxonomy_field')
-        taxonomy_level = params.get('taxonomy_level')
+        taxonomy_rank = params.get('taxonomy_rank')
 
         input_matrix_obj = self.dfu.get_objects({'object_refs': [input_matrix_ref]})['data'][0]
         input_matrix_info = input_matrix_obj['info']
@@ -3070,18 +3073,49 @@ class MatrixUtil:
         # fetch matrix data
         data_matrix = self.data_util.fetch_data({'obj_ref': input_matrix_ref}).get('data_matrix')
         df = pd.read_json(data_matrix)
-        original_row_ids = df.index
-        original_col_ids = df.columns
 
         # fetch row attribute mapping data
         row_am_ref = input_matrix_data.get('row_attributemapping_ref')
         row_am_data = self.dfu.get_objects({'object_refs': [row_am_ref]})['data'][0]['data']
-
         attributes = pd.DataFrame(row_am_data['attributes'])
         instances = pd.DataFrame(row_am_data['instances'])
         am_df = attributes.join(instances)
 
+        if taxonomy_field not in am_df['attribute'].values:
+            raise ValueError('Cannot find attribute {} in matrix row attribute mapping'.format(
+                taxonomy_field))
+
+        taxonomy_row = am_df.loc[am_df['attribute'] == taxonomy_field]
+        if taxonomy_rank not in RANKS:
+            raise ValueError('Invalid taxonomy rank. Please provide one of {}'.format(RANKS))
+        taxonomy_level = RANKS.index(taxonomy_rank)
+
+        category = dict()
+        for idx in df.index:
+            taxonomy_str = taxonomy_row[idx].values[0]
+            logging.info('Parsing taxonomy string: {} for taxa: {}'.format(taxonomy_str, idx))
+            delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
+            taxonomies = [x.strip() for x in taxonomy_str.split(delimiter)]
+            logging.info('Interpreted Taxonomy: {} with delimiter: {}'.format(
+                taxonomies, delimiter))
+            taxonomy = taxonomies[taxonomy_level]
+            logging.info('categorize {} to {}'.format(idx, taxonomy))
+
+            if taxonomy in category:
+                category[taxonomy].append(idx)
+            else:
+                category[taxonomy] = [idx]
+
         # collapse matrix
+        message = ''
+        for taxonomy, row_ids in category.items():
+            df.loc[taxonomy] = df.loc[row_ids].sum(axis=0)
+            df.drop(row_ids, inplace=True)
+            if len(row_ids) == 1:
+                message += 'Replaced {} with {}\n'.format(row_ids, taxonomy)
+            else:
+                message += 'Merged {} into {}\n'.format(row_ids, taxonomy)
+
         df.index = df.index.astype('str')
         df.columns = df.columns.astype('str')
         new_matrix_data = {'row_ids': df.index.tolist(),
@@ -3103,9 +3137,9 @@ class MatrixUtil:
             'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
-
-        report_output = self._generate_collapse_report(new_matrix_obj_ref, workspace_id)
-
+        message = ''
+        report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
+                                              data=new_matrix_data, message=message)
         returnVal.update(report_output)
 
         return returnVal
