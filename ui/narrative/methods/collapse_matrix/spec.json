@@ -107,7 +107,7 @@
     "service-mapping" : {
       "url" : "",
       "name" : "GenericsAPI",
-      "method" : "perform_rarefy",
+      "method" : "collapse_matrix",
       "input_mapping" : [
         {
           "narrative_system_variable": "workspace_id",
