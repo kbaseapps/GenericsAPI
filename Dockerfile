@@ -30,7 +30,7 @@ RUN pip install coverage==5.5
 RUN pip install numpy==1.19.1 \
     && pip install scikit-bio==0.5.6 --ignore-installed certifi \
     && pip install networkx==2.5 \
-    && pip install pandas==1.1.1 \
+    && pip install pandas==1.1.5 \
     && pip install xlrd==1.2.0 \
     && pip install openpyxl==3.0.5 \
     && pip install xlsxwriter==1.3.3 \
@@ -42,7 +42,6 @@ RUN pip install numpy==1.19.1 \
     && pip install plotly==4.9.0 \
     && pip install mock==4.0.2 \
     && pip install biom-format==2.1.7 \
-    && pip install datashader==0.11.1 \
     && pip install rpy2==3.3.5
 
 # -----------------------------------------
