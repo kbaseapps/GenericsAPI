@@ -3108,13 +3108,18 @@ class MatrixUtil:
 
         # collapse matrix
         message = ''
+        max_taxa_count = 6
         for taxonomy, row_ids in category.items():
             df.loc[taxonomy] = df.loc[row_ids].sum(axis=0)
             df.drop(row_ids, inplace=True)
             if len(row_ids) == 1:
-                message += 'Replaced {} with {}\n'.format(row_ids, taxonomy)
+                message += 'Replaced {} with {}\n'.format(row_ids[0], taxonomy)
+            elif len(row_ids) > max_taxa_count:
+                row_str = ', '.join(row_ids[:max_taxa_count]) + '...'
+                message += 'Merged {} into {}\n'.format(row_str, taxonomy)
             else:
-                message += 'Merged {} into {}\n'.format(row_ids, taxonomy)
+                row_str = ', '.join(row_ids)
+                message += 'Merged {} into {}\n'.format(row_str, taxonomy)
 
         df.index = df.index.astype('str')
         df.columns = df.columns.astype('str')
