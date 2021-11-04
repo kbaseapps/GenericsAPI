@@ -25,9 +25,11 @@ RUN Rscript -e "install.packages('vegan')"
 RUN pip install --upgrade pip \
     && python --version
 
+RUN pip install scikit-bio==0.5.6
+
 RUN pip install numpy==1.19.5 \
     && pip install networkx==2.5.1 \
-    && pip install pandas==1.1.1 \
+    && pip install pandas==1.1.5 \
     && pip install xlrd==2.0.1 \
     && pip install openpyxl==3.0.9 \
     && pip install xlsxwriter==3.0.2 \
@@ -42,7 +44,6 @@ RUN pip install numpy==1.19.5 \
     && pip install datashader==0.13.0 \
     && pip install rpy2==3.4.5 \
     && pip install coverage==6.1.1 \
-    && pip install scikit-bio==0.5.6
 
 # -----------------------------------------
 
