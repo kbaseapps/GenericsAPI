@@ -27,7 +27,7 @@ RUN pip install --upgrade pip \
 
 RUN pip install coverage==6.1.1 \
     && pip install numpy==1.19.5 \
-    && pip install scikit-bio==0.5.6 \
+    && pip install scikit-bio==0.5.6 --ignore-installed certifi \
     && pip install networkx==2.5.1 \
     && pip install pandas==1.1.5 \
     && pip install xlrd==2.0.1 \
