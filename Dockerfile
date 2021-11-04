@@ -25,8 +25,9 @@ RUN Rscript -e "install.packages('vegan')"
 RUN pip install --upgrade pip \
     && python --version
 
-RUN pip install coverage==6.1.1 \
-    && pip install numpy==1.19.5 \
+RUN pip install coverage==5.5
+
+RUN pip install numpy==1.19.1 \
     && pip install scikit-bio==0.5.6 --ignore-installed certifi \
     && pip install networkx==2.5.1 \
     && pip install pandas==1.1.5 \
@@ -41,7 +42,7 @@ RUN pip install coverage==6.1.1 \
     && pip install plotly==5.3.1 \
     && pip install mock==4.0.3 \
     && pip install biom-format==2.1.10 \
-    && pip install rpy2==3.4.5
+    && pip install rpy2==3.3.5
 
 # -----------------------------------------
 
