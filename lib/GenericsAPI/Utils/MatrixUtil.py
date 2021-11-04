@@ -3142,7 +3142,6 @@ class MatrixUtil:
             'workspace_id': workspace_id})['obj_ref']
 
         returnVal = {'new_matrix_obj_ref': new_matrix_obj_ref}
-        message = ''
         report_output = self._generate_report(new_matrix_obj_ref, workspace_name,
                                               data=new_matrix_data, message=message)
         returnVal.update(report_output)
