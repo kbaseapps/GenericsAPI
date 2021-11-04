@@ -26,12 +26,12 @@ RUN pip install --upgrade pip \
     && python --version
 
 RUN pip install coverage==6.1.1 \
-    && pip install numpy==1.19.1 \
-    && pip install scikit-bio==0.5.6 --ignore-installed certifi \
-    && pip install networkx==2.5 \
+    && pip install numpy==1.19.5 \
+    && pip install scikit-bio==0.5.6 \
+    && pip install networkx==2.5.1 \
     && pip install pandas==1.1.5 \
-    && pip install xlrd==1.2.0 \
-    && pip install openpyxl==3.0.5 \
+    && pip install xlrd==2.0.1 \
+    && pip install openpyxl==3.0.9 \
     && pip install xlsxwriter==1.3.3 \
     && pip install dotmap==1.3.17 \
     && pip install matplotlib==3.3.1 \
