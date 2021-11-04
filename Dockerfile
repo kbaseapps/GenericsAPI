@@ -25,24 +25,23 @@ RUN Rscript -e "install.packages('vegan')"
 RUN pip install --upgrade pip \
     && python --version
 
-RUN pip install coverage==5.5
-
-RUN pip install numpy==1.19.1 \
-    && pip install scikit-bio==0.5.6 --ignore-installed certifi \
-    && pip install networkx==2.5 \
-    && pip install pandas==1.1.5 \
-    && pip install xlrd==1.2.0 \
-    && pip install openpyxl==3.0.5 \
+RUN pip install coverage==6.1.1 \
+    && pip install numpy==1.19.1 \
+    && pip install scikit-bio==0.5.6 \
+    && pip install networkx==2.5.1 \
+    && pip install xlrd==2.0.1 \
+    && pip install openpyxl==3.0.9 \
     && pip install xlsxwriter==1.3.3 \
-    && pip install dotmap==1.3.17 \
-    && pip install matplotlib==3.3.1 \
-    && pip install scipy==1.5.2 \
-    && pip install natsort==7.0.1 \
-    && pip install scikit-learn==0.23.2 \
-    && pip install plotly==4.9.0 \
-    && pip install mock==4.0.2 \
-    && pip install biom-format==2.1.7 \
-    && pip install rpy2==3.3.5
+    && pip install dotmap==1.3.25 \
+    && pip install matplotlib==3.3.4 \
+    && pip install scipy==1.5.4 \
+    && pip install natsort==8.0.0 \
+    && pip install scikit-learn==0.24.2 \
+    && pip install plotly==5.3.1 \
+    && pip install mock==4.0.3 \
+    && pip install biom-format==2.1.10 \
+    && pip install rpy2==3.4.5 \
+    && pip install pandas==1.1.5
 
 # -----------------------------------------
 
