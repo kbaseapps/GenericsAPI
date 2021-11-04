@@ -639,8 +639,7 @@ class BioMultiTest(unittest.TestCase):
                       }
             self.getImpl().import_matrix_from_biom(self.ctx, params)[0]
 
-    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
-    def test_fetch_sequence(self, file_to_shock):
+    def test_fetch_sequence(self):
         self.start_test()
 
         fake_object_ref = self.createAnObject()
