@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.28"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "ba989fbae9f314fd207a0dbfb182334f32c1d9d2"
+    GIT_COMMIT_HASH = "c51401384861ee62b7a87d86ab1e9f1c04c38ff1"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -372,9 +372,11 @@ class GenericsAPI:
            reference), parameter "workspace_id" of Long, parameter
            "new_matrix_name" of String, parameter "operations" of list of
            String, parameter "abundance_filtering_params" of mapping from
-           String to String, parameter "relative_abundance_params" of mapping
-           from String to String, parameter "standardization_params" of
-           mapping from String to String, parameter
+           String to String, parameter "ubiquity_filtering_params" of mapping
+           from String to String, parameter "normalization_params" of mapping
+           from String to String, parameter "relative_abundance_params" of
+           mapping from String to String, parameter "standardization_params"
+           of mapping from String to String, parameter
            "ratio_transformation_params" of mapping from String to String,
            parameter "log_params" of mapping from String to Double
         :returns: instance of type "TransformMatrixOutput" -> structure:
