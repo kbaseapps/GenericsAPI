@@ -27,7 +27,7 @@ RUN pip install --upgrade pip \
 
 RUN pip install numpy==1.19.5 \
     && pip install networkx==2.5.1 \
-    && pip install pandas==1.1.5 \
+    && pip install pandas==1.1.1 \
     && pip install xlrd==2.0.1 \
     && pip install openpyxl==3.0.9 \
     && pip install xlsxwriter==3.0.2 \
