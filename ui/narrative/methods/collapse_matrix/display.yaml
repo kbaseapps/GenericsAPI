@@ -1,0 +1,74 @@
+name     : Collapse Matrix
+subtitle : Collapse Matrix - group and collapse amplicons by taxonomy
+tooltip  : Collapse Matrix - group and collapse amplicons by taxonomy
+
+icon: upload.png
+
+screenshots :
+    []
+
+suggestions :
+    apps:
+        related :
+            []
+        next :
+            []
+    methods:
+        related :
+            []
+        next :
+            []
+
+parameters :
+    input_matrix_ref :
+        ui-name: |
+            Input Amplicon Matrix
+        short-hint : |
+            Amplicon Matrix with raw count data
+        long-hint  : |
+            Amplicon Matrix with raw count data
+
+    new_matrix_name:
+        ui-name: |
+            Collapsed Matrix Name
+        short-hint : |
+            Output collapsed matrix name
+        long-hint  : |
+            Output collapsed matrix name
+
+    taxonomy_field:
+        ui-name: |
+            Taxonomy field
+        short-hint : |
+            Taxonomy field - row attribute name for taxonomy
+        long-hint  : |
+            Taxonomy field - row attribute name for taxonomy
+
+    taxonomy_rank:
+        ui-name: |
+            Taxonomy Rank
+        short-hint: |
+            Taxonomy Rank - clade used to group and collapse amplicons
+        long-hint : |
+            Taxonomy Rank - clade used to group and collapse amplicons
+
+description : |
+    <p> Collapse Matrix </p>
+    <p> Create new Amplicon Matrix with amplicons grouped by taxonomy (higher-level OTUs) </p>
+    <p> Thanks to Pamela Weisenhorn and Kathleen Beilsmith for designing the essential behavior of this app. </p>
+
+publications:
+    -
+        display-text: |
+            Jari Oksanen, F. Guillaume Blanchet, Michael Friendly, Roeland Kindt,
+            Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B. O'Hara, Gavin
+            L. Simpson, Peter Solymos, M. Henry H. Stevens, Eduard Szoecs and
+            Helene Wagner (2019). vegan: Community Ecology Package. R package
+            version 2.5-6. https://CRAN.R-project.org/package=vegan
+    -
+        display-text: |
+            Hurlbert, S.H. (1971). The nonconcept of species diversity: a critique and alternative parameters. Ecology 52, 577--586.
+    -
+        display-text: |
+            Heck, K.L., van Belle, G. & Simberloff, D. (1975). Explicit calculation of the rarefaction diversity measurement and the determination of sufficient sample size. Ecology 56
+
