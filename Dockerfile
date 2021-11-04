@@ -43,7 +43,7 @@ RUN pip install numpy==1.19.5 \
     && pip install biom-format==2.1.10 \
     && pip install datashader==0.13.0 \
     && pip install rpy2==3.4.5 \
-    && pip install coverage==6.1.1 \
+    && pip install coverage==6.1.1
 
 # -----------------------------------------
 
