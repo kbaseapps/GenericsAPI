@@ -288,7 +288,7 @@ class DataUtil:
         """
         logging.info('Starting validating and saving object data')
 
-        obj_type = params.get('obj_type')
+        obj_type = params.get('obj_type').split('-')[0]
 
         module_name = obj_type.split('.')[0]
         type_name = obj_type.split('.')[1]
