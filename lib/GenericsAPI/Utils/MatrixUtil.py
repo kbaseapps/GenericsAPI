@@ -3144,7 +3144,7 @@ class MatrixUtil:
         # save collapsed matrix
         logging.info("Saving new collapsed matrix object")
         new_matrix_obj_ref = self.data_util.save_object({
-            'obj_type': input_matrix_info[2],
+            'obj_type': input_matrix_info[2].split('-')[0],
             'obj_name': new_matrix_name,
             'data': input_matrix_data,
             'workspace_id': workspace_id})['obj_ref']
