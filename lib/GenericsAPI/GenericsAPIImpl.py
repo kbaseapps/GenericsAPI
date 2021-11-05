@@ -33,7 +33,7 @@ class GenericsAPI:
     ######################################### noqa
     VERSION = "1.0.28"
     GIT_URL = "git@github.com:Tianhao-Gu/GenericsAPI.git"
-    GIT_COMMIT_HASH = "6d730aff7c90afbca00beb69eebc0d597d09ceaa"
+    GIT_COMMIT_HASH = "c51401384861ee62b7a87d86ab1e9f1c04c38ff1"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -372,9 +372,11 @@ class GenericsAPI:
            reference), parameter "workspace_id" of Long, parameter
            "new_matrix_name" of String, parameter "operations" of list of
            String, parameter "abundance_filtering_params" of mapping from
-           String to String, parameter "relative_abundance_params" of mapping
-           from String to String, parameter "standardization_params" of
-           mapping from String to String, parameter
+           String to String, parameter "ubiquity_filtering_params" of mapping
+           from String to String, parameter "normalization_params" of mapping
+           from String to String, parameter "relative_abundance_params" of
+           mapping from String to String, parameter "standardization_params"
+           of mapping from String to String, parameter
            "ratio_transformation_params" of mapping from String to String,
            parameter "log_params" of mapping from String to Double
         :returns: instance of type "TransformMatrixOutput" -> structure:
@@ -421,6 +423,37 @@ class GenericsAPI:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method transform_matrix_variable_specific return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def collapse_matrix(self, ctx, params):
+        """
+        :param params: instance of type "CollapseMatrixParams"
+           (taxonomy_field: name of attribute in matrix row attribute mapping
+           object taxonomy_rank: rank of taxonomy used to group taxa (row)
+           (one of ['Domain', 'Phylum', 'Class', 'Order', 'Family',
+           'Genus'])) -> structure: parameter "input_matrix_ref" of type
+           "obj_ref" (An X/Y/Z style reference), parameter "workspace_id" of
+           Long, parameter "workspace_name" of type "workspace_name"
+           (workspace name of the object), parameter "attri_mapping_ref" of
+           type "obj_ref" (An X/Y/Z style reference), parameter
+           "taxonomy_field" of String, parameter "taxonomy_rank" of String,
+           parameter "new_matrix_name" of String
+        :returns: instance of type "TransformMatrixOutput" -> structure:
+           parameter "report_name" of String, parameter "report_ref" of
+           String, parameter "new_matrix_obj_ref" of type "obj_ref" (An X/Y/Z
+           style reference)
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN collapse_matrix
+        returnVal = self.matrix_util.collapse_matrix(params)
+        #END collapse_matrix
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method collapse_matrix return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

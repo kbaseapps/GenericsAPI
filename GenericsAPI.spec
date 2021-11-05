@@ -280,6 +280,9 @@ module GenericsAPI {
       string new_matrix_name;
       list<string> operations;
       mapping<string, string> abundance_filtering_params;
+      mapping<string, string> ubiquity_filtering_params;
+      mapping<string, string> normalization_params;
+
       mapping<string, string> relative_abundance_params;
       mapping<string, string> standardization_params;
       mapping<string, string> ratio_transformation_params;
@@ -310,6 +313,21 @@ module GenericsAPI {
   } TransformMatrixVariableParams;
 
   funcdef transform_matrix_variable_specific (TransformMatrixVariableParams params) returns (TransformMatrixOutput returnVal) authentication required;
+
+  /* taxonomy_field: name of attribute in matrix row attribute mapping object
+     taxonomy_rank: rank of taxonomy used to group taxa (row) (one of ['Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus'])
+  */
+  typedef structure {
+      obj_ref input_matrix_ref;
+      int workspace_id;
+      workspace_name workspace_name;
+      obj_ref attri_mapping_ref;
+      string taxonomy_field;
+      string taxonomy_rank;
+      string new_matrix_name;
+  } CollapseMatrixParams;
+
+  funcdef collapse_matrix (CollapseMatrixParams params) returns (TransformMatrixOutput returnVal) authentication required;
 
   typedef structure {
     int num_rare_reps;

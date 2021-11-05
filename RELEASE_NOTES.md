@@ -3,6 +3,7 @@
 
 1.0.28
 add ubiquity filtering operation to the transform matrix app
+add collapse_matrix function to group similar taxa based on taxonomy
 
 1.0.27
 address community feedback for amplicon matrix uploader (update metadata for the data type)
