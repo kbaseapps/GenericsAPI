@@ -3094,7 +3094,10 @@ class MatrixUtil:
         for idx in df.index:
             taxonomy_str = taxonomy_row[idx].values[0]
             logging.info('Parsing taxonomy string: {} for taxa: {}'.format(taxonomy_str, idx))
-            delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
+            try:
+                delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
+            except Exception:
+                delimiter = ';'
             taxonomies = [x.strip() for x in taxonomy_str.split(delimiter)]
             taxonomies = ['unclassified' if not x else x for x in taxonomies]
             if len(taxonomies) < len(RANKS) + 1:
