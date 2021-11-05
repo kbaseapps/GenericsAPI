@@ -3096,6 +3096,11 @@ class MatrixUtil:
             logging.info('Parsing taxonomy string: {} for taxa: {}'.format(taxonomy_str, idx))
             delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
             taxonomies = [x.strip() for x in taxonomy_str.split(delimiter)]
+            taxonomies = ['unclassified' if not x else x for x in taxonomies]
+            if len(taxonomies) < len(RANKS) + 1:
+                missing_count = len(RANKS) + 1 - len(taxonomies)
+                for i in range(missing_count):
+                    taxonomies.insert(-1, 'unclassified')
             logging.info('Interpreted Taxonomy: {} with delimiter: {}'.format(
                 taxonomies, delimiter))
             taxonomy = taxonomies[taxonomy_level]

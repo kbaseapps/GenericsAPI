@@ -1066,10 +1066,11 @@ class MatrixUtilTest(unittest.TestCase):
 
         matrix_obj_data = self.dfu.get_objects({'object_refs': [new_obj_ref]})['data'][0]['data']
         matrix_data = matrix_obj_data['data']
-        expected_row_ids = ['Pseudomonadaceae', 'Burkholderiaceae', 'Comamonadaceae']
+        expected_row_ids = ['unclassified', 'Comamonadaceae', 'Pseudomonadaceae', 'Burkholderiaceae']
         self.assertCountEqual(expected_row_ids, matrix_data['row_ids'])
-        expected_values = [[2, 1, 2, 0, 0, 1],
-                           [5, 2, 1, 2, 3, 1],
-                           [0, 0, 1, 4, 2, 0]]
+        expected_values = [[5, 1, 1, 2, 3, 1],
+                           [0, 0, 1, 4, 2, 0],
+                           [2, 1, 1, 0, 0, 1],
+                           [0, 1, 1, 0, 0, 0]]
         self.assert_matrices_equal(expected_values, matrix_data['values'])
         self.assertTrue('row_attributemapping_ref' not in matrix_obj_data)
