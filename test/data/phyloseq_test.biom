@@ -6,8 +6,8 @@
      "generated_by": "QIIME revision XYZ",
      "date": "2011-12-19T19:00:00",
      "rows":[
-        {"id":"GG_OTU_1", "metadata":{"taxonomy":"Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Pseudomonadaceae;Pseudomonas;"}},
-        {"id":"GG_OTU_2", "metadata":{"taxonomy":"Bacteria;Proteobacteria;Gammaproteobacteria;Burkholderiales;Burkholderiaceae;Cupriavidus;"}},
+        {"id":"GG_OTU_1", "metadata":{"taxonomy":"Bacteria;"}},
+        {"id":"GG_OTU_2", "metadata":{"taxonomy":"Bacteria;WOR-1;;;;Genera Incertae Sedis;"}},
         {"id":"GG_OTU_3", "metadata":{"taxonomy":"Bacteria;Proteobacteria;Gammaproteobacteria;Burkholderiales;Comamonadaceae;Variovorax;"}},
         {"id":"GG_OTU_4", "metadata":{"taxonomy":"Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Pseudomonadaceae;Pseudomonas;"}},
         {"id":"GG_OTU_5", "metadata":{"taxonomy":"Bacteria;Proteobacteria;Gammaproteobacteria;Burkholderiales;Burkholderiaceae;Cupriavidus;"}}

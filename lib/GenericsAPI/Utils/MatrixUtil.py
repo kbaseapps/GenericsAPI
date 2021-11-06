@@ -3094,8 +3094,16 @@ class MatrixUtil:
         for idx in df.index:
             taxonomy_str = taxonomy_row[idx].values[0]
             logging.info('Parsing taxonomy string: {} for taxa: {}'.format(taxonomy_str, idx))
-            delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
+            try:
+                delimiter = csv.Sniffer().sniff(taxonomy_str).delimiter
+            except Exception:
+                delimiter = ';'
             taxonomies = [x.strip() for x in taxonomy_str.split(delimiter)]
+            taxonomies = ['unclassified' if not x else x for x in taxonomies]
+            if len(taxonomies) < len(RANKS) + 1:
+                missing_count = len(RANKS) + 1 - len(taxonomies)
+                for i in range(missing_count):
+                    taxonomies.insert(-1, 'unclassified')
             logging.info('Interpreted Taxonomy: {} with delimiter: {}'.format(
                 taxonomies, delimiter))
             taxonomy = taxonomies[taxonomy_level]
@@ -3136,7 +3144,7 @@ class MatrixUtil:
         # save collapsed matrix
         logging.info("Saving new collapsed matrix object")
         new_matrix_obj_ref = self.data_util.save_object({
-            'obj_type': input_matrix_info[2],
+            'obj_type': input_matrix_info[2].split('-')[0],
             'obj_name': new_matrix_name,
             'data': input_matrix_data,
             'workspace_id': workspace_id})['obj_ref']

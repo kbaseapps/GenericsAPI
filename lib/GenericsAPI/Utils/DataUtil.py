@@ -288,7 +288,7 @@ class DataUtil:
         """
         logging.info('Starting validating and saving object data')
 
-        obj_type = params.get('obj_type')
+        obj_type = params.get('obj_type').split('-')[0]
 
         module_name = obj_type.split('.')[0]
         type_name = obj_type.split('.')[1]
@@ -326,6 +326,7 @@ class DataUtil:
         for data_name in int_data_names:
             if data_name in data:
                 try:
+                    logging.info('Casting {} to int'.format(data_name))
                     data[data_name] = int(data[data_name])
                 except Exception as e:
                     err_msg = 'Unexpected data type {}. '.format(data_name)
@@ -339,6 +340,7 @@ class DataUtil:
         for data_name in float_data_names:
             if data_name in data:
                 try:
+                    logging.info('Casting {} to float'.format(data_name))
                     data[data_name] = float(data[data_name])
                 except Exception as e:
                     err_msg = 'Unexpected data type {}. '.format(data_name)
