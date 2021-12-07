@@ -6,15 +6,16 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-# RUN echo "start building docker image"
+RUN cat /etc/os-release
 
 # R related installations
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FCAE2A0E115C3D8A
+# RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FCAE2A0E115C3D8A
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7'
 RUN echo 'deb https://cloud.r-project.org/bin/linux/debian stretch-cran35/' >> /etc/apt/sources.list
 
 RUN apt-get update --fix-missing
 RUN apt-get install -y gcc wget
-RUN apt-get install -y --allow-unauthenticated r-base r-base-dev
+RUN apt-get install -y r-base r-base-dev
 
 
 RUN cp /usr/bin/R /kb/deployment/bin/.
