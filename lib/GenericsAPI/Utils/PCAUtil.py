@@ -728,11 +728,6 @@ class PCAUtil:
         else:
             raise ValueError('Unexpected dimension')
 
-        # if not attribute_mapping:
-        #     if (color_marker_by and color_marker_by.get('attribute_color')[0]) or \
-        #        (scale_size_by and scale_size_by.get('attribute_size')[0]):
-        #         raise ValueError('Matrix object is not associated with any {} attribute mapping'.format(dimension))
-
         return obj_data
 
     def __init__(self, config):

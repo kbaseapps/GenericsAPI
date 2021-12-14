@@ -332,12 +332,8 @@ class PCAUtilTest(unittest.TestCase):
         params = {'input_obj_ref': expr_matrix_ref,
                   'workspace_name': self.wsName,
                   'pca_matrix_name': 'test_pca_matrix_obj',
-                  'scale_size_by': {
-                        "attribute_size": ["test_attribute_1"]
-                    },
-                  'color_marker_by': {
-                        "attribute_color": ["test_attribute_2"]
-                    },
+                  'scale_size_by': {"attribute_size": ["test_attribute_1"]},
+                  'color_marker_by': {"attribute_color": ["test_attribute_2"]},
                   'n_components': 3,
                   'dimension': 'row'}
 
@@ -357,7 +353,8 @@ class PCAUtilTest(unittest.TestCase):
         self.assertEqual(len(pca_matrix_data.get('explained_variance_ratio')), 3)
 
         expected_row_ids = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
-        expected_col_ids = ['principal_component_1', 'principal_component_2', 'principal_component_3']
+        expected_col_ids = ['principal_component_1', 'principal_component_2',
+                            'principal_component_3']
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['row_ids'], expected_row_ids)
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['col_ids'], expected_col_ids)
 
@@ -371,12 +368,8 @@ class PCAUtilTest(unittest.TestCase):
                   'workspace_name': self.wsName,
                   'pca_matrix_name': 'test_pca_matrix_obj',
                   'associated_matrix_obj_ref': asso_matrix_ref,
-                  'scale_size_by': {
-                        'row_size': ['WRI_RS00010_CDS_1']
-                    },
-                  'color_marker_by': {
-                        "attribute_color": ["test_attribute_2"]
-                    },
+                  'scale_size_by': {'row_size': ['WRI_RS00010_CDS_1']},
+                  'color_marker_by': {"attribute_color": ["test_attribute_2"]},
                   'n_components': 3,
                   'dimension': 'col'}
 
@@ -396,7 +389,8 @@ class PCAUtilTest(unittest.TestCase):
         self.assertEqual(len(pca_matrix_data.get('explained_variance_ratio')), 3)
 
         expected_row_ids = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
-        expected_col_ids = ['principal_component_1', 'principal_component_2', 'principal_component_3']
+        expected_col_ids = ['principal_component_1', 'principal_component_2',
+                            'principal_component_3']
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['row_ids'], expected_row_ids)
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['col_ids'], expected_col_ids)
 
