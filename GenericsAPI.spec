@@ -596,6 +596,7 @@ module GenericsAPI {
     string dimension;
     int n_components;
     obj_ref attribute_mapping_obj_ref;
+    obj_ref associated_matrix_obj_ref;
     mapping<string, string> scale_size_by;
     mapping<string, string> color_marker_by;
   } PCAParams;

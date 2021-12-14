@@ -116,8 +116,9 @@ class PCAUtilTest(unittest.TestCase):
         return PCAUtilTest().test_shock
 
     def loadExpressionMatrix(self):
-        if hasattr(self.__class__, 'expr_matrix_ref'):
-            return self.__class__.expr_matrix_ref
+        if hasattr(self.__class__, 'expr_matrix_ref') and hasattr(self.__class__,
+                                                                  'asso_matrix_ref'):
+            return self.__class__.expr_matrix_ref, self.__class__.asso_matrix_ref
 
         # matrix_file_name = 'test_import.xlsx'
         col_attribute = {'attributes': [{'attribute': 'test_attribute_1',
@@ -219,7 +220,50 @@ class PCAUtilTest(unittest.TestCase):
 
         self.__class__.expr_matrix_ref = expr_matrix_ref
         print('Loaded ExpressionMatrix: ' + expr_matrix_ref)
-        return expr_matrix_ref
+
+        # load associated matrix
+        matrix_data = {'attributes': {'Instrument': 'Old Faithful',
+                                      'Scientist': 'Marie Currie'},
+                       'col_attributemapping_ref': col_attributemapping_ref,
+                       'col_mapping': {'instance_1': 'instance_1',
+                                       'instance_2': 'instance_2',
+                                       'instance_3': 'instance_3',
+                                       'instance_4': 'instance_4'},
+                       'col_normalization': 'test_col_normalization',
+                       'data': {'col_ids': ['instance_1', 'instance_2', 'instance_3',
+                                            'instance_4'],
+                                'row_ids': ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1',
+                                            'WRI_RS00025_CDS_1', 'WRI_RS00030_CDS_1',
+                                            'WRI_RS00035_CDS_1'],
+                                'values': [[0.1, 0.2, 0.3, 0.4],
+                                           [0.5, 0.6, 0.7, 0.8],
+                                           [0.9, 1, 1.1, 1.2],
+                                           [0.9, 1, 1.1, 1.2],
+                                           [0.9, 1, 1.1, 1.2]]},
+                       'description': 'test_desc',
+                       'row_attributemapping_ref': row_attributemapping_ref,
+                       'row_mapping': {'WRI_RS00010_CDS_1': 'WRI_RS00010_CDS_1',
+                                       'WRI_RS00015_CDS_1': 'WRI_RS00015_CDS_1',
+                                       'WRI_RS00025_CDS_1': 'WRI_RS00025_CDS_1',
+                                       'WRI_RS00030_CDS_1': 'WRI_RS00030_CDS_1',
+                                       'WRI_RS00035_CDS_1': 'WRI_RS00035_CDS_1'},
+                       'row_normalization': 'test_row_normalization',
+                       'scale': 'log2',
+                       'search_attributes': ['Scientist | Marie Currie',
+                                             'Instrument | Old Faithful']}
+
+        info = self.dfu.save_objects({
+            'id': self.wsId,
+            'objects': [{'type': 'KBaseMatrices.ExpressionMatrix',
+                         'data': matrix_data,
+                         'name': 'test_associated_ExpressionMatrix'}]})[0]
+
+        asso_matrix_ref = "%s/%s/%s" % (info[6], info[0], info[4])
+
+        self.__class__.asso_matrix_ref = asso_matrix_ref
+        print('Loaded Associated ExpressionMatrix: ' + asso_matrix_ref)
+
+        return expr_matrix_ref, asso_matrix_ref
 
     def loadPCAMatrix(self):
 
@@ -283,17 +327,13 @@ class PCAUtilTest(unittest.TestCase):
     def test_run_pca_ok(self, file_to_shock):
         self.start_test()
 
-        expr_matrix_ref = self.loadExpressionMatrix()
+        expr_matrix_ref, asso_matrix_ref = self.loadExpressionMatrix()
 
         params = {'input_obj_ref': expr_matrix_ref,
                   'workspace_name': self.wsName,
                   'pca_matrix_name': 'test_pca_matrix_obj',
-                  'scale_size_by': {
-                        "attribute_size": ["test_attribute_1"]
-                    },
-                  'color_marker_by': {
-                        "attribute_color": ["test_attribute_2"]
-                    },
+                  'scale_size_by': {"attribute_size": ["test_attribute_1"]},
+                  'color_marker_by': {"attribute_color": ["test_attribute_2"]},
                   'n_components': 3,
                   'dimension': 'row'}
 
@@ -313,7 +353,44 @@ class PCAUtilTest(unittest.TestCase):
         self.assertEqual(len(pca_matrix_data.get('explained_variance_ratio')), 3)
 
         expected_row_ids = ['WRI_RS00010_CDS_1', 'WRI_RS00015_CDS_1', 'WRI_RS00025_CDS_1']
-        expected_col_ids = ['principal_component_1', 'principal_component_2', 'principal_component_3']
+        expected_col_ids = ['principal_component_1', 'principal_component_2',
+                            'principal_component_3']
+        self.assertCountEqual(pca_matrix_data['rotation_matrix']['row_ids'], expected_row_ids)
+        self.assertCountEqual(pca_matrix_data['rotation_matrix']['col_ids'], expected_col_ids)
+
+    @patch.object(DataFileUtil, "file_to_shock", side_effect=mock_file_to_shock)
+    def test_run_pca_size_by_asso_matrix_ok(self, file_to_shock):
+        self.start_test()
+
+        expr_matrix_ref, asso_matrix_ref = self.loadExpressionMatrix()
+
+        params = {'input_obj_ref': expr_matrix_ref,
+                  'workspace_name': self.wsName,
+                  'pca_matrix_name': 'test_pca_matrix_obj',
+                  'associated_matrix_obj_ref': asso_matrix_ref,
+                  'scale_size_by': {'row_size': ['WRI_RS00010_CDS_1']},
+                  'color_marker_by': {"attribute_color": ["test_attribute_2"]},
+                  'n_components': 3,
+                  'dimension': 'col'}
+
+        ret = self.getImpl().run_pca(self.ctx, params)[0]
+
+        self.assertTrue('report_name' in ret)
+        self.assertTrue('report_ref' in ret)
+        self.assertTrue('pca_ref' in ret)
+
+        pca_matrix_ref = ret.get('pca_ref')
+
+        pca_matrix_data = self.dfu.get_objects(
+                    {"object_refs": [pca_matrix_ref]})['data'][0]['data']
+
+        self.assertTrue('explained_variance_ratio' in pca_matrix_data)
+        self.assertTrue('rotation_matrix' in pca_matrix_data)
+        self.assertEqual(len(pca_matrix_data.get('explained_variance_ratio')), 3)
+
+        expected_row_ids = ['instance_1', 'instance_2', 'instance_3', 'instance_4']
+        expected_col_ids = ['principal_component_1', 'principal_component_2',
+                            'principal_component_3']
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['row_ids'], expected_row_ids)
         self.assertCountEqual(pca_matrix_data['rotation_matrix']['col_ids'], expected_col_ids)
 
