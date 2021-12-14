@@ -328,53 +328,86 @@ class PCAUtil:
 
         return plot_pca_matrix
 
-    def _build_size_pca_matrix(self, plot_pca_matrix, obj_data, dimension, attribute_name):
+    def _build_size_pca_matrix(self, plot_pca_matrix, obj_data, dimension, scale_size_by,
+                               associated_matrix_obj_ref):
         """
         _build_size_pca_matrix: append attribute value to rotation_matrix
         """
-        logging.info('appending attribute value for sizing to rotation matrix')
 
         plot_pca_matrix = plot_pca_matrix.copy()
 
-        if dimension == 'row':
-            attribute_mapping = obj_data.get('row_mapping')
-            attribute_mapping_ref = obj_data.get('row_attributemapping_ref')
-        elif dimension == 'col':
-            attribute_mapping = obj_data.get('col_mapping')
-            attribute_mapping_ref = obj_data.get('col_attributemapping_ref')
+        if associated_matrix_obj_ref is not None:
+            logging.info('appending matrix value for sizing to the rotation matrix')
+            matrix_obj = self.dfu.get_objects({
+                        'object_refs': [associated_matrix_obj_ref]})['data'][0]['data']
+            matrix_data = matrix_obj['data']
+
+            size_data = list()
+            if dimension == 'col':
+                scale_row_by = scale_size_by['row_size'][0]
+                size_index = matrix_data['row_ids'].index(scale_row_by)
+                for sample in plot_pca_matrix.index:
+                    if sample in matrix_data['col_ids']:
+                        idx = matrix_data['col_ids'].index(sample)
+                        size_data.append(matrix_data['values'][size_index][idx])
+                    else:
+                        size_data.append(None)
+            else:
+                scale_col_by = scale_size_by['col_size'][0]
+                size_index = matrix_data['col_ids'].index(scale_col_by)
+                for sample in plot_pca_matrix.index:
+                    if sample in matrix_data['row_ids']:
+                        idx = matrix_data['row_ids'].index(sample)
+                        size_data.append(matrix_data['values'][idx][size_index])
+                    else:
+                        size_data.append(None)
+
+            logging.info('generated size data: {}'.format(size_data))
+            plot_pca_matrix['attribute_value_size'] = size_data
         else:
-            raise ValueError('Unexpected dimension')
+            logging.info('appending attribute value for sizing to the rotation matrix')
 
-        if not attribute_mapping:
-            logging.warning('Matrix object does not have {}_mapping attribute'.format(dimension))
-            # build matrix with unify color and shape
-            return plot_pca_matrix
-        else:
-            # append instance col mapping from row/col_mapping
-            plot_pca_matrix['instance'] = plot_pca_matrix.index.map(attribute_mapping)
+            attribute_name = scale_size_by.get('attribute_size')[0]
+            if dimension == 'row':
+                attribute_mapping = obj_data.get('row_mapping')
+                attribute_mapping_ref = obj_data.get('row_attributemapping_ref')
+            elif dimension == 'col':
+                attribute_mapping = obj_data.get('col_mapping')
+                attribute_mapping_ref = obj_data.get('col_attributemapping_ref')
+            else:
+                raise ValueError('Unexpected dimension')
 
-        res = self.dfu.get_objects({'object_refs': [attribute_mapping_ref]})['data'][0]
-        attri_data = res['data']
-        attri_name = res['info'][1]
+            if not attribute_mapping:
+                logging.warning('Matrix object does not have {}_mapping attribute'.format(
+                    dimension))
+                # build matrix with unify color and shape
+                return plot_pca_matrix
+            else:
+                # append instance col mapping from row/col_mapping
+                plot_pca_matrix['instance'] = plot_pca_matrix.index.map(attribute_mapping)
 
-        attributes = attri_data.get('attributes')
+            res = self.dfu.get_objects({'object_refs': [attribute_mapping_ref]})['data'][0]
+            attri_data = res['data']
+            attri_name = res['info'][1]
 
-        attr_pos = None
-        for idx, attribute in enumerate(attributes):
-            if attribute.get('attribute') == attribute_name:
-                attr_pos = idx
-                break
+            attributes = attri_data.get('attributes')
 
-        if attr_pos is None:
-            raise ValueError('Cannot find attribute [{}] in [{}]'.format(attribute_name,
-                                                                         attri_name))
+            attr_pos = None
+            for idx, attribute in enumerate(attributes):
+                if attribute.get('attribute') == attribute_name:
+                    attr_pos = idx
+                    break
 
-        instances = attri_data.get('instances')
+            if attr_pos is None:
+                raise ValueError('Cannot find attribute [{}] in [{}]'.format(attribute_name,
+                                                                             attri_name))
 
-        plot_pca_matrix['attribute_value_size'] = None
-        for instance_name, attri_values in instances.items():
-            plot_pca_matrix.loc[plot_pca_matrix.instance == instance_name,
-                                ['attribute_value_size']] = attri_values[attr_pos]
+            instances = attri_data.get('instances')
+
+            plot_pca_matrix['attribute_value_size'] = None
+            for instance_name, attri_values in instances.items():
+                plot_pca_matrix.loc[plot_pca_matrix.instance == instance_name,
+                                    ['attribute_value_size']] = attri_values[attr_pos]
 
         return plot_pca_matrix
 
@@ -695,10 +728,10 @@ class PCAUtil:
         else:
             raise ValueError('Unexpected dimension')
 
-        if not attribute_mapping:
-            if (color_marker_by and color_marker_by.get('attribute_color')[0]) or \
-               (scale_size_by and scale_size_by.get('attribute_size')[0]):
-                raise ValueError('Matrix object is not associated with any {} attribute mapping'.format(dimension))
+        # if not attribute_mapping:
+        #     if (color_marker_by and color_marker_by.get('attribute_color')[0]) or \
+        #        (scale_size_by and scale_size_by.get('attribute_size')[0]):
+        #         raise ValueError('Matrix object is not associated with any {} attribute mapping'.format(dimension))
 
         return obj_data
 
@@ -772,7 +805,8 @@ class PCAUtil:
         if params.get('scale_size_by'):
             plot_pca_matrix = self._build_size_pca_matrix(
                                             plot_pca_matrix, obj_data, dimension,
-                                            params.get('scale_size_by').get('attribute_size')[0])
+                                            params.get('scale_size_by'),
+                                            params.get('associated_matrix_obj_ref'))
 
         returnVal = {'pca_ref': pca_ref}
 

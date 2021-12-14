@@ -50,6 +50,14 @@ parameters :
         long-hint  : |
             Select associated KBaseExperiments.AttributeMapping object
 
+    associated_matrix_obj_ref:
+        ui-name: |
+            Associated Matrix Object
+        short-hint: |
+            Associated Matrix object used to group and size result marker
+        long-hint: |
+            Associated Matrix object used to group and size result marker
+
     attribute_color:
         ui-name: |
             Attribute
@@ -65,6 +73,23 @@ parameters :
             Select an attribute for plot sizing
         long-hint  : |
             Select an attribute for plot sizing
+
+    row_size:
+        ui-name: |
+            Associated Matrix Row
+        short-hint: |
+            Select a row from associated matrix for plot sizing (valid when perform MDS on Column)
+        long-hint: |
+            Select a row from associated matrix for plot sizing (valid when perform MDS on Column)
+
+    col_size:
+        ui-name: |
+            Associated Matrix Column
+        short-hint: |
+            Select a column from associated matrix for plot sizing (valid when perform MDS on Row)
+        long-hint: |
+            Select a column from associated matrix for plot sizing (valid when perform MDS on Row)
+
 
     pca_matrix_name:
         ui-name: |
