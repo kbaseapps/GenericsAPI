@@ -1367,10 +1367,10 @@ class MatrixUtil:
                     raise ValueError(
                         'Cannot parse file. Please provide valide tsv, excel or csv file')
 
-        dup_col = df.columns.str.match('.*\.\d')
+        dup_col = df.columns.str.match(r'.*\.\d')
         if dup_col.any():
             logging.warning('Found possible duplicate headers: {}'.format(
-                df.loc[:, dup_col].columns.str.replace('\.\d+', '').to_list()))
+                df.loc[:, dup_col].columns.str.replace(r'\.\d+', '').to_list()))
 
         # remove NaN indexed rows
         df = df[df.index.notnull()]
