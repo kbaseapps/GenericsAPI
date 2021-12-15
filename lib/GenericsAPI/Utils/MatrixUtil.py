@@ -1351,13 +1351,13 @@ class MatrixUtil:
         try:
             df = pd.read_excel(file_path, sheet_name='data', index_col=0)
 
-        except XLRDError:
+        except Exception:
             try:
                 df = pd.read_excel(file_path, index_col=0)
                 logging.warning('WARNING: A sheet named "data" was not found in the attached file,'
                                 ' proceeding with the first sheet as the data sheet.')
 
-            except XLRDError:
+            except Exception:
 
                 try:
                     reader = pd.read_csv(file_path, sep=None, iterator=True)
