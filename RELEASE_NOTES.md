@@ -2,7 +2,7 @@
 =========================================
 1.0.29
 add link associate matrix object feature for PCA app
-fix duplicate column header for matrix importer
+add warning message in case of duplicate column header for matrix importer
 
 1.0.28
 add ubiquity filtering operation to the transform matrix app
