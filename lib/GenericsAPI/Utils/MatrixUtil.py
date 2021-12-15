@@ -1351,13 +1351,13 @@ class MatrixUtil:
         try:
             df = pd.read_excel(file_path, sheet_name='data', index_col=0)
 
-        except XLRDError:
+        except Exception:
             try:
                 df = pd.read_excel(file_path, index_col=0)
                 logging.warning('WARNING: A sheet named "data" was not found in the attached file,'
                                 ' proceeding with the first sheet as the data sheet.')
 
-            except XLRDError:
+            except Exception:
 
                 try:
                     reader = pd.read_csv(file_path, sep=None, iterator=True)
@@ -1366,6 +1366,11 @@ class MatrixUtil:
                 except Exception:
                     raise ValueError(
                         'Cannot parse file. Please provide valide tsv, excel or csv file')
+
+        dup_col = df.columns.str.match(r'.*\.\d')
+        if dup_col.any():
+            logging.warning('Found possible duplicate headers: {}'.format(
+                df.loc[:, dup_col].columns.str.replace(r'\.\d+', '').to_list()))
 
         # remove NaN indexed rows
         df = df[df.index.notnull()]
