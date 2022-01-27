@@ -1,7 +1,8 @@
 # GenericsAPI release notes
 =========================================
+
 1.0.29
-* updated the PCA app including the ability to link different type of metrices and size observations by values in the associated matrix
+* updated the PCA app including the ability to link different types of matrices and size observations by values in the associated matrix
 * added warning message in case of duplicate column header for matrix importer
 
 1.0.28
