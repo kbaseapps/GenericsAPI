@@ -1,4 +1,4 @@
-TARGET_TESTS = . #PCAUtil_test.py NetworkUtil_test.py
+TARGET_TESTS = PCAUtil_test.py
 SERVICE = genericsapi
 SERVICE_CAPS = GenericsAPI
 SPEC_FILE = GenericsAPI.spec

@@ -1,6 +1,9 @@
 # GenericsAPI release notes
 =========================================
 
+1.0.30
+* bug fix transform_matrix_variable_specific when input variables is a string type
+
 1.0.29
 * updated the PCA app including the ability to link different types of matrices and size observations by values in the associated matrix
 * added warning message in case of duplicate column header for matrix importer
