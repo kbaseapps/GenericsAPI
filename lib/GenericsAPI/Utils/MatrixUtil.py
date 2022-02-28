@@ -2663,6 +2663,10 @@ class MatrixUtil:
         dimension = params.get('dimension', 'row')
         variables = params.get('variables', list())
 
+        if type(variables) == str:
+            logging.info('casting variables "{}" to list'.format(variables))
+            variables = variables.split(',')
+
         if dimension not in ['col', 'row']:
             raise ValueError('Please use "col" or "row" for input dimension')
 
