@@ -13,7 +13,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: pip install flake8 lintly
-      - uses: grantmcconnaughey/lintly-flake8-github-action
+      - uses: grantmcconnaughey/lintly-flake8-github-action@f2dd9eb
         with:
           # The GitHub API token to create reviews with
           token: ${{ secrets.GITHUB_TOKEN }}
