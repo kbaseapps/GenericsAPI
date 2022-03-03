@@ -12,7 +12,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies
-        run: pip install flake8 lintly markupsafe
+        run: pip install flake8 lintly markupsafe=2.1.0
       - uses: grantmcconnaughey/lintly-flake8-github-action@f2dd9ebeaba3114275c7d5ad958658782a52d3db
         with:
           # The GitHub API token to create reviews with
